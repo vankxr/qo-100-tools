@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="9.5.2">
+<eagle version="9.6.1">
 <drawing>
 <settings>
-<setting alwaysvectorfont="no"/>
+<setting alwaysvectorfont="yes"/>
 <setting verticaltext="up"/>
 </settings>
 <grid distance="0.5" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.1" altunitdist="mm" altunit="mm"/>
@@ -335,7 +335,7 @@
 <wire x1="2.475" y1="-2.96" x2="-2.475" y2="-2.96" width="0.127" layer="51"/>
 <wire x1="-2.475" y1="-4.065" x2="-2.475" y2="-2.96" width="0.127" layer="51"/>
 <wire x1="2.475" y1="-4.065" x2="2.475" y2="-2.96" width="0.127" layer="51"/>
-<circle x="2.2" y="-1.6" radius="0.4242625" width="0" layer="51"/>
+<circle x="2.2" y="-1.6" radius="0.4242625" width="0" layer="21"/>
 <smd name="3@1" x="-5.3" y="0" dx="2.4" dy="3.38" layer="1"/>
 <smd name="1" x="0" y="-3.7" dx="2.4" dy="6.55" layer="1" rot="R90"/>
 <smd name="3@0" x="5.3" y="0" dx="2.4" dy="3.38" layer="1" rot="R180"/>
