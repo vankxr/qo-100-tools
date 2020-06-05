@@ -1,11 +1,11 @@
 <Qucs Schematic 0.0.19>
 <Properties>
-  <View=-602,3,2303,2099,0.620922,0,0>
+  <View=102,-768,2997,2083,0.564474,0,0>
   <Grid=10,10,0>
   <DataSet=pa-lpf-simulation.dat>
   <DataDisplay=pa-lpf-simulation.sch>
   <OpenDisplay=1>
-  <Script=5g_filter.m>
+  <Script=pa-lpf-simulation.m>
   <RunScript=0>
   <showFrame=0>
   <FrameText0=Title>
@@ -20,11 +20,13 @@
 <Wires>
 </Wires>
 <Diagrams>
-  <Rect -537 1376 2431 1353 3 #c0c0c0 1 00 0 1e+09 2.5e+08 1e+10 1 -120.719 5 16.5304 1 -1 0.1 1 315 0 225 "" "" "">
-	<"gain" #0000ff 0 3 0 0 0>
-	  <Mkr 2.43129e+09 300 -1311 3 0 0>
-	  <Mkr 4.80416e+09 1138 -796 3 0 0>
-	  <Mkr 7.17343e+09 1748 -825 3 0 0>
+  <Rect 220 718 2601 1458 3 #c0c0c0 1 00 1 0 2e+08 1e+10 1 -70 2 6.32553 1 -1 0.1 1 315 0 225 "" "" "">
+	<"S21_dB" #0000ff 0 3 0 0 0>
+	  <Mkr 2.39009e+09 731 -1408 3 0 0>
+	  <Mkr 7.20424e+09 1594 -1188 3 0 0>
+	  <Mkr 4.79817e+09 1288 -987 3 0 0>
+	  <Mkr 3.06355e+09 927 -1377 3 0 0>
+	<"S11_dB" #ff0000 0 3 0 0 0>
   </Rect>
 </Diagrams>
 <Paintings>

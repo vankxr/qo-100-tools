@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="9.6.1">
+<eagle version="9.5.2">
 <drawing>
 <settings>
-<setting alwaysvectorfont="yes"/>
+<setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.5" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.1" altunitdist="mm" altunit="mm"/>
+<grid distance="0.25" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.1" altunitdist="mm" altunit="mm"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="16" fill="1" visible="no" active="no"/>
@@ -196,19 +196,20 @@
 <wire x1="72" y1="0" x2="75" y2="3" width="0" layer="20" curve="90"/>
 <wire x1="75" y1="3" x2="75" y2="45" width="0" layer="20"/>
 <wire x1="75" y1="45" x2="72" y2="48" width="0" layer="20" curve="90"/>
-<hole x="3" y="45" drill="3"/>
-<circle x="3" y="45" radius="2.5" width="0" layer="39"/>
-<hole x="3" y="3" drill="3"/>
-<circle x="3" y="3" radius="2.5" width="0" layer="39"/>
-<hole x="72" y="3" drill="3"/>
-<circle x="72" y="3" radius="2.5" width="0" layer="39"/>
-<hole x="72" y="45" drill="3"/>
-<circle x="72" y="45" radius="2.5" width="0" layer="39"/>
 <text x="28.8" y="46.3" size="1.016" layer="21" font="vector" ratio="15" align="center-right">AUTO</text>
 <text x="33" y="46.3" size="1.016" layer="21" font="vector" ratio="15" rot="R180" align="center-right">ON</text>
 <text x="30.9" y="45" size="1.016" layer="21" font="vector" ratio="15" align="top-center">BIAS</text>
 <text x="66.4" y="33.6" size="2.54" layer="21" font="vector" ratio="10" rot="R90" align="center">-</text>
 <text x="66.4" y="38.5" size="2.54" layer="21" font="vector" ratio="10" rot="R90" align="center">+</text>
+<text x="2.5" y="20.5" size="1.016" layer="21" font="vector" ratio="12" rot="SR270" align="center-right">RF IN
++30 dBm</text>
+<text x="72.5" y="20.5" size="1.016" layer="21" font="vector" ratio="12" rot="SR90" align="center-left">RF OUT
++43 dBm</text>
+<text x="63" y="43.5" size="1.016" layer="21" font="vector" ratio="12" rot="SR0" align="center">DC IN
+Max. 28 V</text>
+<text x="16.5" y="2.4" size="1.016" layer="21" font="vector" ratio="12" rot="SR0" align="center">IcyRadio PA v1
+May 2020</text>
+<rectangle x1="35" y1="9" x2="39" y2="19" layer="30"/>
 </plain>
 <libraries>
 <library name="Capacitor">
@@ -1201,25 +1202,21 @@ design rules under a new name.</description>
 </element>
 <element name="C12" library="Capacitor" package="CAP0603" value="0.5pF" x="24.8" y="13.18" smashed="yes" rot="R270">
 <attribute name="NAME" x="23.8736" y="15.416" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
-<attribute name="REF" value="GJM0225C1CR50BB01" x="24.8" y="13.18" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VALUE" x="22.768" y="16.1264" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="-27.27" y="-37.62" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
-<element name="C13" library="Capacitor" package="CAP0603" value="12pF" x="31.9" y="24.4" smashed="yes" rot="R180">
-<attribute name="NAME" x="33.7536" y="24.416" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
-<attribute name="REF" value="GQM1875C2E120GB12" x="31.9" y="24.4" size="1.778" layer="27" rot="R180" display="off"/>
+<element name="C13" library="Capacitor" package="CAP0603" value="2.2pF" x="31.9" y="24.4" smashed="yes" rot="R180">
+<attribute name="NAME" x="28.2536" y="24.416" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="34.8464" y="26.432" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="-23.98" y="76.47" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
 <element name="C14" library="Capacitor" package="CAP0603" value="5.6pF" x="27.7" y="14" smashed="yes">
 <attribute name="NAME" x="26.1536" y="12.616" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
-<attribute name="REF" value="GQM1875C2E5R6CB12" x="27.7" y="14" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="24.7536" y="11.968" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="42.94" y="-43.15" size="1.778" layer="27" display="off"/>
 </element>
 <element name="C16" library="Capacitor" package="CAP0603" value="2.2pF" x="49.3" y="18.9" smashed="yes" rot="R90">
 <attribute name="NAME" x="49.284" y="20.7536" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
-<attribute name="REF" value="GQM1875C2E2R2BB12" x="49.3" y="18.9" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VALUE" x="51.332" y="15.9536" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="106.45" y="44.3" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
@@ -1230,19 +1227,16 @@ design rules under a new name.</description>
 </element>
 <element name="C18" library="Capacitor" package="CAP0603" value="1.8pF" x="49.3" y="9.1" smashed="yes" rot="R270">
 <attribute name="NAME" x="49.284" y="5.4536" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
-<attribute name="REF" value="GQM1875C2E1R8BB12" x="49.3" y="9.1" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VALUE" x="47.268" y="12.0464" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="-7.85" y="-21.38" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="C20" library="Capacitor" package="CAP0603" value="12pF" x="50.2" y="14" smashed="yes">
 <attribute name="NAME" x="50.0536" y="15.416" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
-<attribute name="REF" value="GQM1875C2E120GB12" x="50.2" y="14" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="47.2536" y="11.968" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="85.76" y="-43.15" size="1.778" layer="27" display="off"/>
 </element>
 <element name="C22" library="Capacitor" package="CAP0603" value="1.2pF" x="53.4" y="13.18" smashed="yes" rot="R270">
 <attribute name="NAME" x="52.4736" y="15.416" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
-<attribute name="REF" value="GQM1875C2E1R2BB12" x="53.4" y="13.18" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VALUE" x="51.368" y="16.1264" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="-3.75" y="-27.46" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
@@ -1273,7 +1267,6 @@ design rules under a new name.</description>
 </element>
 <element name="C6" library="Capacitor" package="CAP0603" value="12pF" x="15.2" y="14" smashed="yes">
 <attribute name="NAME" x="15.7536" y="12.616" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
-<attribute name="REF" value="GQM1875C2E120GB12" x="15.2" y="14" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="12.2536" y="11.968" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="45.68" y="-38.07" size="1.778" layer="27" display="off"/>
 </element>
@@ -1282,9 +1275,8 @@ design rules under a new name.</description>
 <attribute name="VALUE" x="34.8464" y="33.632" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="-3.66" y="83.67" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
-<element name="C10" library="Capacitor" package="CAP0603" value="20pF" x="31.9" y="26.2" smashed="yes" rot="R180">
-<attribute name="NAME" x="33.7536" y="26.216" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
-<attribute name="REF" value="GQM1875C2E200GB12" x="31.9" y="26.2" size="1.778" layer="27" rot="R180" display="off"/>
+<element name="C10" library="Capacitor" package="CAP0603" value="12pF" x="31.9" y="26.2" smashed="yes" rot="R180">
+<attribute name="NAME" x="28.2536" y="26.216" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="34.8464" y="28.232" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="-8.74" y="78.27" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
@@ -1294,7 +1286,7 @@ design rules under a new name.</description>
 <element name="F1" library="PTC Fuses" package="1206" value="" x="53.5" y="44.4" smashed="yes">
 <attribute name="HOLD" value="2A" x="106.84" y="-11.48" size="1.778" layer="27" display="off"/>
 <attribute name="NAME" x="55.03" y="46.27" size="0.8" layer="25" font="vector" ratio="10" align="center-left"/>
-<attribute name="TRIP" value="4A" x="106.84" y="-11.48" size="1.778" layer="27" display="off"/>
+<attribute name="TRIP" value="3.5A" x="106.84" y="-11.48" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="52.23" y="41.76" size="1.27" layer="27"/>
 </element>
 <element name="Q1" library="Ampleon" package="SOT1483-1" value="BLP9G0722-20G" x="37" y="14" smashed="yes" rot="R90">
@@ -1361,15 +1353,13 @@ design rules under a new name.</description>
 <attribute name="VALUE" x="42.4956" y="37.963" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VOLTAGE" value="50V" x="45.95" y="41.9" size="1.778" layer="27" display="off"/>
 </element>
-<element name="C8" library="Capacitor" package="CAP0603" value="43pF" x="31.9" y="28" smashed="yes" rot="R180">
+<element name="C8" library="Capacitor" package="CAP0603" value="47pF" x="31.9" y="28" smashed="yes" rot="R180">
 <attribute name="NAME" x="33.7536" y="28.016" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
-<attribute name="REF" value="GQM1875C2E430GB12" x="31.9" y="28" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="VALUE" x="34.8464" y="30.032" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="31.9" y="28" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
-<element name="C7" library="Capacitor" package="CAP0603" value="62pF" x="31.9" y="29.8" smashed="yes" rot="R180">
+<element name="C7" library="Capacitor" package="CAP0603" value="100pF" x="31.9" y="29.8" smashed="yes" rot="R180">
 <attribute name="NAME" x="33.7536" y="29.816" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
-<attribute name="REF" value="GQM1875C2E620GB12" x="31.9" y="29.8" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="VALUE" x="34.8464" y="31.832" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="31.9" y="29.8" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
@@ -1383,27 +1373,23 @@ design rules under a new name.</description>
 <attribute name="NAME" x="42" y="19.9" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
 <attribute name="REF" value="1111SQ-39N" x="44.3" y="19.1" size="0.8" layer="27" font="vector" ratio="10" rot="R90" display="off"/>
 </element>
-<element name="C15" library="Capacitor" package="CAP0603" value="12pF" x="45.2" y="24.4" smashed="yes">
+<element name="C15" library="Capacitor" package="CAP0603" value="2.2pF" x="45.2" y="24.4" smashed="yes">
 <attribute name="NAME" x="47.0536" y="24.416" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
-<attribute name="REF" value="GQM1875C2E120GB12" x="45.2" y="24.4" size="0.8" layer="27" font="vector" ratio="10" display="off"/>
 <attribute name="VALUE" x="42.2536" y="22.368" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="45.2" y="24.4" size="0.8" layer="27" font="vector" ratio="10" display="off"/>
 </element>
-<element name="C17" library="Capacitor" package="CAP0603" value="20pF" x="45.2" y="26.2" smashed="yes">
+<element name="C17" library="Capacitor" package="CAP0603" value="12pF" x="45.2" y="26.2" smashed="yes">
 <attribute name="NAME" x="47.0536" y="26.216" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
-<attribute name="REF" value="GQM1875C2E200GB12" x="45.2" y="26.2" size="0.8" layer="27" font="vector" ratio="10" display="off"/>
 <attribute name="VALUE" x="42.2536" y="24.168" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="45.2" y="26.2" size="0.8" layer="27" font="vector" ratio="10" display="off"/>
 </element>
-<element name="C19" library="Capacitor" package="CAP0603" value="43pF" x="45.2" y="28" smashed="yes">
+<element name="C19" library="Capacitor" package="CAP0603" value="47pF" x="45.2" y="28" smashed="yes">
 <attribute name="NAME" x="47.0536" y="28.016" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
-<attribute name="REF" value="GQM1875C2E430GB12" x="45.2" y="28" size="0.8" layer="27" font="vector" ratio="10" display="off"/>
 <attribute name="VALUE" x="42.2536" y="25.968" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="45.2" y="28" size="0.8" layer="27" font="vector" ratio="10" display="off"/>
 </element>
-<element name="C21" library="Capacitor" package="CAP0603" value="62pF" x="45.2" y="29.8" smashed="yes">
+<element name="C21" library="Capacitor" package="CAP0603" value="100pF" x="45.2" y="29.8" smashed="yes">
 <attribute name="NAME" x="47.0536" y="29.816" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
-<attribute name="REF" value="GQM1875C2E620GB12" x="45.2" y="29.8" size="0.8" layer="27" font="vector" ratio="10" display="off"/>
 <attribute name="VALUE" x="42.2536" y="27.768" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="45.2" y="29.8" size="0.8" layer="27" font="vector" ratio="10" display="off"/>
 </element>
@@ -1419,7 +1405,7 @@ design rules under a new name.</description>
 </element>
 </elements>
 <signals>
-<signal name="GND" airwireshidden="yes">
+<signal name="GND">
 <contactref element="Q1" pad="3@0"/>
 <contactref element="Q1" pad="3@1"/>
 <contactref element="RFCON1" pad="GND@0"/>
@@ -1454,8 +1440,8 @@ design rules under a new name.</description>
 <vertex x="-2" y="15.6"/>
 <vertex x="-2" y="50"/>
 <vertex x="77" y="50"/>
-<vertex x="77" y="15.8"/>
-<vertex x="67" y="15.8"/>
+<vertex x="77" y="15.6"/>
+<vertex x="67" y="15.6"/>
 <vertex x="67" y="19.7"/>
 <vertex x="53.9" y="19.7"/>
 <vertex x="53.9" y="17"/>
@@ -1466,10 +1452,10 @@ design rules under a new name.</description>
 <vertex x="52.9" y="8.5"/>
 <vertex x="52.9" y="12.5"/>
 <vertex x="53.9" y="12.5"/>
-<vertex x="53.9" y="7.3"/>
-<vertex x="66.2" y="7.3"/>
-<vertex x="66.2" y="12.2"/>
-<vertex x="77" y="12.2"/>
+<vertex x="53.9" y="7.5"/>
+<vertex x="66.2" y="7.5"/>
+<vertex x="66.2" y="12.4"/>
+<vertex x="77" y="12.4"/>
 <vertex x="77" y="-1.5"/>
 <vertex x="-2" y="-1.5"/>
 <vertex x="-2" y="12.4"/>
@@ -1498,15 +1484,7 @@ design rules under a new name.</description>
 <vertex x="79" y="52"/>
 <vertex x="-4" y="52"/>
 </polygon>
-<via x="35" y="23" extent="1-16" drill="0.3"/>
-<via x="36" y="23" extent="1-16" drill="0.3"/>
-<via x="37" y="23" extent="1-16" drill="0.3"/>
-<via x="38" y="23" extent="1-16" drill="0.3"/>
-<via x="39" y="23" extent="1-16" drill="0.3"/>
 <via x="39" y="22" extent="1-16" drill="0.3"/>
-<via x="38" y="22" extent="1-16" drill="0.3"/>
-<via x="37" y="22" extent="1-16" drill="0.3"/>
-<via x="36" y="22" extent="1-16" drill="0.3"/>
 <via x="35.5" y="17.5" extent="1-16" drill="0.3"/>
 <via x="36.5" y="17.5" extent="1-16" drill="0.3"/>
 <via x="37.5" y="17.5" extent="1-16" drill="0.3"/>
@@ -1606,35 +1584,12 @@ design rules under a new name.</description>
 <via x="24.5" y="22.5" extent="1-16" drill="0.3"/>
 <via x="24.5" y="21.5" extent="1-16" drill="0.3"/>
 <via x="24.5" y="20.5" extent="1-16" drill="0.3"/>
-<via x="35" y="25" extent="1-16" drill="0.3"/>
-<via x="36" y="25" extent="1-16" drill="0.3"/>
-<via x="37" y="25" extent="1-16" drill="0.3"/>
-<via x="38" y="25" extent="1-16" drill="0.3"/>
-<via x="39" y="25" extent="1-16" drill="0.3"/>
-<via x="39" y="24" extent="1-16" drill="0.3"/>
-<via x="38" y="24" extent="1-16" drill="0.3"/>
-<via x="37" y="24" extent="1-16" drill="0.3"/>
-<via x="36" y="24" extent="1-16" drill="0.3"/>
-<via x="35" y="24" extent="1-16" drill="0.3"/>
-<via x="35" y="27" extent="1-16" drill="0.3"/>
-<via x="36" y="27" extent="1-16" drill="0.3"/>
-<via x="37" y="27" extent="1-16" drill="0.3"/>
-<via x="38" y="27" extent="1-16" drill="0.3"/>
-<via x="39" y="27" extent="1-16" drill="0.3"/>
-<via x="39" y="26" extent="1-16" drill="0.3"/>
-<via x="38" y="26" extent="1-16" drill="0.3"/>
-<via x="37" y="26" extent="1-16" drill="0.3"/>
-<via x="36" y="26" extent="1-16" drill="0.3"/>
-<via x="35" y="26" extent="1-16" drill="0.3"/>
 <via x="35" y="29" extent="1-16" drill="0.3"/>
 <via x="36" y="29" extent="1-16" drill="0.3"/>
 <via x="37" y="29" extent="1-16" drill="0.3"/>
 <via x="38" y="29" extent="1-16" drill="0.3"/>
 <via x="39" y="29" extent="1-16" drill="0.3"/>
 <via x="39" y="28" extent="1-16" drill="0.3"/>
-<via x="38" y="28" extent="1-16" drill="0.3"/>
-<via x="37" y="28" extent="1-16" drill="0.3"/>
-<via x="36" y="28" extent="1-16" drill="0.3"/>
 <via x="35" y="28" extent="1-16" drill="0.3"/>
 <via x="35" y="31" extent="1-16" drill="0.3"/>
 <via x="36" y="31" extent="1-16" drill="0.3"/>
@@ -1919,17 +1874,17 @@ design rules under a new name.</description>
 <via x="3.5" y="8.5" extent="1-16" drill="0.3"/>
 <via x="4.5" y="8.5" extent="1-16" drill="0.3"/>
 <via x="5.5" y="8.5" extent="1-16" drill="0.3"/>
-<via x="34.5" y="4.5" extent="1-16" drill="0.3"/>
+<via x="33.5" y="0.5" extent="1-16" drill="0.3"/>
 <via x="34.5" y="5.5" extent="1-16" drill="0.3"/>
 <via x="32.5" y="5.5" extent="1-16" drill="0.3"/>
 <via x="33.5" y="4.5" extent="1-16" drill="0.3"/>
 <via x="33.5" y="5.5" extent="1-16" drill="0.3"/>
 <via x="31.5" y="5.5" extent="1-16" drill="0.3"/>
-<via x="36.5" y="4.5" extent="1-16" drill="0.3"/>
-<via x="36.5" y="5.5" extent="1-16" drill="0.3"/>
+<via x="40.5" y="0.5" extent="1-16" drill="0.3"/>
+<via x="33.5" y="2.5" extent="1-16" drill="0.3"/>
 <via x="32.5" y="4.5" extent="1-16" drill="0.3"/>
-<via x="35.5" y="4.5" extent="1-16" drill="0.3"/>
-<via x="35.5" y="5.5" extent="1-16" drill="0.3"/>
+<via x="33.5" y="1.5" extent="1-16" drill="0.3"/>
+<via x="33.5" y="3.5" extent="1-16" drill="0.3"/>
 <via x="31.5" y="4.5" extent="1-16" drill="0.3"/>
 <via x="30.5" y="4.5" extent="1-16" drill="0.3"/>
 <via x="29.5" y="4.5" extent="1-16" drill="0.3"/>
@@ -2112,14 +2067,11 @@ design rules under a new name.</description>
 <via x="41" y="23" extent="1-16" drill="0.3"/>
 <via x="41" y="22" extent="1-16" drill="0.3"/>
 <via x="40" y="22" extent="1-16" drill="0.3"/>
-<via x="40" y="25" extent="1-16" drill="0.3"/>
 <via x="41" y="25" extent="1-16" drill="0.3"/>
 <via x="41" y="24" extent="1-16" drill="0.3"/>
-<via x="40" y="24" extent="1-16" drill="0.3"/>
 <via x="40" y="27" extent="1-16" drill="0.3"/>
 <via x="41" y="27" extent="1-16" drill="0.3"/>
 <via x="41" y="26" extent="1-16" drill="0.3"/>
-<via x="40" y="26" extent="1-16" drill="0.3"/>
 <via x="40" y="29" extent="1-16" drill="0.3"/>
 <via x="41" y="29" extent="1-16" drill="0.3"/>
 <via x="41" y="28" extent="1-16" drill="0.3"/>
@@ -2160,22 +2112,18 @@ design rules under a new name.</description>
 <contactref element="C17" pad="2"/>
 <contactref element="C19" pad="2"/>
 <contactref element="C21" pad="2"/>
-<via x="37.5" y="5.5" extent="1-16" drill="0.3"/>
-<via x="38.5" y="5.5" extent="1-16" drill="0.3"/>
-<via x="37.5" y="4.5" extent="1-16" drill="0.3"/>
-<via x="38.5" y="4.5" extent="1-16" drill="0.3"/>
-<via x="36.5" y="1.5" extent="1-16" drill="0.3"/>
-<via x="36.5" y="2.5" extent="1-16" drill="0.3"/>
-<via x="35.5" y="1.5" extent="1-16" drill="0.3"/>
-<via x="35.5" y="2.5" extent="1-16" drill="0.3"/>
-<via x="36.5" y="3.5" extent="1-16" drill="0.3"/>
-<via x="35.5" y="3.5" extent="1-16" drill="0.3"/>
-<via x="37.5" y="3.5" extent="1-16" drill="0.3"/>
-<via x="38.5" y="3.5" extent="1-16" drill="0.3"/>
-<via x="37.5" y="2.5" extent="1-16" drill="0.3"/>
-<via x="38.5" y="2.5" extent="1-16" drill="0.3"/>
-<via x="37.5" y="1.5" extent="1-16" drill="0.3"/>
-<via x="38.5" y="1.5" extent="1-16" drill="0.3"/>
+<via x="40.5" y="3.5" extent="1-16" drill="0.3"/>
+<via x="40.5" y="4.5" extent="1-16" drill="0.3"/>
+<via x="40.5" y="1.5" extent="1-16" drill="0.3"/>
+<via x="40.5" y="2.5" extent="1-16" drill="0.3"/>
+<via x="41.5" y="2.5" extent="1-16" drill="0.3"/>
+<via x="41.5" y="1.5" extent="1-16" drill="0.3"/>
+<via x="32.5" y="1.5" extent="1-16" drill="0.3"/>
+<via x="32.5" y="0.5" extent="1-16" drill="0.3"/>
+<via x="32.5" y="2.5" extent="1-16" drill="0.3"/>
+<via x="32.5" y="3.5" extent="1-16" drill="0.3"/>
+<via x="41.5" y="3.5" extent="1-16" drill="0.3"/>
+<via x="41.5" y="4.5" extent="1-16" drill="0.3"/>
 <contactref element="C23" pad="2"/>
 <contactref element="C26" pad="2"/>
 <via x="50.5" y="42.5" extent="1-16" drill="0.3"/>
@@ -2293,6 +2241,19 @@ design rules under a new name.</description>
 <via x="41.5" y="5.5" extent="1-16" drill="0.3"/>
 <via x="44.5" y="5.5" extent="1-16" drill="0.3"/>
 <via x="43.5" y="5.5" extent="1-16" drill="0.3"/>
+<via x="41.5" y="0.5" extent="1-16" drill="0.3"/>
+<via x="37" y="3" extent="1-16" drill="3" diameter="5.5" alwaysstop="yes"/>
+<via x="3" y="3" extent="1-16" drill="3" diameter="5.5" alwaysstop="yes"/>
+<via x="72" y="3" extent="1-16" drill="3" diameter="5.5" alwaysstop="yes"/>
+<via x="72" y="45" extent="1-16" drill="3" diameter="5.5" alwaysstop="yes"/>
+<via x="3" y="45" extent="1-16" drill="3" diameter="5.5" alwaysstop="yes"/>
+<via x="37" y="25" extent="1-16" drill="3" diameter="5.5" alwaysstop="yes"/>
+<via x="38" y="28" extent="1-16" drill="0.3"/>
+<via x="35.5" y="22" extent="1-16" drill="0.3"/>
+<via x="38" y="22" extent="1-16" drill="0.3"/>
+<via x="40" y="24" extent="1-16" drill="0.3"/>
+<via x="40" y="26" extent="1-16" drill="0.3"/>
+<via x="36" y="28" extent="1-16" drill="0.3"/>
 </signal>
 <signal name="N$2">
 <contactref element="C14" pad="2"/>
@@ -2327,14 +2288,14 @@ design rules under a new name.</description>
 <wire x1="56.7" y1="15.4" x2="56.7" y2="14" width="0.75" layer="1"/>
 <wire x1="56.7" y1="14" x2="57.65" y2="14" width="0.75" layer="1"/>
 <wire x1="57.65" y1="14" x2="58.6" y2="14" width="0.75" layer="1"/>
-<wire x1="58.6" y1="14" x2="58.6" y2="17.75" width="0.75" layer="1"/>
-<wire x1="58.6" y1="17.75" x2="62.05" y2="17.75" width="0.75" layer="1"/>
+<wire x1="58.6" y1="14" x2="58.6" y2="16.5" width="0.75" layer="1"/>
+<wire x1="58.6" y1="16.5" x2="62.05" y2="16.5" width="0.75" layer="1"/>
 <wire x1="62.05" y1="14.95" x2="63" y2="14.95" width="0.75" layer="1"/>
 <wire x1="63" y1="14.95" x2="63.95" y2="14.95" width="0.75" layer="1"/>
 <wire x1="63.95" y1="14.95" x2="63.95" y2="15.75" width="0.75" layer="1"/>
 <wire x1="65.55" y1="15.75" x2="65.55" y2="14" width="0.75" layer="1"/>
 <wire x1="65.55" y1="14" x2="71.5" y2="14" width="0.75" layer="1"/>
-<wire x1="62.05" y1="17.75" x2="62.05" y2="14.95" width="0.75" layer="1"/>
+<wire x1="62.05" y1="16.5" x2="62.05" y2="14.95" width="0.75" layer="1"/>
 <wire x1="63.95" y1="15.75" x2="65.55" y2="15.75" width="0.75" layer="1"/>
 <wire x1="63" y1="14.95" x2="63" y2="11.575" width="0.75" layer="1"/>
 <polygon width="0.1" layer="1">
@@ -2345,10 +2306,10 @@ design rules under a new name.</description>
 </polygon>
 <wire x1="57.65" y1="14" x2="57.65" y2="12" width="0.75" layer="1"/>
 <polygon width="0.1" layer="1">
-<vertex x="56.05" y="13.25"/>
-<vertex x="58.9" y="13.25"/>
-<vertex x="58.9" y="9"/>
-<vertex x="56.05" y="9"/>
+<vertex x="56.2" y="13.25"/>
+<vertex x="59.1" y="13.25"/>
+<vertex x="59.1" y="9"/>
+<vertex x="56.2" y="9"/>
 </polygon>
 <wire x1="51.01915" y1="14" x2="53.4" y2="14" width="1.1" layer="1"/>
 <wire x1="53.4" y1="14" x2="53.4" y2="13.99915" width="1.1" layer="1"/>
@@ -2405,14 +2366,10 @@ design rules under a new name.</description>
 <contactref element="R8" pad="2"/>
 <contactref element="C13" pad="1"/>
 <contactref element="C10" pad="1"/>
-<wire x1="32.75" y1="35.23085" x2="32.71915" y2="35.2" width="0.8128" layer="1"/>
 <wire x1="32.7" y1="21.71915" x2="32.71915" y2="21.7383" width="0.8128" layer="1"/>
 <contactref element="C11" pad="1"/>
 <contactref element="C8" pad="1"/>
 <contactref element="C7" pad="1"/>
-<wire x1="32.71915" y1="35.3617" x2="32.7" y2="35.38085" width="0.508" layer="1"/>
-<wire x1="32.75" y1="37.6" x2="32.75" y2="35.39255" width="0.508" layer="1"/>
-<wire x1="32.75" y1="35.39255" x2="32.71915" y2="35.3617" width="0.508" layer="1"/>
 <wire x1="32.7" y1="21.71915" x2="32.7" y2="24.38085" width="0.508" layer="1"/>
 <wire x1="32.71915" y1="26.2" x2="32.71915" y2="24.4" width="0.508" layer="1"/>
 <wire x1="32.71915" y1="24.4" x2="32.7" y2="24.38085" width="0.508" layer="1"/>
@@ -2420,8 +2377,9 @@ design rules under a new name.</description>
 <wire x1="32.71915" y1="29.8" x2="32.71915" y2="28" width="0.508" layer="1"/>
 <wire x1="32.71915" y1="31.6" x2="32.71915" y2="29.8" width="0.508" layer="1"/>
 <wire x1="32.71915" y1="33.4" x2="32.71915" y2="31.6" width="0.508" layer="1"/>
-<wire x1="32.71915" y1="35.2" x2="32.71915" y2="33.4" width="0.508" layer="1"/>
-<wire x1="32.75" y1="35.23085" x2="32.7" y2="35.38085" width="0" layer="19" extent="1-1"/>
+<wire x1="32.71915" y1="33.4" x2="32.71915" y2="35.2" width="0.508" layer="1"/>
+<wire x1="32.71915" y1="35.2" x2="32.75" y2="35.23085" width="0.508" layer="1"/>
+<wire x1="32.75" y1="35.23085" x2="32.75" y2="37.6" width="0.508" layer="1"/>
 </signal>
 <signal name="VDD" class="1">
 <contactref element="U1" pad="1"/>
@@ -2483,7 +2441,8 @@ design rules under a new name.</description>
 <wire x1="28.6" y1="46.3" x2="29.884" y2="46.3" width="0.3048" layer="1"/>
 <wire x1="10.76915" y1="22.6" x2="10.76915" y2="24.53085" width="0.3048" layer="1"/>
 <wire x1="10.76915" y1="24.53085" x2="10.7" y2="24.6" width="0.3048" layer="1"/>
-<wire x1="10.76915" y1="22.6" x2="10.8" y2="20.81915" width="0" layer="19" extent="1-1"/>
+<wire x1="10.8" y1="20.81915" x2="10.8" y2="22.56915" width="1.1" layer="1"/>
+<wire x1="10.8" y1="22.56915" x2="10.76915" y2="22.6" width="1.1" layer="1"/>
 </signal>
 <signal name="N$1" class="1">
 <contactref element="CON1" pad="P$2"/>
@@ -2511,8 +2470,10 @@ design rules under a new name.</description>
 <contactref element="C5" pad="1"/>
 <contactref element="R3" pad="2"/>
 <wire x1="10.8" y1="15.63415" x2="10.78085" y2="15.6533" width="1.1" layer="1"/>
-<wire x1="10.76915" y1="17.4" x2="10.8" y2="19.18085" width="0" layer="19" extent="1-1"/>
-<wire x1="10.8" y1="15.63415" x2="10.76915" y2="17.4" width="0" layer="19" extent="1-1"/>
+<wire x1="10.8" y1="15.63415" x2="10.8" y2="17.36915" width="1.1" layer="1"/>
+<wire x1="10.8" y1="17.36915" x2="10.76915" y2="17.4" width="1.1" layer="1"/>
+<wire x1="10.76915" y1="17.4" x2="10.76915" y2="19.15" width="1.1" layer="1"/>
+<wire x1="10.76915" y1="19.15" x2="10.8" y2="19.18085" width="1.1" layer="1"/>
 </signal>
 </signals>
 <mfgpreviewcolors>
@@ -2524,4 +2485,10 @@ design rules under a new name.</description>
 </mfgpreviewcolors>
 </board>
 </drawing>
+<compatibility>
+<note version="6.3" minversion="6.2.2" severity="warning">
+Since Version 6.2.2 text objects can contain more than one line,
+which will not be processed correctly with this version.
+</note>
+</compatibility>
 </eagle>

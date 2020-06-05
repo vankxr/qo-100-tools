@@ -3528,26 +3528,14 @@ Logo</text>
 <part name="U1" library="Analog Devices" deviceset="ADP7142A*" device="" technology="UJZ" value="ADP7142AUJZ"/>
 <part name="Q1" library="Ampleon" deviceset="BLP9G0722-20" device="G"/>
 <part name="RFCON1" library="RF Connector" deviceset="RFCON" device="-SMA-EDGE"/>
-<part name="C12" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="0.5pF">
-<attribute name="REF" value="GJM0225C1CR50BB01"/>
-</part>
+<part name="C12" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="0.5pF"/>
 <part name="GND1" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND2" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="C14" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="5.6pF">
-<attribute name="REF" value="GQM1875C2E5R6CB12"/>
-</part>
-<part name="C16" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="2.2pF">
-<attribute name="REF" value="GQM1875C2E2R2BB12"/>
-</part>
-<part name="C18" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1.8pF">
-<attribute name="REF" value="GQM1875C2E1R8BB12"/>
-</part>
-<part name="C22" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1.2pF">
-<attribute name="REF" value="GQM1875C2E1R2BB12"/>
-</part>
-<part name="C20" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="12pF">
-<attribute name="REF" value="GQM1875C2E120GB12"/>
-</part>
+<part name="C14" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="5.6pF"/>
+<part name="C16" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="2.2pF"/>
+<part name="C18" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1.8pF"/>
+<part name="C22" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1.2pF"/>
+<part name="C20" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="12pF"/>
 <part name="GND3" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND4" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND5" library="Supply Symbol" deviceset="GND" device=""/>
@@ -3556,13 +3544,9 @@ Logo</text>
 <part name="GND7" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND8" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="R8" library="Resistor" deviceset="RESISTOR" device="-0603" value="5.1 Ohms"/>
-<part name="C13" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="12pF">
-<attribute name="REF" value="GQM1875C2E120GB12"/>
-</part>
+<part name="C13" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="2.2pF"/>
 <part name="GND9" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="C10" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="20pF">
-<attribute name="REF" value="GQM1875C2E200GB12"/>
-</part>
+<part name="C10" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="12pF"/>
 <part name="GND10" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="R6" library="Resistor" deviceset="RESISTOR" device="-0603" value="3.4K Ohms"/>
 <part name="GND12" library="Supply Symbol" deviceset="GND" device=""/>
@@ -3608,44 +3592,30 @@ Logo</text>
 <part name="VCC6" library="Supply Symbol" deviceset="VDD" device=""/>
 <part name="F1" library="PTC Fuses" deviceset="PTC" device="1206">
 <attribute name="HOLD" value="2A"/>
-<attribute name="TRIP" value="4A"/>
+<attribute name="TRIP" value="3.5A"/>
 </part>
 <part name="GND24" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND25" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="U2" library="Generic Filter" deviceset="2450BP15E0100" device=""/>
-<part name="C6" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="12pF">
-<attribute name="REF" value="GQM1875C2E120GB12"/>
-</part>
+<part name="C6" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="12pF"/>
 <part name="FRAME1" library="Frame" deviceset="A3-LANDSCAPE" device=""/>
 <part name="LOGO1" library="Silkscreen" deviceset="JS" device="-10MM"/>
 <part name="C27" library="Capacitor" deviceset="CAPACITOR" device="-1206" value="10uF">
 <attribute name="VOLTAGE" value="50V"/>
 </part>
-<part name="C8" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="43pF">
-<attribute name="REF" value="GQM1875C2E430GB12"/>
-</part>
+<part name="C8" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="47pF"/>
 <part name="GND26" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="C7" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="62pF">
-<attribute name="REF" value="GQM1875C2E620GB12"/>
-</part>
+<part name="C7" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100pF"/>
 <part name="GND27" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="C11" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="10uF"/>
 <part name="GND29" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND30" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND31" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="L1" library="Coilcraft" deviceset="1111SQ-" device="" technology="39N" value="39nH"/>
-<part name="C15" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="12pF">
-<attribute name="REF" value="GQM1875C2E120GB12"/>
-</part>
-<part name="C17" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="20pF">
-<attribute name="REF" value="GQM1875C2E200GB12"/>
-</part>
-<part name="C19" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="43pF">
-<attribute name="REF" value="GQM1875C2E430GB12"/>
-</part>
-<part name="C21" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="62pF">
-<attribute name="REF" value="GQM1875C2E620GB12"/>
-</part>
+<part name="C15" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="2.2pF"/>
+<part name="C17" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="12pF"/>
+<part name="C19" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="47pF"/>
+<part name="C21" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100pF"/>
 <part name="C23" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100nF"/>
 <part name="GND28" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="C26" library="Capacitor" deviceset="CAPACITOR" device="-1206" value="10uF">
@@ -3675,7 +3645,6 @@ Logo</text>
 <attribute name="VALUE" x="210.5914" y="154.94" size="1.778" layer="96" ratio="10" rot="SR270" align="top-left"/>
 <attribute name="NAME" x="216.1286" y="154.94" size="1.778" layer="95" ratio="10" rot="SR270"/>
 <attribute name="VOLTAGE" x="208.0514" y="154.94" size="1.778" layer="97" ratio="10" rot="SR270" align="top-left"/>
-<attribute name="REF" x="213.36" y="154.94" size="1.778" layer="96" rot="R270" display="off"/>
 </instance>
 <instance part="GND1" gate="G$1" x="99.06" y="139.7" smashed="yes">
 <attribute name="VALUE" x="99.06" y="134.62" size="1.778" layer="96" align="bottom-center"/>
@@ -3687,31 +3656,26 @@ Logo</text>
 <attribute name="VALUE" x="220.98" y="162.3314" size="1.778" layer="96" ratio="10" rot="SR0" align="top-left"/>
 <attribute name="NAME" x="220.98" y="167.8686" size="1.778" layer="95" ratio="10" rot="SR0"/>
 <attribute name="VOLTAGE" x="220.98" y="159.7914" size="1.778" layer="97" ratio="10" rot="SR0" align="top-left"/>
-<attribute name="REF" x="220.98" y="165.1" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="C16" gate="G$1" x="276.86" y="170.18" smashed="yes" rot="R270">
 <attribute name="VALUE" x="274.0914" y="170.18" size="1.778" layer="96" ratio="10" rot="SR270" align="top-left"/>
 <attribute name="NAME" x="279.6286" y="170.18" size="1.778" layer="95" ratio="10" rot="SR270"/>
 <attribute name="VOLTAGE" x="271.5514" y="170.18" size="1.778" layer="97" ratio="10" rot="SR270" align="top-left"/>
-<attribute name="REF" x="276.86" y="170.18" size="1.778" layer="96" rot="R270" display="off"/>
 </instance>
 <instance part="C18" gate="G$1" x="289.56" y="170.18" smashed="yes" rot="R270">
 <attribute name="VALUE" x="286.7914" y="170.18" size="1.778" layer="96" ratio="10" rot="SR270" align="top-left"/>
 <attribute name="NAME" x="292.3286" y="170.18" size="1.778" layer="95" ratio="10" rot="SR270"/>
 <attribute name="VOLTAGE" x="284.2514" y="170.18" size="1.778" layer="97" ratio="10" rot="SR270" align="top-left"/>
-<attribute name="REF" x="289.56" y="170.18" size="1.778" layer="96" rot="R270" display="off"/>
 </instance>
 <instance part="C22" gate="G$1" x="317.5" y="170.18" smashed="yes" rot="R270">
 <attribute name="VALUE" x="314.7314" y="170.18" size="1.778" layer="96" ratio="10" rot="SR270" align="top-left"/>
 <attribute name="NAME" x="320.2686" y="170.18" size="1.778" layer="95" ratio="10" rot="SR270"/>
 <attribute name="VOLTAGE" x="312.1914" y="170.18" size="1.778" layer="97" ratio="10" rot="SR270" align="top-left"/>
-<attribute name="REF" x="317.5" y="170.18" size="1.778" layer="96" rot="R270" display="off"/>
 </instance>
 <instance part="C20" gate="G$1" x="299.72" y="177.8" smashed="yes">
 <attribute name="VALUE" x="299.72" y="175.0314" size="1.778" layer="96" ratio="10" rot="SR0" align="top-left"/>
 <attribute name="NAME" x="299.72" y="180.5686" size="1.778" layer="95" ratio="10" rot="SR0"/>
 <attribute name="VOLTAGE" x="299.72" y="172.4914" size="1.778" layer="97" ratio="10" rot="SR0" align="top-left"/>
-<attribute name="REF" x="299.72" y="177.8" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="GND3" gate="G$1" x="271.78" y="195.58" smashed="yes">
 <attribute name="VALUE" x="271.78" y="190.5" size="1.778" layer="96" align="bottom-center"/>
@@ -3752,7 +3716,6 @@ Logo</text>
 <attribute name="VALUE" x="200.4314" y="210.82" size="1.778" layer="96" ratio="10" rot="SR270" align="top-left"/>
 <attribute name="NAME" x="205.9686" y="210.82" size="1.778" layer="95" ratio="10" rot="SR270"/>
 <attribute name="VOLTAGE" x="197.8914" y="210.82" size="1.778" layer="97" ratio="10" rot="SR270" align="top-left"/>
-<attribute name="REF" x="203.2" y="210.82" size="1.778" layer="96" rot="R270" display="off"/>
 </instance>
 <instance part="GND10" gate="G$1" x="203.2" y="195.58" smashed="yes">
 <attribute name="VALUE" x="203.2" y="190.5" size="1.778" layer="96" align="bottom-center"/>
@@ -3918,7 +3881,6 @@ Logo</text>
 <attribute name="VALUE" x="144.78" y="162.3314" size="1.778" layer="96" ratio="10" rot="SR0" align="top-left"/>
 <attribute name="NAME" x="144.78" y="167.8686" size="1.778" layer="95" ratio="10" rot="SR0"/>
 <attribute name="VOLTAGE" x="144.78" y="159.7914" size="1.778" layer="97" ratio="10" rot="SR0" align="top-left"/>
-<attribute name="REF" x="144.78" y="165.1" size="1.778" layer="96" display="off"/>
 </instance>
 <instance part="FRAME1" gate="G$1" x="0" y="0" smashed="yes">
 <attribute name="DRAWING_NAME" x="271.78" y="20.574" size="2.54" layer="94" font="vector"/>
@@ -3939,7 +3901,6 @@ Logo</text>
 <attribute name="VALUE" x="187.7314" y="210.82" size="1.778" layer="96" ratio="10" rot="SR270" align="top-left"/>
 <attribute name="NAME" x="193.2686" y="210.82" size="1.778" layer="95" ratio="10" rot="SR270"/>
 <attribute name="VOLTAGE" x="185.1914" y="210.82" size="1.778" layer="97" ratio="10" rot="SR270" align="top-left"/>
-<attribute name="REF" x="190.5" y="210.82" size="1.778" layer="96" rot="R270" display="off"/>
 </instance>
 <instance part="GND26" gate="G$1" x="190.5" y="195.58" smashed="yes">
 <attribute name="VALUE" x="190.5" y="190.5" size="1.778" layer="96" align="bottom-center"/>
@@ -3948,7 +3909,6 @@ Logo</text>
 <attribute name="VALUE" x="175.0314" y="210.82" size="1.778" layer="96" ratio="10" rot="SR270" align="top-left"/>
 <attribute name="NAME" x="180.5686" y="210.82" size="1.778" layer="95" ratio="10" rot="SR270"/>
 <attribute name="VOLTAGE" x="172.4914" y="210.82" size="1.778" layer="97" ratio="10" rot="SR270" align="top-left"/>
-<attribute name="REF" x="177.8" y="210.82" size="1.778" layer="96" rot="R270" display="off"/>
 </instance>
 <instance part="GND27" gate="G$1" x="177.8" y="195.58" smashed="yes">
 <attribute name="VALUE" x="177.8" y="190.5" size="1.778" layer="96" align="bottom-center"/>
@@ -3982,19 +3942,16 @@ Logo</text>
 <attribute name="VALUE" x="281.7114" y="210.82" size="1.778" layer="96" ratio="10" rot="SR270" align="top-left"/>
 <attribute name="NAME" x="287.2486" y="210.82" size="1.778" layer="95" ratio="10" rot="SR270"/>
 <attribute name="VOLTAGE" x="279.1714" y="210.82" size="1.778" layer="97" ratio="10" rot="SR270" align="top-left"/>
-<attribute name="REF" x="284.48" y="210.82" size="1.778" layer="96" rot="R270" display="off"/>
 </instance>
 <instance part="C19" gate="G$1" x="297.18" y="210.82" smashed="yes" rot="R270">
 <attribute name="VALUE" x="294.4114" y="210.82" size="1.778" layer="96" ratio="10" rot="SR270" align="top-left"/>
 <attribute name="NAME" x="299.9486" y="210.82" size="1.778" layer="95" ratio="10" rot="SR270"/>
 <attribute name="VOLTAGE" x="291.8714" y="210.82" size="1.778" layer="97" ratio="10" rot="SR270" align="top-left"/>
-<attribute name="REF" x="297.18" y="210.82" size="1.778" layer="96" rot="R270" display="off"/>
 </instance>
 <instance part="C21" gate="G$1" x="309.88" y="210.82" smashed="yes" rot="R270">
 <attribute name="VALUE" x="307.1114" y="210.82" size="1.778" layer="96" ratio="10" rot="SR270" align="top-left"/>
 <attribute name="NAME" x="312.6486" y="210.82" size="1.778" layer="95" ratio="10" rot="SR270"/>
 <attribute name="VOLTAGE" x="304.5714" y="210.82" size="1.778" layer="97" ratio="10" rot="SR270" align="top-left"/>
-<attribute name="REF" x="309.88" y="210.82" size="1.778" layer="96" rot="R270" display="off"/>
 </instance>
 <instance part="C23" gate="G$1" x="322.58" y="210.82" smashed="yes" rot="R270">
 <attribute name="VALUE" x="319.8114" y="210.82" size="1.778" layer="96" ratio="10" rot="SR270" align="top-left"/>

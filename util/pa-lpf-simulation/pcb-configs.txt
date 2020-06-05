@@ -1,2 +1,0 @@
-JLCPCB FR-4 E0 = 4,5
-PCB thickness = 0.6 mm
