@@ -1,0 +1,7 @@
+set_io CLK1             29      # IN    # Clock input 1
+set_io RESETn           30      # IN    # Global reset
+set_io SMC_IRQn         32      # OUT   # SMC Interrupt request output
+set_io SPI_SCK          15      # IN    # Control SPI Slave SCK input
+set_io SPI_MOSI         13      # IN    # Control SPI Slave MOSI input
+set_io SPI_MISO         12      # OUT   # Control SPI Slave MISO output
+set_io SPI_CSn          14      # IN    # Control SPI Slave CS input

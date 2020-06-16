@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="9.5.2">
+<eagle version="9.6.1">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -2100,7 +2100,7 @@
 <pin name="INTVCC" x="-30.48" y="-22.86" length="middle"/>
 <pin name="CLKOUT" x="-30.48" y="-17.78" length="middle"/>
 </symbol>
-<symbol name="ADP150XXX">
+<symbol name="ADP150">
 <pin name="OUT" x="5.08" y="-2.54" length="middle" rot="R180"/>
 <pin name="GND" x="-22.86" y="-12.7" length="middle"/>
 <pin name="VIN" x="-22.86" y="-2.54" length="middle"/>
@@ -2242,9 +2242,9 @@
 </device>
 </devices>
 </deviceset>
-<deviceset name="ADP150*" prefix="U">
+<deviceset name="ADP150UJZ*" prefix="U">
 <gates>
-<gate name="G$1" symbol="ADP150XXX" x="0" y="0"/>
+<gate name="G$1" symbol="ADP150" x="0" y="0"/>
 </gates>
 <devices>
 <device name="" package="SOT23-5">
@@ -2255,13 +2255,13 @@
 <connect gate="G$1" pin="VIN" pad="1"/>
 </connects>
 <technologies>
-<technology name="UJZ-1.8"/>
-<technology name="UJZ-2.0"/>
-<technology name="UJZ-2.5"/>
-<technology name="UJZ-2.65"/>
-<technology name="UJZ-2.8"/>
-<technology name="UJZ-3.0"/>
-<technology name="UJZ-3.3"/>
+<technology name="-1.8"/>
+<technology name="-2.0"/>
+<technology name="-2.5"/>
+<technology name="-2.65"/>
+<technology name="-2.8"/>
+<technology name="-3.0"/>
+<technology name="-3.3"/>
 </technologies>
 </device>
 </devices>
@@ -2457,6 +2457,11 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 <smd name="GND@2" x="-2.54" y="0" dx="1.524" dy="4.064" layer="16"/>
 <smd name="GND@3" x="2.54" y="0" dx="1.524" dy="4.064" layer="16"/>
 <text x="-3.81" y="-1.27" size="1.27" layer="25" rot="R90">&gt;NAME</text>
+<text x="-5.015" y="-5.96" size="0.3048" layer="51" rot="R90">PCB Edge</text>
+<wire x1="-4.655" y1="-4.3" x2="-4.355" y2="-3.6" width="0.08" layer="51"/>
+<wire x1="-4.355" y1="-3.6" x2="-4.555" y2="-3.7" width="0.08" layer="51"/>
+<wire x1="-4.355" y1="-3.6" x2="-4.255" y2="-3.8" width="0.08" layer="51"/>
+<wire x1="-5" y1="-3.5" x2="5" y2="-3.5" width="0" layer="51"/>
 </package>
 <package name="PAD-RF">
 <description>&lt;b&gt;SMD PAD&lt;/b&gt;</description>
@@ -5708,14 +5713,14 @@ Logo</text>
 <part name="GND1002" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND1005" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="5V01002" library="Supply Symbol" deviceset="5V0" device=""/>
-<part name="U15" library="Analog Devices" deviceset="ADP150*" device="" technology="UJZ-3.3" value="ADP150UJZ-3.3"/>
+<part name="U15" library="Analog Devices" deviceset="ADP150UJZ*" device="" technology="-3.3" value="ADP150UJZ-3.3"/>
 <part name="C87" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1uF"/>
 <part name="GND1048" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="C84" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1uF"/>
 <part name="GND1041" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND1045" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="5V00002" library="Supply Symbol" deviceset="5V0" device=""/>
-<part name="U14" library="Analog Devices" deviceset="ADP150*" device="" technology="UJZ-3.3" value="ADP150UJZ-3.3"/>
+<part name="U14" library="Analog Devices" deviceset="ADP150UJZ*" device="" technology="-3.3" value="ADP150UJZ-3.3"/>
 <part name="C86" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1uF"/>
 <part name="GND51" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="C83" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1uF"/>

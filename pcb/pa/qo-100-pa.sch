@@ -220,7 +220,7 @@
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="ADP7142A*" prefix="U">
+<deviceset name="ADP7142AUJZ*" prefix="U">
 <gates>
 <gate name="G$1" symbol="ADP7142" x="0" y="0"/>
 </gates>
@@ -234,11 +234,11 @@
 <connect gate="G$1" pin="VOUT" pad="5"/>
 </connects>
 <technologies>
-<technology name="UJZ"/>
-<technology name="UJZ-1.8"/>
-<technology name="UJZ-2.5"/>
-<technology name="UJZ-3.3"/>
-<technology name="UJZ-5.0"/>
+<technology name=""/>
+<technology name="-1.8"/>
+<technology name="-2.5"/>
+<technology name="-3.3"/>
+<technology name="-5.0"/>
 </technologies>
 </device>
 </devices>
@@ -421,6 +421,11 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 <smd name="GND@2" x="-2.54" y="0" dx="1.524" dy="4.064" layer="16"/>
 <smd name="GND@3" x="2.54" y="0" dx="1.524" dy="4.064" layer="16"/>
 <text x="-3.81" y="-1.27" size="1.27" layer="25" rot="R90">&gt;NAME</text>
+<text x="-5.015" y="-5.96" size="0.3048" layer="51" rot="R90">PCB Edge</text>
+<wire x1="-4.655" y1="-4.3" x2="-4.355" y2="-3.6" width="0.08" layer="51"/>
+<wire x1="-4.355" y1="-3.6" x2="-4.555" y2="-3.7" width="0.08" layer="51"/>
+<wire x1="-4.355" y1="-3.6" x2="-4.255" y2="-3.8" width="0.08" layer="51"/>
+<wire x1="-5" y1="-3.5" x2="5" y2="-3.5" width="0" layer="51"/>
 </package>
 <package name="PAD-RF">
 <description>&lt;b&gt;SMD PAD&lt;/b&gt;</description>
@@ -3525,7 +3530,7 @@ Logo</text>
 </class>
 </classes>
 <parts>
-<part name="U1" library="Analog Devices" deviceset="ADP7142A*" device="" technology="UJZ" value="ADP7142AUJZ"/>
+<part name="U1" library="Analog Devices" deviceset="ADP7142AUJZ*" device="" value="ADP7142AUJZ"/>
 <part name="Q1" library="Ampleon" deviceset="BLP9G0722-20" device="G"/>
 <part name="RFCON1" library="RF Connector" deviceset="RFCON" device="-SMA-EDGE"/>
 <part name="C12" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="0.5pF"/>
