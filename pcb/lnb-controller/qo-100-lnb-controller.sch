@@ -4736,7 +4736,7 @@ Logo</text>
 <part name="GND10" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="R2" library="Resistor" deviceset="RESISTOR" device="-0603" value="43.2 Ohms"/>
 <part name="R7" library="Resistor" deviceset="RESISTOR" device="-0603" value="86.6 Ohms"/>
-<part name="C9" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100nF"/>
+<part name="C9" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="68pF"/>
 <part name="L1" library="Inductor" deviceset="INDUCTOR" device="-0603" value="470nH">
 <attribute name="CURRENT" value="600 mA"/>
 </part>
@@ -4750,23 +4750,23 @@ Logo</text>
 <part name="GND19" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="C8" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100nF"/>
 <part name="GND21" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="C22" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="51pF"/>
-<part name="L9" library="Inductor" deviceset="INDUCTOR" device="-0603" value="820nH"/>
-<part name="C18" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="620pF"/>
-<part name="L7" library="Inductor" deviceset="INDUCTOR" device="-0603" value="68nH"/>
-<part name="C15" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="51pF"/>
-<part name="L4" library="Inductor" deviceset="INDUCTOR" device="-0603" value="820nH"/>
+<part name="C22" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100pF"/>
+<part name="L9" library="Inductor" deviceset="INDUCTOR" device="-0603" value="470nH"/>
+<part name="C18" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1nF"/>
+<part name="L7" library="Inductor" deviceset="INDUCTOR" device="-0603" value="43nH"/>
+<part name="C15" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100pF"/>
+<part name="L4" library="Inductor" deviceset="INDUCTOR" device="-0603" value="470nH"/>
 <part name="GND22" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND23" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="C13" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="330pF"/>
 <part name="L5" library="Inductor" deviceset="INDUCTOR" device="-0603" value="120nH"/>
 <part name="L6" library="Inductor" deviceset="INDUCTOR" device="-0603" value="120nH"/>
 <part name="C16" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="330pF"/>
-<part name="C20" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100nF"/>
+<part name="C20" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="68pF"/>
 <part name="JP3" library="Pin Header" deviceset="PINHD-1X2" device="" package3d_urn="urn:adsk.eagle:package:22435/2"/>
 <part name="U5" library="Microchip" deviceset="MXT57*" device="" technology="3ABC25M0000"/>
 <part name="C19" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100pF"/>
-<part name="L8" library="Inductor" deviceset="INDUCTOR" device="-0603" value="390nH"/>
+<part name="L8" library="Inductor" deviceset="INDUCTOR" device="-0603" value="330nH"/>
 <part name="GND14" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="R9" library="Resistor" deviceset="RESISTOR" device="-0603" value="2.5K Ohms"/>
 <part name="D3" library="LED" deviceset="LED" device="TH3MM" value="LEDTH3MM">

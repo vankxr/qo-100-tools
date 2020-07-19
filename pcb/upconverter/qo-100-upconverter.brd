@@ -1695,12 +1695,12 @@ design rules under a new name.</description>
 <attribute name="VALUE" x="17.232" y="52.7536" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="72.35" y="133.17" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
-<element name="C40" library="Capacitor" package="CAP0603" value="12pF" x="31" y="50.5" smashed="yes" rot="R180">
+<element name="C40" library="Capacitor" package="CAP0603" value="15pF" x="31" y="50.5" smashed="yes" rot="R180">
 <attribute name="NAME" x="29.4536" y="51.916" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="33.9464" y="52.532" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="0.52" y="122.89" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
-<element name="C35" library="Capacitor" package="CAP0603" value="12pF" x="41" y="50.5" smashed="yes" rot="R180">
+<element name="C35" library="Capacitor" package="CAP0603" value="15pF" x="41" y="50.5" smashed="yes" rot="R180">
 <attribute name="NAME" x="39.5536" y="51.916" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="43.9464" y="52.532" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="5.44" y="122.89" size="1.778" layer="27" rot="R180" display="off"/>
@@ -1740,12 +1740,12 @@ design rules under a new name.</description>
 <attribute name="VALUE" x="11.9464" y="46.832" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="-46.88" y="117.19" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
-<element name="C50" library="Capacitor" package="CAP0603" value="12pF" x="9" y="50" smashed="yes" rot="R180">
+<element name="C50" library="Capacitor" package="CAP0603" value="15pF" x="9" y="50" smashed="yes" rot="R180">
 <attribute name="NAME" x="7.4536" y="51.416" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="11.9464" y="52.032" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="-51.96" y="122.39" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
-<element name="C44" library="Capacitor" package="CAP0603" value="12pF" x="21" y="50.5" smashed="yes" rot="R180">
+<element name="C44" library="Capacitor" package="CAP0603" value="15pF" x="21" y="50.5" smashed="yes" rot="R180">
 <attribute name="NAME" x="19.4536" y="51.916" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="23.9464" y="52.532" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="-45.04" y="122.89" size="1.778" layer="27" rot="R180" display="off"/>
@@ -1940,7 +1940,7 @@ design rules under a new name.</description>
 <attribute name="VALUE" x="57.668" y="29.6464" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="-22.85" y="-49.5" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
-<element name="C12" library="Capacitor" package="CAP0603" value="100nF" x="62.3" y="27.5" smashed="yes" rot="R180">
+<element name="C12" library="Capacitor" package="CAP0603" value="10pF" x="62.3" y="27.5" smashed="yes" rot="R180">
 <attribute name="NAME" x="60.7536" y="28.916" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="65.2464" y="29.532" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="-18.98" y="110.05" size="1.778" layer="27" rot="R180" display="off"/>

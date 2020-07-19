@@ -5492,7 +5492,7 @@ Logo</text>
 <part name="GND613" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND612" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND611" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="C12" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100nF"/>
+<part name="C12" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="10pF"/>
 <part name="R6" library="Resistor" deviceset="RESISTOR" device="-0603" value="5.1K Ohms"/>
 <part name="GND609" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="R4" library="Resistor" deviceset="RESISTOR" device="-0603" value="100K Ohms"/>
@@ -5569,8 +5569,8 @@ Logo</text>
 <part name="GND25" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="TP1" library="PADs" deviceset="TESTPOINT" device="-1.27MM"/>
 <part name="U7" library="Analog Devices" deviceset="ADL5?" device="" technology="601" value="ADL5601"/>
-<part name="C40" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="12pF"/>
-<part name="C35" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="12pF"/>
+<part name="C40" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="15pF"/>
+<part name="C35" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="15pF"/>
 <part name="L9" library="Inductor" deviceset="INDUCTOR" device="-0603" value="470nH"/>
 <part name="C39" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="15pF"/>
 <part name="C38" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1nF"/>
@@ -5588,11 +5588,11 @@ Logo</text>
 <part name="GND30" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND31" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND32" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="C50" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="12pF"/>
+<part name="C50" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="15pF"/>
 <part name="U8" library="Analog Devices" deviceset="ADL5?" device="" technology="601"/>
 <part name="GND33" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="L10" library="Inductor" deviceset="INDUCTOR" device="-0603" value="470nH"/>
-<part name="C44" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="12pF"/>
+<part name="C44" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="15pF"/>
 <part name="C43" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="15pF"/>
 <part name="C42" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1nF"/>
 <part name="C41" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1uF"/>
