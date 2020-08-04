@@ -256,7 +256,9 @@ int init()
     DBGPRINTLN_CTX("EMU - IOVDD Voltage: %.2f mV", adc_get_iovdd());
     DBGPRINTLN_CTX("EMU - IOVDD Status: %s", g_ubIOVDDLow ? "LOW" : "OK");
     DBGPRINTLN_CTX("EMU - Core Voltage: %.2f mV", adc_get_corevdd());
-    DBGPRINTLN_CTX("EMU - VBAT Voltage: %.2f mV", adc_get_vbat());
+    DBGPRINTLN_CTX("EMU - 5V0 Voltage: %.2f mV", adc_get_5v0());
+    DBGPRINTLN_CTX("EMU - 12V0 Voltage: %.2f mV", adc_get_12v0());
+    DBGPRINTLN_CTX("EMU - VIN Voltage: %.2f mV", adc_get_vin());
 
     DBGPRINTLN_CTX("CMU - HFXO Oscillator: %.3f MHz", (float)HFXO_OSC_FREQ / 1000000);
     DBGPRINTLN_CTX("CMU - HFRCO Oscillator: %.3f MHz", (float)HFRCO_OSC_FREQ / 1000000);
@@ -280,6 +282,10 @@ int init()
     DBGPRINTLN_CTX("CMU - LFE Clock: %.3f kHz", (float)LFE_CLOCK_FREQ / 1000);
     DBGPRINTLN_CTX("CMU - RTCC Clock: %.3f kHz", (float)RTCC_CLOCK_FREQ / 1000);
 
+    DBGPRINTLN_CTX("Waiting 1000 ms...");
+
+    delay_ms(1000);
+
     if(adf4351_init())
         DBGPRINTLN_CTX("ADF4351 init OK!");
     else
@@ -299,7 +305,7 @@ int main()
     DBGPRINTLN_CTX("Attenuator value: -%.3f dB", (float)F1951_ATTENUATION);
 
     // PLL
-    adf4351_pfd_config(26000000, 1, 0, 10, 0);
+    adf4351_pfd_config(26000000, 1, 0, 50, 0);
     DBGPRINTLN_CTX("PLL Reference frequency: %.3f MHz", (float)ADF4351_REF_FREQ / 1000000);
     DBGPRINTLN_CTX("PLL PFD frequency: %.3f MHz", (float)ADF4351_PFD_FREQ / 1000000);
 
@@ -316,21 +322,37 @@ int main()
 
     MIXER_ENABLE();
 
-    PA_5V0_ENABLE();
+    delay_ms(200);
 
-    PA_12V0_ENABLE();
-    delay_ms(500);
-    PA_12V0_DISABLE();
+    PA_5V0_ENABLE();
+    //PA_12V0_ENABLE();
 
     while(1)
     {
         static uint64_t ullLastLEDTick = 0;
+        static uint64_t ullLastDebugPrint = 0;
 
         if(g_ullSystemTick - ullLastLEDTick > 500)
         {
             ullLastLEDTick = g_ullSystemTick;
 
             LED_TOGGLE();
+        }
+
+        if(g_ullSystemTick - ullLastDebugPrint > 2000)
+        {
+            ullLastDebugPrint = g_ullSystemTick;
+
+            DBGPRINTLN_CTX("----------------------------------");
+            DBGPRINTLN_CTX("ADC temperature: %.2f C", adc_get_temperature());
+            DBGPRINTLN_CTX("EMU temperature: %.2f C", emu_get_temperature());
+            DBGPRINTLN_CTX("AVDD Voltage: %.2f mV", adc_get_avdd());
+            DBGPRINTLN_CTX("DVDD Voltage: %.2f mV", adc_get_dvdd());
+            DBGPRINTLN_CTX("IOVDD Voltage: %.2f mV", adc_get_iovdd());
+            DBGPRINTLN_CTX("Core Voltage: %.2f mV", adc_get_corevdd());
+            DBGPRINTLN_CTX("5V0 Voltage: %.2f mV", adc_get_5v0());
+            DBGPRINTLN_CTX("12V0 Voltage: %.2f mV", adc_get_12v0());
+            DBGPRINTLN_CTX("VIN Voltage: %.2f mV", adc_get_vin());
         }
     }
 
