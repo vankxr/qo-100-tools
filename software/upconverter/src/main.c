@@ -301,7 +301,7 @@ int init()
 int main()
 {
     // Attenuator
-    f1951_set_attenuation(32.5f);
+    f1951_set_attenuation(22.5f);
     DBGPRINTLN_CTX("Attenuator value: -%.3f dB", (float)F1951_ATTENUATION);
 
     // PLL
@@ -325,7 +325,7 @@ int main()
     delay_ms(200);
 
     PA_5V0_ENABLE();
-    //PA_12V0_ENABLE();
+    PA_12V0_ENABLE();
 
     while(1)
     {
