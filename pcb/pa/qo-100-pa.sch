@@ -3533,13 +3533,13 @@ Logo</text>
 <part name="U1" library="Analog Devices" deviceset="ADP7142AUJZ*" device="" value="ADP7142AUJZ"/>
 <part name="Q1" library="Ampleon" deviceset="BLP9G0722-20" device="G"/>
 <part name="RFCON1" library="RF Connector" deviceset="RFCON" device="-SMA-EDGE"/>
-<part name="C12" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="0.5pF"/>
+<part name="C12" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="2.2pF"/>
 <part name="GND1" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND2" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="C14" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="5.6pF"/>
-<part name="C16" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="2.2pF"/>
-<part name="C18" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1.8pF"/>
-<part name="C22" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1.2pF"/>
+<part name="C16" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="0.5pF"/>
+<part name="C18" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1.2pF"/>
+<part name="C22" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="DNP"/>
 <part name="C20" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="12pF"/>
 <part name="GND3" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND4" library="Supply Symbol" deviceset="GND" device=""/>
