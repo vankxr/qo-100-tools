@@ -4736,7 +4736,7 @@ Logo</text>
 <part name="GND10" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="R2" library="Resistor" deviceset="RESISTOR" device="-0603" value="43.2 Ohms"/>
 <part name="R7" library="Resistor" deviceset="RESISTOR" device="-0603" value="86.6 Ohms"/>
-<part name="C9" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="68pF"/>
+<part name="C9" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100nF"/>
 <part name="L1" library="Inductor" deviceset="INDUCTOR" device="-0603" value="470nH">
 <attribute name="CURRENT" value="600 mA"/>
 </part>
@@ -4790,6 +4790,9 @@ DS. Eq. 3 &amp; Table 1</text>
 <text x="191.262" y="328.422" size="1.27" layer="98" rot="R180">Vout = ((R4/(R3+R6)) + 1) * 0.97</text>
 <text x="421.64" y="332.74" size="1.778" layer="98" rot="R90" align="center">VGSon = -6.5V at 13V
 VGSon = -9.0V at 18V</text>
+<text x="188.722" y="84.582" size="1.27" layer="98" rot="R180">R2 &amp; R7 form a 75 to 50 Ohm balun
+Install R2 = 0 Ohm and remove R7 if
+no impedance match is needed</text>
 </plain>
 <instances>
 <instance part="FRAME5" gate="G$1" x="0" y="0" smashed="yes">

@@ -301,7 +301,7 @@ int init()
 int main()
 {
     // Attenuator
-    f1951_set_attenuation(22.5f);
+    f1951_set_attenuation(18.0f);
     DBGPRINTLN_CTX("Attenuator value: -%.3f dB", (float)F1951_ATTENUATION);
 
     // PLL

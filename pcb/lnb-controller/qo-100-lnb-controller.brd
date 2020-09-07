@@ -1441,7 +1441,7 @@ design rules under a new name.</description>
 <attribute name="VALUE" x="32.368" y="56.6464" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="-48.15" y="28.3" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
-<element name="C9" library="Capacitor" package="CAP0603" value="68pF" x="26.8" y="22" smashed="yes">
+<element name="C9" library="Capacitor" package="CAP0603" value="100nF" x="26.8" y="22" smashed="yes">
 <attribute name="NAME" x="27.2536" y="20.616" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="23.8536" y="19.968" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="57.28" y="-60.55" size="1.778" layer="27" display="off"/>
