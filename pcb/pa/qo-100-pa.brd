@@ -3,7 +3,7 @@
 <eagle version="9.6.1">
 <drawing>
 <settings>
-<setting alwaysvectorfont="no"/>
+<setting alwaysvectorfont="yes"/>
 <setting verticaltext="up"/>
 </settings>
 <grid distance="0.25" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.1" altunitdist="mm" altunit="mm"/>
@@ -209,7 +209,7 @@
 Max. 28 V</text>
 <text x="16.5" y="2.4" size="1.016" layer="21" font="vector" ratio="12" rot="SR0" align="center">IcyRadio PA v1
 May 2020</text>
-<rectangle x1="35" y1="9" x2="39" y2="19" layer="30"/>
+<rectangle x1="30" y1="7" x2="44" y2="21" layer="30"/>
 </plain>
 <libraries>
 <library name="Capacitor">
@@ -316,10 +316,10 @@ May 2020</text>
 <library name="Ampleon">
 <packages>
 <package name="SOT1483-1">
-<wire x1="-4.825" y1="2.96" x2="4.825" y2="2.96" width="0.127" layer="21"/>
-<wire x1="4.825" y1="2.96" x2="4.825" y2="-2.96" width="0.127" layer="21"/>
-<wire x1="4.825" y1="-2.96" x2="-4.825" y2="-2.96" width="0.127" layer="21"/>
-<wire x1="-4.825" y1="-2.96" x2="-4.825" y2="2.96" width="0.127" layer="21"/>
+<wire x1="-4.825" y1="2.96" x2="4.825" y2="2.96" width="0.127" layer="51"/>
+<wire x1="4.825" y1="2.96" x2="4.825" y2="-2.96" width="0.127" layer="51"/>
+<wire x1="4.825" y1="-2.96" x2="-4.825" y2="-2.96" width="0.127" layer="51"/>
+<wire x1="-4.825" y1="-2.96" x2="-4.825" y2="2.96" width="0.127" layer="51"/>
 <wire x1="5.335" y1="0.89" x2="5.335" y2="-0.89" width="0.127" layer="51"/>
 <wire x1="4.825" y1="0.89" x2="4.825" y2="-0.89" width="0.127" layer="51"/>
 <wire x1="4.825" y1="0.89" x2="5.335" y2="0.89" width="0.127" layer="51"/>
@@ -336,12 +336,21 @@ May 2020</text>
 <wire x1="2.475" y1="-2.96" x2="-2.475" y2="-2.96" width="0.127" layer="51"/>
 <wire x1="-2.475" y1="-4.065" x2="-2.475" y2="-2.96" width="0.127" layer="51"/>
 <wire x1="2.475" y1="-4.065" x2="2.475" y2="-2.96" width="0.127" layer="51"/>
-<circle x="2.2" y="-1.6" radius="0.4242625" width="0" layer="21"/>
+<circle x="4.2" y="-3.6" radius="0.4242625" width="0" layer="21"/>
 <smd name="3@1" x="-5.3" y="0" dx="2.4" dy="3.38" layer="1"/>
-<smd name="1" x="0" y="-3.7" dx="2.4" dy="6.55" layer="1" rot="R90"/>
+<smd name="1" x="0" y="-3.95" dx="1.9" dy="6.55" layer="1" rot="R90"/>
 <smd name="3@0" x="5.3" y="0" dx="2.4" dy="3.38" layer="1" rot="R180"/>
-<smd name="2" x="0" y="3.7" dx="2.4" dy="6.55" layer="1" rot="R270"/>
+<smd name="2" x="0" y="3.95" dx="1.9" dy="6.55" layer="1" rot="R270"/>
 <text x="3.81" y="3.81" size="1.27" layer="25">&gt;NAME</text>
+<smd name="3@2" x="0" y="0" dx="4.5" dy="8.7" layer="1" rot="R90"/>
+<wire x1="4.825" y1="-1.96" x2="4.825" y2="-2.96" width="0.127" layer="21"/>
+<wire x1="4.825" y1="-2.96" x2="3.825" y2="-2.96" width="0.127" layer="21"/>
+<wire x1="-4.825" y1="1.96" x2="-4.825" y2="2.96" width="0.127" layer="21"/>
+<wire x1="-4.825" y1="2.96" x2="-3.825" y2="2.96" width="0.127" layer="21"/>
+<wire x1="4.825" y1="1.96" x2="4.825" y2="2.96" width="0.127" layer="21"/>
+<wire x1="4.825" y1="2.96" x2="3.825" y2="2.96" width="0.127" layer="21"/>
+<wire x1="-4.825" y1="-1.96" x2="-4.825" y2="-2.96" width="0.127" layer="21"/>
+<wire x1="-4.825" y1="-2.96" x2="-3.825" y2="-2.96" width="0.127" layer="21"/>
 </package>
 </packages>
 </library>
@@ -2259,6 +2268,7 @@ design rules under a new name.</description>
 <via x="40" y="24" extent="1-16" drill="0.3"/>
 <via x="40" y="26" extent="1-16" drill="0.3"/>
 <via x="36" y="28" extent="1-16" drill="0.3"/>
+<contactref element="Q1" pad="3@2"/>
 </signal>
 <signal name="N$2">
 <contactref element="C14" pad="2"/>
@@ -2488,6 +2498,61 @@ design rules under a new name.</description>
 <mfgpreviewcolor name="coppercolor" color="0xFFB8B8B8"/>
 <mfgpreviewcolor name="substratecolor" color="0xFF786E46"/>
 </mfgpreviewcolors>
+<errors>
+<approved hash="19,1,60e4621d342b36d2"/>
+<approved hash="19,1,78ea7e4e0c780adc"/>
+<approved hash="19,1,b867bb21ad17ae51"/>
+<approved hash="19,1,d865db3a550c5653"/>
+<approved hash="19,1,18641b3d4d0b4e52"/>
+<approved hash="19,1,5332560a0c3c0904"/>
+<approved hash="19,1,f333f60dec3be905"/>
+<approved hash="19,1,5dda5c1a062c07ec"/>
+<approved hash="19,1,505a571a0d2c0a6c"/>
+<approved hash="19,1,f05bf71ded2bea6d"/>
+<approved hash="19,1,a85aaf1dfd2bfa6c"/>
+<approved hash="19,1,785a7f1e0d280a6c"/>
+<approved hash="19,1,7ab2745e06680884"/>
+<approved hash="19,1,6664620d343b3052"/>
+<approved hash="19,1,a665a20a2c3c2853"/>
+<approved hash="19,1,c667c211d427d051"/>
+<approved hash="19,1,52b25c5a066c0884"/>
+<approved hash="19,1,f2b3fc5de66be885"/>
+<approved hash="19,1,aab2a45df66bf884"/>
+<approved hash="19,1,a0e5a21a2c2c2ed3"/>
+<approved hash="19,1,c0e7c201d437d6d1"/>
+<approved hash="19,1,5252557a0f4c0864"/>
+<approved hash="19,1,f253f57def4be865"/>
+<approved hash="19,1,a8eaae4dfc7bfadc"/>
+<approved hash="19,1,aa52ad7dff4bf864"/>
+<approved hash="19,1,7a527d7e0f480864"/>
+<approved hash="19,1,67c46325351331f2"/>
+<approved hash="19,1,a7c5a3222d1429f3"/>
+<approved hash="19,1,c7c7c339d50fd1f1"/>
+<approved hash="19,1,52aa530a093c089c"/>
+<approved hash="19,1,f2abf30de93be89d"/>
+<approved hash="19,1,aaaaab0df93bf89c"/>
+<approved hash="19,1,61a4624534733792"/>
+<approved hash="19,1,a1a5a2422c742f93"/>
+<approved hash="19,1,f0ebf64dec7beadd"/>
+<approved hash="19,1,c1a7c259d46fd791"/>
+<approved hash="19,1,ab32ae0dfc3bf904"/>
+<approved hash="19,1,7b327e0e0c380904"/>
+<approved hash="19,1,69e46a0d3c3b3fd2"/>
+<approved hash="19,1,a9e5aa0a243c27d3"/>
+<approved hash="19,1,c9e7ca11dc27dfd1"/>
+<approved hash="19,1,4c324f0a153c1604"/>
+<approved hash="19,1,ec33ef0df53bf605"/>
+<approved hash="19,1,b432b70de53be604"/>
+<approved hash="19,1,6432670e15381604"/>
+<approved hash="19,1,7aaa7b0e0938089c"/>
+<approved hash="19,1,66846405323330b2"/>
+<approved hash="19,1,a685a4022a3428b3"/>
+<approved hash="19,1,c687c419d22fd0b1"/>
+<approved hash="19,1,50ea564a0c7c0adc"/>
+<approved hash="19,1,75da741e062807ec"/>
+<approved hash="19,1,a5daa41df62bf7ec"/>
+<approved hash="19,1,fddbfc1de62be7ed"/>
+</errors>
 </board>
 </drawing>
 <compatibility>

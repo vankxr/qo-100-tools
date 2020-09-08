@@ -248,10 +248,10 @@
 <library name="Ampleon">
 <packages>
 <package name="SOT1483-1">
-<wire x1="-4.825" y1="2.96" x2="4.825" y2="2.96" width="0.127" layer="21"/>
-<wire x1="4.825" y1="2.96" x2="4.825" y2="-2.96" width="0.127" layer="21"/>
-<wire x1="4.825" y1="-2.96" x2="-4.825" y2="-2.96" width="0.127" layer="21"/>
-<wire x1="-4.825" y1="-2.96" x2="-4.825" y2="2.96" width="0.127" layer="21"/>
+<wire x1="-4.825" y1="2.96" x2="4.825" y2="2.96" width="0.127" layer="51"/>
+<wire x1="4.825" y1="2.96" x2="4.825" y2="-2.96" width="0.127" layer="51"/>
+<wire x1="4.825" y1="-2.96" x2="-4.825" y2="-2.96" width="0.127" layer="51"/>
+<wire x1="-4.825" y1="-2.96" x2="-4.825" y2="2.96" width="0.127" layer="51"/>
 <wire x1="5.335" y1="0.89" x2="5.335" y2="-0.89" width="0.127" layer="51"/>
 <wire x1="4.825" y1="0.89" x2="4.825" y2="-0.89" width="0.127" layer="51"/>
 <wire x1="4.825" y1="0.89" x2="5.335" y2="0.89" width="0.127" layer="51"/>
@@ -268,12 +268,21 @@
 <wire x1="2.475" y1="-2.96" x2="-2.475" y2="-2.96" width="0.127" layer="51"/>
 <wire x1="-2.475" y1="-4.065" x2="-2.475" y2="-2.96" width="0.127" layer="51"/>
 <wire x1="2.475" y1="-4.065" x2="2.475" y2="-2.96" width="0.127" layer="51"/>
-<circle x="2.2" y="-1.6" radius="0.4242625" width="0" layer="21"/>
+<circle x="4.2" y="-3.6" radius="0.4242625" width="0" layer="21"/>
 <smd name="3@1" x="-5.3" y="0" dx="2.4" dy="3.38" layer="1"/>
-<smd name="1" x="0" y="-3.7" dx="2.4" dy="6.55" layer="1" rot="R90"/>
+<smd name="1" x="0" y="-3.95" dx="1.9" dy="6.55" layer="1" rot="R90"/>
 <smd name="3@0" x="5.3" y="0" dx="2.4" dy="3.38" layer="1" rot="R180"/>
-<smd name="2" x="0" y="3.7" dx="2.4" dy="6.55" layer="1" rot="R270"/>
+<smd name="2" x="0" y="3.95" dx="1.9" dy="6.55" layer="1" rot="R270"/>
 <text x="3.81" y="3.81" size="1.27" layer="25">&gt;NAME</text>
+<smd name="3@2" x="0" y="0" dx="4.5" dy="8.7" layer="1" rot="R90"/>
+<wire x1="4.825" y1="-1.96" x2="4.825" y2="-2.96" width="0.127" layer="21"/>
+<wire x1="4.825" y1="-2.96" x2="3.825" y2="-2.96" width="0.127" layer="21"/>
+<wire x1="-4.825" y1="1.96" x2="-4.825" y2="2.96" width="0.127" layer="21"/>
+<wire x1="-4.825" y1="2.96" x2="-3.825" y2="2.96" width="0.127" layer="21"/>
+<wire x1="4.825" y1="1.96" x2="4.825" y2="2.96" width="0.127" layer="21"/>
+<wire x1="4.825" y1="2.96" x2="3.825" y2="2.96" width="0.127" layer="21"/>
+<wire x1="-4.825" y1="-1.96" x2="-4.825" y2="-2.96" width="0.127" layer="21"/>
+<wire x1="-4.825" y1="-2.96" x2="-3.825" y2="-2.96" width="0.127" layer="21"/>
 </package>
 </packages>
 <symbols>
@@ -314,7 +323,7 @@
 <connects>
 <connect gate="G$1" pin="D" pad="1"/>
 <connect gate="G$1" pin="G" pad="2"/>
-<connect gate="G$1" pin="S" pad="3@0 3@1"/>
+<connect gate="G$1" pin="S" pad="3@0 3@1 3@2"/>
 </connects>
 <technologies>
 <technology name=""/>
