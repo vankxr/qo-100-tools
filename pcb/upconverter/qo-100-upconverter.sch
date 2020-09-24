@@ -1463,6 +1463,17 @@
 <wire x1="-3.95" y1="-6.35" x2="3.95" y2="-6.35" width="0.127" layer="21"/>
 <wire x1="3.95" y1="-6.35" x2="6.9" y2="-3.4" width="0.127" layer="21" curve="90"/>
 </package>
+<package name="IND0404">
+<smd name="1" x="-1.65" y="0" dx="3.4" dy="1.75" layer="1" rot="R90"/>
+<smd name="2" x="1.65" y="0" dx="3.4" dy="1.75" layer="1" rot="R90"/>
+<wire x1="2" y1="-2" x2="2" y2="2" width="0.127" layer="51"/>
+<wire x1="2" y1="2" x2="-2" y2="2" width="0.127" layer="51"/>
+<wire x1="-2" y1="2" x2="-2" y2="-2" width="0.127" layer="51"/>
+<text x="-2.08" y="2.58" size="1.016" layer="25">&gt;NAME</text>
+<wire x1="2" y1="2" x2="-2" y2="2" width="0.127" layer="21"/>
+<wire x1="2" y1="-2" x2="-2" y2="-2" width="0.127" layer="51"/>
+<wire x1="2" y1="-2" x2="-2" y2="-2" width="0.127" layer="21"/>
+</package>
 </packages>
 <symbols>
 <symbol name="IND">
@@ -1590,6 +1601,17 @@
 </technology>
 </technologies>
 </device>
+<device name="-4X4MM" package="IND0404">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+</connects>
+<technologies>
+<technology name="">
+<attribute name="CURRENT" value="" constant="no"/>
+</technology>
+</technologies>
+</device>
 </devices>
 </deviceset>
 </devicesets>
@@ -1706,6 +1728,28 @@
 <wire x1="-1.1" y1="-0.55" x2="-1.1" y2="0.55" width="0.1905" layer="21"/>
 <wire x1="-1.1" y1="0.55" x2="-0.2" y2="0.55" width="0.1905" layer="21"/>
 </package>
+<package name="RES2728">
+<smd name="1" x="-3.15" y="0" dx="2.8" dy="7.8" layer="1"/>
+<smd name="2" x="3.15" y="0" dx="2.8" dy="7.8" layer="1"/>
+<wire x1="-1.7876" y1="-3.8764" x2="-1.7876" y2="3.8764" width="0" layer="51"/>
+<wire x1="-1.7876" y1="3.8764" x2="-3.5258" y2="3.8764" width="0" layer="51"/>
+<wire x1="-3.5258" y1="-3.8764" x2="-1.7876" y2="-3.8764" width="0" layer="51"/>
+<wire x1="1.7876" y1="3.8764" x2="1.7876" y2="-3.8764" width="0" layer="51"/>
+<wire x1="1.7876" y1="-3.8764" x2="3.4258" y2="-3.8764" width="0" layer="51"/>
+<wire x1="3.4258" y1="3.8764" x2="1.7876" y2="3.8764" width="0" layer="51"/>
+<wire x1="-1.7876" y1="-3.8764" x2="1.7876" y2="-3.8764" width="0" layer="51"/>
+<wire x1="3.4258" y1="-3.8764" x2="3.4258" y2="3.8764" width="0" layer="51"/>
+<wire x1="1.7876" y1="3.8764" x2="-1.7876" y2="3.8764" width="0" layer="51"/>
+<wire x1="-3.5258" y1="3.8764" x2="-3.5258" y2="-3.8764" width="0" layer="51"/>
+<text x="-4.8544" y="4.64" size="2.0828" layer="25" ratio="10" rot="SR0">&gt;NAME</text>
+<text x="-5.4544" y="-6.645" size="2.0828" layer="27" ratio="10" rot="SR0">&gt;VALUE</text>
+<wire x1="-1.7" y1="-4.2" x2="-4.9" y2="-4.2" width="0.1905" layer="21"/>
+<wire x1="-4.9" y1="-4.2" x2="-4.9" y2="4.2" width="0.1905" layer="21"/>
+<wire x1="-4.9" y1="4.2" x2="-1.7" y2="4.2" width="0.1905" layer="21"/>
+<wire x1="1.7" y1="4.2" x2="4.9" y2="4.2" width="0.1905" layer="21"/>
+<wire x1="4.9" y1="4.2" x2="4.9" y2="-4.2" width="0.1905" layer="21"/>
+<wire x1="4.9" y1="-4.2" x2="1.7" y2="-4.2" width="0.1905" layer="21"/>
+</package>
 </packages>
 <symbols>
 <symbol name="RES">
@@ -1774,6 +1818,17 @@
 </technologies>
 </device>
 <device name="-0402" package="RES0402">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+</connects>
+<technologies>
+<technology name="">
+<attribute name="TOLERANCE" value="" constant="no"/>
+</technology>
+</technologies>
+</device>
+<device name="-2728" package="RES2728">
 <connects>
 <connect gate="G$1" pin="1" pad="1"/>
 <connect gate="G$1" pin="2" pad="2"/>
@@ -2499,6 +2554,44 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 <wire x1="4.85" y1="33.35" x2="4.85" y2="21.35" width="0.127" layer="21"/>
 <text x="-7.112" y="-2.921" size="1.27" layer="25">&gt;NAME</text>
 </package>
+<package name="F-EDGE">
+<text x="-11.115" y="-2.46" size="0.3048" layer="51" rot="R90">PCB Edge</text>
+<wire x1="-10.755" y1="-0.8" x2="-10.455" y2="-0.1" width="0.08" layer="51"/>
+<wire x1="-10.455" y1="-0.1" x2="-10.655" y2="-0.2" width="0.08" layer="51"/>
+<wire x1="-10.455" y1="-0.1" x2="-10.355" y2="-0.3" width="0.08" layer="51"/>
+<wire x1="-12" y1="0" x2="-9.525" y2="0" width="0" layer="51"/>
+<wire x1="-9.525" y1="0" x2="-6.605" y2="0" width="0" layer="51"/>
+<wire x1="12" y1="0" x2="9.525" y2="0" width="0" layer="51"/>
+<wire x1="9.525" y1="0" x2="6.605" y2="0" width="0" layer="51"/>
+<wire x1="5.335" y1="12.95" x2="-5.335" y2="12.95" width="0" layer="51"/>
+<wire x1="-5.335" y1="12.95" x2="-6.605" y2="11.68" width="0" layer="51" curve="90"/>
+<wire x1="-6.605" y1="11.68" x2="-6.605" y2="0" width="0" layer="51"/>
+<wire x1="5.335" y1="12.95" x2="6.605" y2="11.68" width="0" layer="51" curve="-90"/>
+<wire x1="6.605" y1="11.68" x2="6.605" y2="0" width="0" layer="51"/>
+<smd name="GND@3" x="7.24" y="16" dx="9.4" dy="4.58" layer="1" cream="no"/>
+<smd name="GND@5" x="9.6525" y="9.525" dx="4.575" dy="17.53" layer="1" cream="no"/>
+<smd name="GND@2" x="-7.24" y="16" dx="9.4" dy="4.58" layer="1" cream="no"/>
+<smd name="GND@0" x="-9.6525" y="9.525" dx="4.575" dy="17.53" layer="1" cream="no"/>
+<smd name="SIGNAL" x="0" y="16.71" dx="6" dy="1.78" layer="1" rot="R90" cream="no"/>
+<wire x1="-9.525" y1="0" x2="-9.525" y2="16.64" width="0.127" layer="51"/>
+<wire x1="-9.525" y1="16.64" x2="9.525" y2="16.64" width="0.127" layer="51"/>
+<wire x1="9.525" y1="16.64" x2="9.525" y2="0" width="0.127" layer="51"/>
+<wire x1="9.525" y1="0" x2="-9.525" y2="0" width="0.127" layer="51"/>
+<wire x1="-9.525" y1="-3.18" x2="-9.525" y2="0" width="0.127" layer="51"/>
+<wire x1="9.525" y1="0" x2="9.525" y2="-3.18" width="0.127" layer="51"/>
+<wire x1="9.525" y1="-3.18" x2="4" y2="-3.18" width="0.127" layer="51"/>
+<wire x1="4" y1="-3.18" x2="-4" y2="-3.18" width="0.127" layer="51"/>
+<wire x1="-4" y1="-3.18" x2="-9.525" y2="-3.18" width="0.127" layer="51"/>
+<wire x1="-4" y1="-3.18" x2="-4" y2="-16.32" width="0.127" layer="51"/>
+<wire x1="-4" y1="-16.32" x2="4" y2="-16.32" width="0.127" layer="51"/>
+<wire x1="4" y1="-16.32" x2="4" y2="-3.18" width="0.127" layer="51"/>
+<text x="-9" y="19" size="1.27" layer="25">&gt;NAME</text>
+<wire x1="9.525" y1="0" x2="-9.525" y2="0" width="0.127" layer="21"/>
+<wire x1="9.525" y1="0" x2="9.525" y2="0.6" width="0.127" layer="21"/>
+<wire x1="-9.525" y1="0" x2="-9.525" y2="0.6" width="0.127" layer="21"/>
+<pad name="GND@4" x="7.94" y="14.61" drill="1.91" diameter="3.5" shape="octagon"/>
+<pad name="GND@1" x="-7.94" y="14.61" drill="1.91" diameter="3.5" shape="octagon"/>
+</package>
 </packages>
 <symbols>
 <symbol name="RFCON">
@@ -2555,6 +2648,15 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 <device name="-BNC" package="BNC">
 <connects>
 <connect gate="G$1" pin="GND" pad="GND"/>
+<connect gate="G$1" pin="SIGNAL" pad="SIGNAL"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="-F-EDGE" package="F-EDGE">
+<connects>
+<connect gate="G$1" pin="GND" pad="GND@0 GND@1 GND@2 GND@3 GND@4 GND@5"/>
 <connect gate="G$1" pin="SIGNAL" pad="SIGNAL"/>
 </connects>
 <technologies>
@@ -3837,28 +3939,6 @@ Source: &lt;a href="http://www.littelfuse.com/~/media/electronics/datasheets/tvs
 <wire x1="0.354" y1="0.554" x2="0.354" y2="-0.554" width="0.127" layer="21"/>
 <wire x1="0.354" y1="-0.554" x2="-0.5" y2="0" width="0.127" layer="21"/>
 </package>
-<package name="LED_3MM" urn="urn:adsk.eagle:footprint:39306/1" locally_modified="yes">
-<wire x1="1.5748" y1="-1.27" x2="1.5748" y2="1.27" width="0.254" layer="51"/>
-<wire x1="0" y1="2.032" x2="1.561" y2="1.3009" width="0.254" layer="22" curve="-50.193108" cap="flat"/>
-<wire x1="-1.7929" y1="0.9562" x2="0" y2="2.032" width="0.254" layer="22" curve="-61.926949" cap="flat"/>
-<wire x1="0" y1="-2.032" x2="1.5512" y2="-1.3126" width="0.254" layer="22" curve="49.763022" cap="flat"/>
-<wire x1="-1.7643" y1="-1.0082" x2="0" y2="-2.032" width="0.254" layer="22" curve="60.255215" cap="flat"/>
-<wire x1="-2.032" y1="0" x2="-1.7891" y2="0.9634" width="0.254" layer="51" curve="-28.301701" cap="flat"/>
-<wire x1="-2.032" y1="0" x2="-1.7306" y2="-1.065" width="0.254" layer="51" curve="31.60822" cap="flat"/>
-<wire x1="1.5748" y1="1.2954" x2="1.5748" y2="0.7874" width="0.254" layer="22"/>
-<wire x1="1.5748" y1="-1.2954" x2="1.5748" y2="-0.8382" width="0.254" layer="22"/>
-<wire x1="0" y1="2.032" x2="1.561" y2="1.3009" width="0.254" layer="21" curve="-50.193108" cap="flat"/>
-<wire x1="-1.7929" y1="0.9562" x2="0" y2="2.032" width="0.254" layer="21" curve="-61.926949" cap="flat"/>
-<wire x1="0" y1="-2.032" x2="1.5512" y2="-1.3126" width="0.254" layer="21" curve="49.763022" cap="flat"/>
-<wire x1="-1.7643" y1="-1.0082" x2="0" y2="-2.032" width="0.254" layer="21" curve="60.255215" cap="flat"/>
-<wire x1="1.5748" y1="1.2954" x2="1.5748" y2="0.7874" width="0.254" layer="21"/>
-<wire x1="1.5748" y1="-1.2954" x2="1.5748" y2="-0.8382" width="0.254" layer="21"/>
-<pad name="A" x="-1.27" y="0" drill="0.8128" diameter="1.8796"/>
-<pad name="K" x="1.27" y="0" drill="0.8128" diameter="1.8796"/>
-<text x="0" y="2.286" size="0.6096" layer="25" font="vector" ratio="20" align="bottom-center">&gt;NAME</text>
-<text x="0" y="-2.286" size="0.6096" layer="27" font="vector" ratio="20" align="top-center">&gt;VALUE</text>
-<text x="-4.064" y="0.381" size="1.778" layer="21" font="vector">+</text>
-</package>
 <package name="LED_5MM" urn="urn:adsk.eagle:footprint:39305/1" locally_modified="yes">
 <wire x1="2.54" y1="-1.905" x2="2.54" y2="1.905" width="0.2032" layer="22"/>
 <wire x1="-1.143" y1="0" x2="0" y2="1.143" width="0.1524" layer="51" curve="-90" cap="flat"/>
@@ -3916,6 +3996,28 @@ Source: &lt;a href="http://www.littelfuse.com/~/media/electronics/datasheets/tvs
 <vertex x="-0.9" y="0.9"/>
 <vertex x="0.9" y="0.9"/>
 </polygon>
+</package>
+<package name="LED_3MM" urn="urn:adsk.eagle:footprint:39306/1" locally_modified="yes">
+<wire x1="1.5748" y1="-1.27" x2="1.5748" y2="1.27" width="0.254" layer="51"/>
+<wire x1="0" y1="2.032" x2="1.561" y2="1.3009" width="0.254" layer="22" curve="-50.193108" cap="flat"/>
+<wire x1="-1.7929" y1="0.9562" x2="0" y2="2.032" width="0.254" layer="22" curve="-61.926949" cap="flat"/>
+<wire x1="0" y1="-2.032" x2="1.5512" y2="-1.3126" width="0.254" layer="22" curve="49.763022" cap="flat"/>
+<wire x1="-1.7643" y1="-1.0082" x2="0" y2="-2.032" width="0.254" layer="22" curve="60.255215" cap="flat"/>
+<wire x1="-2.032" y1="0" x2="-1.7891" y2="0.9634" width="0.254" layer="51" curve="-28.301701" cap="flat"/>
+<wire x1="-2.032" y1="0" x2="-1.7306" y2="-1.065" width="0.254" layer="51" curve="31.60822" cap="flat"/>
+<wire x1="1.5748" y1="1.2954" x2="1.5748" y2="0.7874" width="0.254" layer="22"/>
+<wire x1="1.5748" y1="-1.2954" x2="1.5748" y2="-0.8382" width="0.254" layer="22"/>
+<wire x1="0" y1="2.032" x2="1.561" y2="1.3009" width="0.254" layer="21" curve="-50.193108" cap="flat"/>
+<wire x1="-1.7929" y1="0.9562" x2="0" y2="2.032" width="0.254" layer="21" curve="-61.926949" cap="flat"/>
+<wire x1="0" y1="-2.032" x2="1.5512" y2="-1.3126" width="0.254" layer="21" curve="49.763022" cap="flat"/>
+<wire x1="-1.7643" y1="-1.0082" x2="0" y2="-2.032" width="0.254" layer="21" curve="60.255215" cap="flat"/>
+<wire x1="1.5748" y1="1.2954" x2="1.5748" y2="0.7874" width="0.254" layer="21"/>
+<wire x1="1.5748" y1="-1.2954" x2="1.5748" y2="-0.8382" width="0.254" layer="21"/>
+<pad name="A" x="-1.27" y="0" drill="0.8128" diameter="1.8796"/>
+<pad name="K" x="1.27" y="0" drill="0.8128" diameter="1.8796"/>
+<text x="0" y="2.286" size="0.6096" layer="25" font="vector" ratio="20" align="bottom-center">&gt;NAME</text>
+<text x="0" y="-2.286" size="0.6096" layer="27" font="vector" ratio="20" align="top-center">&gt;VALUE</text>
+<text x="-2.794" y="1.651" size="1.27" layer="21" font="vector" align="center">+</text>
 </package>
 </packages>
 <symbols>
