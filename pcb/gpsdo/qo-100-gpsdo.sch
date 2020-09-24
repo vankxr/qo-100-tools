@@ -2072,6 +2072,26 @@ Logo</text>
 </library>
 <library name="Analog Devices">
 <packages>
+<package name="DFN10">
+<smd name="11" x="0" y="0" dx="2.38" dy="1.65" layer="1" rot="R270"/>
+<smd name="1" x="-1.425" y="1" dx="0.7" dy="0.25" layer="1"/>
+<circle x="-1.869" y="1.836" radius="0.2" width="0" layer="21"/>
+<wire x1="-1.5" y1="1.5" x2="1.5" y2="1.5" width="0.127" layer="21"/>
+<wire x1="1.5" y1="1.5" x2="1.5" y2="-1.5" width="0.127" layer="51"/>
+<wire x1="1.5" y1="-1.5" x2="-1.5" y2="-1.5" width="0.127" layer="21"/>
+<wire x1="-1.5" y1="-1.5" x2="-1.5" y2="1.5" width="0.127" layer="51"/>
+<text x="-1.27" y="2.54" size="0.4064" layer="25">&gt;NAME</text>
+<text x="-1.27" y="1.905" size="0.4064" layer="27">&gt;VALUE</text>
+<smd name="2" x="-1.425" y="0.5" dx="0.7" dy="0.25" layer="1"/>
+<smd name="3" x="-1.425" y="0" dx="0.7" dy="0.25" layer="1"/>
+<smd name="4" x="-1.425" y="-0.5" dx="0.7" dy="0.25" layer="1"/>
+<smd name="5" x="-1.425" y="-1" dx="0.7" dy="0.25" layer="1"/>
+<smd name="6" x="1.425" y="-1" dx="0.7" dy="0.25" layer="1" rot="R180"/>
+<smd name="7" x="1.425" y="-0.5" dx="0.7" dy="0.25" layer="1" rot="R180"/>
+<smd name="8" x="1.425" y="0" dx="0.7" dy="0.25" layer="1" rot="R180"/>
+<smd name="9" x="1.425" y="0.5" dx="0.7" dy="0.25" layer="1" rot="R180"/>
+<smd name="10" x="1.425" y="1" dx="0.7" dy="0.25" layer="1" rot="R180"/>
+</package>
 <package name="MSOP10" urn="urn:adsk.eagle:footprint:16021/1" locally_modified="yes">
 <wire x1="-1.5" y1="-1.5" x2="1.5" y2="-1.5" width="0.127" layer="51"/>
 <wire x1="1.5" y1="-1.5" x2="1.5" y2="1.5" width="0.127" layer="21"/>
@@ -2237,16 +2257,33 @@ Logo</text>
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="AD5541A" prefix="U">
+<deviceset name="AD5541A?" prefix="U">
 <gates>
 <gate name="G$1" symbol="AD5541A" x="0" y="0"/>
 </gates>
 <devices>
-<device name="" package="MSOP10">
+<device name="RMZ" package="MSOP10">
 <connects>
 <connect gate="G$1" pin="!CS" pad="5"/>
 <connect gate="G$1" pin="!LDAC" pad="8"/>
 <connect gate="G$1" pin="AGND" pad="3"/>
+<connect gate="G$1" pin="DGND" pad="9"/>
+<connect gate="G$1" pin="DIN" pad="7"/>
+<connect gate="G$1" pin="REF" pad="4"/>
+<connect gate="G$1" pin="SCLK" pad="6"/>
+<connect gate="G$1" pin="VDD" pad="1"/>
+<connect gate="G$1" pin="VLOGIC" pad="10"/>
+<connect gate="G$1" pin="VOUT" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="CPZ" package="DFN10">
+<connects>
+<connect gate="G$1" pin="!CS" pad="5"/>
+<connect gate="G$1" pin="!LDAC" pad="8"/>
+<connect gate="G$1" pin="AGND" pad="3 11"/>
 <connect gate="G$1" pin="DGND" pad="9"/>
 <connect gate="G$1" pin="DIN" pad="7"/>
 <connect gate="G$1" pin="REF" pad="4"/>
@@ -2335,6 +2372,25 @@ Logo</text>
 </library>
 <library name="Microchip">
 <packages>
+<package name="TDFN8">
+<smd name="1" x="-1.5" y="0.75" dx="0.75" dy="0.3" layer="1"/>
+<text x="-0.948" y="1.248" size="0.4064" layer="25">&gt;NAME</text>
+<circle x="-2.014" y="1.483" radius="0.3" width="0" layer="21"/>
+<smd name="9" x="0" y="0" dx="1.46" dy="1.36" layer="1" rot="R270"/>
+<wire x1="-1.5" y1="1" x2="1.5" y2="1" width="0.127" layer="51"/>
+<wire x1="1.5" y1="1" x2="1.5" y2="-1" width="0.127" layer="51"/>
+<wire x1="1.5" y1="-1" x2="-1.5" y2="-1" width="0.127" layer="51"/>
+<wire x1="-1.5" y1="-1" x2="-1.5" y2="1" width="0.127" layer="51"/>
+<wire x1="-0.9" y1="1" x2="0.9" y2="1" width="0.127" layer="21"/>
+<wire x1="0.9" y1="-1" x2="-0.9" y2="-1" width="0.127" layer="21"/>
+<smd name="2" x="-1.5" y="0.25" dx="0.75" dy="0.3" layer="1"/>
+<smd name="3" x="-1.5" y="-0.25" dx="0.75" dy="0.3" layer="1"/>
+<smd name="4" x="-1.5" y="-0.75" dx="0.75" dy="0.3" layer="1"/>
+<smd name="5" x="1.5" y="-0.75" dx="0.75" dy="0.3" layer="1" rot="R180"/>
+<smd name="6" x="1.5" y="-0.25" dx="0.75" dy="0.3" layer="1" rot="R180"/>
+<smd name="7" x="1.5" y="0.25" dx="0.75" dy="0.3" layer="1" rot="R180"/>
+<smd name="8" x="1.5" y="0.75" dx="0.75" dy="0.3" layer="1" rot="R180"/>
+</package>
 <package name="MSOP8" urn="urn:adsk.eagle:footprint:4307/1" locally_modified="yes">
 <wire x1="1.5" y1="-1.5" x2="-1.5" y2="-1.5" width="0.127" layer="51"/>
 <wire x1="-1.5" y1="1.5" x2="1.5" y2="1.5" width="0.127" layer="51"/>
@@ -2515,7 +2571,7 @@ Logo</text>
 <gate name=".PWR" symbol="OP_AMP_PWR" x="12.7" y="0"/>
 </gates>
 <devices>
-<device name="" package="MSOP8">
+<device name="-E/MS" package="MSOP8">
 <connects>
 <connect gate=".1" pin="+IN" pad="3"/>
 <connect gate=".1" pin="-IN" pad="2"/>
@@ -2525,6 +2581,21 @@ Logo</text>
 <connect gate=".2" pin="OUT" pad="7"/>
 <connect gate=".PWR" pin="V+" pad="8"/>
 <connect gate=".PWR" pin="V-" pad="4"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="-E/MNY" package="TDFN8">
+<connects>
+<connect gate=".1" pin="+IN" pad="3"/>
+<connect gate=".1" pin="-IN" pad="2"/>
+<connect gate=".1" pin="OUT" pad="1"/>
+<connect gate=".2" pin="+IN" pad="5"/>
+<connect gate=".2" pin="-IN" pad="6"/>
+<connect gate=".2" pin="OUT" pad="7"/>
+<connect gate=".PWR" pin="V+" pad="8"/>
+<connect gate=".PWR" pin="V-" pad="4 9"/>
 </connects>
 <technologies>
 <technology name=""/>
@@ -6024,8 +6095,8 @@ Source: &lt;a href="http://www.littelfuse.com/~/media/electronics/datasheets/tvs
 <parts>
 <part name="FRAME1" library="Frame" deviceset="A2-LANDSCAPE" device=""/>
 <part name="LOGO1" library="Silkscreen" deviceset="JS" device="-5MM"/>
-<part name="U5" library="Analog Devices" deviceset="AD5541A" device=""/>
-<part name="U6" library="Microchip" deviceset="MCP6V32" device=""/>
+<part name="U5" library="Analog Devices" deviceset="AD5541A?" device="CPZ"/>
+<part name="U6" library="Microchip" deviceset="MCP6V32" device="-E/MNY"/>
 <part name="U4" library="Microchip" deviceset="MCP1501-*" device="" technology="25"/>
 <part name="U14" library="Logic" deviceset="74LVC1G17" device=""/>
 <part name="R25" library="Resistor" deviceset="RESISTOR" device="-0603" value="100 Ohms"/>
