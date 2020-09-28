@@ -5549,6 +5549,7 @@ Logo</text>
 <part name="3V21" library="Supply Symbol" deviceset="3V3" device=""/>
 <part name="R3" library="Resistor" deviceset="RESISTOR" device="-0603" value="1K Ohms"/>
 <part name="3V22" library="Supply Symbol" deviceset="3V3" device=""/>
+<part name="5V00003" library="Supply Symbol" deviceset="5V0" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -7267,8 +7268,8 @@ DS. Table 1</text>
 <attribute name="VOLTAGE" x="215.6714" y="304.8" size="1.778" layer="97" ratio="10" rot="SR270" align="top-left"/>
 </instance>
 <instance part="F1" gate="G$1" x="256.54" y="340.36" smashed="yes">
-<attribute name="HOLD" x="256.54" y="336.296" size="1.778" layer="97" align="top-left"/>
-<attribute name="TRIP" x="256.54" y="333.756" size="1.778" layer="97" align="top-left"/>
+<attribute name="HOLD" x="256.54" y="336.296" size="1.778" layer="97" align="top-left" display="both"/>
+<attribute name="TRIP" x="256.54" y="333.756" size="1.778" layer="97" align="top-left" display="both"/>
 <attribute name="NAME" x="256.54" y="345.1606" size="1.778" layer="95" ratio="10" rot="SR0"/>
 </instance>
 <instance part="R24" gate="G$1" x="190.5" y="299.72" smashed="yes" rot="R270">
@@ -7406,8 +7407,8 @@ DS. Table 1</text>
 <attribute name="VOLTAGE" x="215.6714" y="66.04" size="1.778" layer="97" ratio="10" rot="SR270" align="top-left"/>
 </instance>
 <instance part="F2" gate="G$1" x="256.54" y="101.6" smashed="yes">
-<attribute name="HOLD" x="256.54" y="97.536" size="1.778" layer="97" align="top-left"/>
-<attribute name="TRIP" x="256.54" y="94.996" size="1.778" layer="97" align="top-left"/>
+<attribute name="HOLD" x="256.54" y="97.536" size="1.778" layer="97" align="top-left" display="both"/>
+<attribute name="TRIP" x="256.54" y="94.996" size="1.778" layer="97" align="top-left" display="both"/>
 <attribute name="NAME" x="256.54" y="106.4006" size="1.778" layer="95" ratio="10" rot="SR0"/>
 </instance>
 <instance part="R27" gate="G$1" x="190.5" y="60.96" smashed="yes" rot="R270">
@@ -7583,6 +7584,9 @@ DS. Table 1</text>
 </instance>
 <instance part="VIN7" gate="G$1" x="180.34" y="185.42" smashed="yes">
 <attribute name="VALUE" x="177.8" y="182.88" size="1.778" layer="96" rot="R90"/>
+</instance>
+<instance part="5V00003" gate="G$1" x="76.2" y="226.06" smashed="yes">
+<attribute name="VALUE" x="73.66" y="223.52" size="1.778" layer="96" rot="R90"/>
 </instance>
 </instances>
 <busses>
@@ -8061,11 +8065,6 @@ DS. Table 1</text>
 <wire x1="246.38" y1="353.06" x2="256.54" y2="353.06" width="0.1524" layer="91"/>
 <label x="256.54" y="353.06" size="1.778" layer="95" xref="yes"/>
 </segment>
-<segment>
-<wire x1="81.28" y1="215.9" x2="71.12" y2="215.9" width="0.1524" layer="91"/>
-<label x="71.12" y="215.9" size="1.778" layer="95" rot="R180" xref="yes"/>
-<pinref part="U5" gate=".CNTRL" pin="BIAS"/>
-</segment>
 </net>
 <net name="VBIAS2_SW" class="0">
 <segment>
@@ -8284,6 +8283,14 @@ DS. Table 1</text>
 <pinref part="U7" gate="G$1" pin="EXT_CAP"/>
 <wire x1="391.16" y1="175.26" x2="391.16" y2="180.34" width="0.1524" layer="91"/>
 <wire x1="391.16" y1="180.34" x2="406.4" y2="180.34" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="5V0" class="0">
+<segment>
+<pinref part="5V00003" gate="G$1" pin="5V0"/>
+<pinref part="U5" gate=".CNTRL" pin="BIAS"/>
+<wire x1="76.2" y1="226.06" x2="76.2" y2="215.9" width="0.1524" layer="91"/>
+<wire x1="76.2" y1="215.9" x2="81.28" y2="215.9" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
