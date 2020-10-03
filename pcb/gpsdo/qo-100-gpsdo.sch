@@ -2970,7 +2970,9 @@ Logo</text>
 <connect gate="G$1" pin="2" pad="2"/>
 </connects>
 <technologies>
-<technology name=""/>
+<technology name="">
+<attribute name="TOLERANCE" value="" constant="no"/>
+</technology>
 </technologies>
 </device>
 </devices>
@@ -3313,6 +3315,17 @@ Logo</text>
 <wire x1="-3.95" y1="-6.35" x2="3.95" y2="-6.35" width="0.127" layer="21"/>
 <wire x1="3.95" y1="-6.35" x2="6.9" y2="-3.4" width="0.127" layer="21" curve="90"/>
 </package>
+<package name="IND0404">
+<smd name="1" x="-1.65" y="0" dx="3.4" dy="1.75" layer="1" rot="R90"/>
+<smd name="2" x="1.65" y="0" dx="3.4" dy="1.75" layer="1" rot="R90"/>
+<wire x1="2" y1="-2" x2="2" y2="2" width="0.127" layer="51"/>
+<wire x1="2" y1="2" x2="-2" y2="2" width="0.127" layer="51"/>
+<wire x1="-2" y1="2" x2="-2" y2="-2" width="0.127" layer="51"/>
+<text x="-2.08" y="2.58" size="1.016" layer="25">&gt;NAME</text>
+<wire x1="2" y1="2" x2="-2" y2="2" width="0.127" layer="21"/>
+<wire x1="2" y1="-2" x2="-2" y2="-2" width="0.127" layer="51"/>
+<wire x1="2" y1="-2" x2="-2" y2="-2" width="0.127" layer="21"/>
+</package>
 </packages>
 <symbols>
 <symbol name="IND">
@@ -3430,6 +3443,17 @@ Logo</text>
 </technologies>
 </device>
 <device name="-13X13X6.5MM" package="IND1365">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+</connects>
+<technologies>
+<technology name="">
+<attribute name="CURRENT" value="" constant="no"/>
+</technology>
+</technologies>
+</device>
+<device name="-4X4MM" package="IND0404">
 <connects>
 <connect gate="G$1" pin="1" pad="1"/>
 <connect gate="G$1" pin="2" pad="2"/>
@@ -3839,7 +3863,7 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 </package>
 </packages>
 <symbols>
-<symbol name="SI5351C">
+<symbol name="SI5351C-X-GM">
 <pin name="INTR" x="-27.94" y="-30.48" length="middle"/>
 <pin name="GND" x="-27.94" y="-53.34" length="middle"/>
 <pin name="SCL" x="-27.94" y="-22.86" length="middle"/>
@@ -3870,9 +3894,9 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 </symbol>
 </symbols>
 <devicesets>
-<deviceset name="SI5351C" prefix="U">
+<deviceset name="SI5351C-B-GM" prefix="U">
 <gates>
-<gate name="G$1" symbol="SI5351C" x="0" y="0"/>
+<gate name="G$1" symbol="SI5351C-X-GM" x="0" y="0"/>
 </gates>
 <devices>
 <device name="" package="QFN20">
@@ -5123,7 +5147,7 @@ Source: &lt;a href="http://www.littelfuse.com/~/media/electronics/datasheets/tvs
 </package>
 </packages>
 <symbols>
-<symbol name="OCXO">
+<symbol name="OCXO/VCTCXO">
 <wire x1="-15.24" y1="0" x2="0" y2="0" width="0.254" layer="94"/>
 <wire x1="0" y1="0" x2="0" y2="-15.24" width="0.254" layer="94"/>
 <wire x1="0" y1="-15.24" x2="-15.24" y2="-15.24" width="0.254" layer="94"/>
@@ -5139,7 +5163,7 @@ Source: &lt;a href="http://www.littelfuse.com/~/media/electronics/datasheets/tvs
 <devicesets>
 <deviceset name="OSC5A2B02" prefix="U">
 <gates>
-<gate name="G$1" symbol="OCXO" x="0" y="0"/>
+<gate name="G$1" symbol="OCXO/VCTCXO" x="0" y="0"/>
 </gates>
 <devices>
 <device name="" package="OSC5A2B02">
@@ -6117,7 +6141,7 @@ Source: &lt;a href="http://www.littelfuse.com/~/media/electronics/datasheets/tvs
 <part name="R11" library="Resistor" deviceset="RESISTOR" device="-0603" value="10K Ohms"/>
 <part name="GND6" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="R12" library="Resistor" deviceset="RESISTOR" device="-0603" value="10K Ohms"/>
-<part name="U9" library="Silicon Labs" deviceset="SI5351C" device=""/>
+<part name="U9" library="Silicon Labs" deviceset="SI5351C-B-GM" device=""/>
 <part name="U3" library="U-Blox" deviceset="NEO-7*" device="" technology="M"/>
 <part name="3V1" library="Supply Symbol" deviceset="3V3" device=""/>
 <part name="GND7" library="Supply Symbol" deviceset="GND" device=""/>
