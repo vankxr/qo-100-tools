@@ -472,6 +472,44 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 <wire x1="4.85" y1="33.35" x2="4.85" y2="21.35" width="0.127" layer="21"/>
 <text x="-7.112" y="-2.921" size="1.27" layer="25">&gt;NAME</text>
 </package>
+<package name="F-EDGE">
+<text x="-11.115" y="-2.46" size="0.3048" layer="51" rot="R90">PCB Edge</text>
+<wire x1="-10.755" y1="-0.8" x2="-10.455" y2="-0.1" width="0.08" layer="51"/>
+<wire x1="-10.455" y1="-0.1" x2="-10.655" y2="-0.2" width="0.08" layer="51"/>
+<wire x1="-10.455" y1="-0.1" x2="-10.355" y2="-0.3" width="0.08" layer="51"/>
+<wire x1="-12" y1="0" x2="-9.525" y2="0" width="0" layer="51"/>
+<wire x1="-9.525" y1="0" x2="-6.605" y2="0" width="0" layer="51"/>
+<wire x1="12" y1="0" x2="9.525" y2="0" width="0" layer="51"/>
+<wire x1="9.525" y1="0" x2="6.605" y2="0" width="0" layer="51"/>
+<wire x1="5.335" y1="12.95" x2="-5.335" y2="12.95" width="0" layer="51"/>
+<wire x1="-5.335" y1="12.95" x2="-6.605" y2="11.68" width="0" layer="51" curve="90"/>
+<wire x1="-6.605" y1="11.68" x2="-6.605" y2="0" width="0" layer="51"/>
+<wire x1="5.335" y1="12.95" x2="6.605" y2="11.68" width="0" layer="51" curve="-90"/>
+<wire x1="6.605" y1="11.68" x2="6.605" y2="0" width="0" layer="51"/>
+<smd name="GND@3" x="7.24" y="16" dx="9.4" dy="4.58" layer="1" cream="no"/>
+<smd name="GND@5" x="9.6525" y="9.525" dx="4.575" dy="17.53" layer="1" cream="no"/>
+<smd name="GND@2" x="-7.24" y="16" dx="9.4" dy="4.58" layer="1" cream="no"/>
+<smd name="GND@0" x="-9.6525" y="9.525" dx="4.575" dy="17.53" layer="1" cream="no"/>
+<smd name="SIGNAL" x="0" y="16.71" dx="6" dy="1.78" layer="1" rot="R90" cream="no"/>
+<wire x1="-9.525" y1="0" x2="-9.525" y2="16.64" width="0.127" layer="51"/>
+<wire x1="-9.525" y1="16.64" x2="9.525" y2="16.64" width="0.127" layer="51"/>
+<wire x1="9.525" y1="16.64" x2="9.525" y2="0" width="0.127" layer="51"/>
+<wire x1="9.525" y1="0" x2="-9.525" y2="0" width="0.127" layer="51"/>
+<wire x1="-9.525" y1="-3.18" x2="-9.525" y2="0" width="0.127" layer="51"/>
+<wire x1="9.525" y1="0" x2="9.525" y2="-3.18" width="0.127" layer="51"/>
+<wire x1="9.525" y1="-3.18" x2="4" y2="-3.18" width="0.127" layer="51"/>
+<wire x1="4" y1="-3.18" x2="-4" y2="-3.18" width="0.127" layer="51"/>
+<wire x1="-4" y1="-3.18" x2="-9.525" y2="-3.18" width="0.127" layer="51"/>
+<wire x1="-4" y1="-3.18" x2="-4" y2="-16.32" width="0.127" layer="51"/>
+<wire x1="-4" y1="-16.32" x2="4" y2="-16.32" width="0.127" layer="51"/>
+<wire x1="4" y1="-16.32" x2="4" y2="-3.18" width="0.127" layer="51"/>
+<text x="-9" y="19" size="1.27" layer="25">&gt;NAME</text>
+<wire x1="9.525" y1="0" x2="-9.525" y2="0" width="0.127" layer="21"/>
+<wire x1="9.525" y1="0" x2="9.525" y2="0.6" width="0.127" layer="21"/>
+<wire x1="-9.525" y1="0" x2="-9.525" y2="0.6" width="0.127" layer="21"/>
+<pad name="GND@4" x="7.94" y="14.61" drill="1.91" diameter="3.5" shape="octagon"/>
+<pad name="GND@1" x="-7.94" y="14.61" drill="1.91" diameter="3.5" shape="octagon"/>
+</package>
 </packages>
 <symbols>
 <symbol name="RFCON">
@@ -528,6 +566,15 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 <device name="-BNC" package="BNC">
 <connects>
 <connect gate="G$1" pin="GND" pad="GND"/>
+<connect gate="G$1" pin="SIGNAL" pad="SIGNAL"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="-F-EDGE" package="F-EDGE">
+<connects>
+<connect gate="G$1" pin="GND" pad="GND@0 GND@1 GND@2 GND@3 GND@4 GND@5"/>
 <connect gate="G$1" pin="SIGNAL" pad="SIGNAL"/>
 </connects>
 <technologies>
@@ -873,6 +920,28 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 <wire x1="-1.1" y1="-0.55" x2="-1.1" y2="0.55" width="0.1905" layer="21"/>
 <wire x1="-1.1" y1="0.55" x2="-0.2" y2="0.55" width="0.1905" layer="21"/>
 </package>
+<package name="RES2728">
+<smd name="1" x="-3.15" y="0" dx="2.8" dy="7.8" layer="1"/>
+<smd name="2" x="3.15" y="0" dx="2.8" dy="7.8" layer="1"/>
+<wire x1="-1.7876" y1="-3.8764" x2="-1.7876" y2="3.8764" width="0" layer="51"/>
+<wire x1="-1.7876" y1="3.8764" x2="-3.5258" y2="3.8764" width="0" layer="51"/>
+<wire x1="-3.5258" y1="-3.8764" x2="-1.7876" y2="-3.8764" width="0" layer="51"/>
+<wire x1="1.7876" y1="3.8764" x2="1.7876" y2="-3.8764" width="0" layer="51"/>
+<wire x1="1.7876" y1="-3.8764" x2="3.4258" y2="-3.8764" width="0" layer="51"/>
+<wire x1="3.4258" y1="3.8764" x2="1.7876" y2="3.8764" width="0" layer="51"/>
+<wire x1="-1.7876" y1="-3.8764" x2="1.7876" y2="-3.8764" width="0" layer="51"/>
+<wire x1="3.4258" y1="-3.8764" x2="3.4258" y2="3.8764" width="0" layer="51"/>
+<wire x1="1.7876" y1="3.8764" x2="-1.7876" y2="3.8764" width="0" layer="51"/>
+<wire x1="-3.5258" y1="3.8764" x2="-3.5258" y2="-3.8764" width="0" layer="51"/>
+<text x="-4.8544" y="4.64" size="2.0828" layer="25" ratio="10" rot="SR0">&gt;NAME</text>
+<text x="-5.4544" y="-6.645" size="2.0828" layer="27" ratio="10" rot="SR0">&gt;VALUE</text>
+<wire x1="-1.7" y1="-4.2" x2="-4.9" y2="-4.2" width="0.1905" layer="21"/>
+<wire x1="-4.9" y1="-4.2" x2="-4.9" y2="4.2" width="0.1905" layer="21"/>
+<wire x1="-4.9" y1="4.2" x2="-1.7" y2="4.2" width="0.1905" layer="21"/>
+<wire x1="1.7" y1="4.2" x2="4.9" y2="4.2" width="0.1905" layer="21"/>
+<wire x1="4.9" y1="4.2" x2="4.9" y2="-4.2" width="0.1905" layer="21"/>
+<wire x1="4.9" y1="-4.2" x2="1.7" y2="-4.2" width="0.1905" layer="21"/>
+</package>
 </packages>
 <symbols>
 <symbol name="RES">
@@ -941,6 +1010,17 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 </technologies>
 </device>
 <device name="-0402" package="RES0402">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="2"/>
+</connects>
+<technologies>
+<technology name="">
+<attribute name="TOLERANCE" value="" constant="no"/>
+</technology>
+</technologies>
+</device>
+<device name="-2728" package="RES2728">
 <connects>
 <connect gate="G$1" pin="1" pad="1"/>
 <connect gate="G$1" pin="2" pad="2"/>
@@ -1232,7 +1312,7 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 </library>
 <library name="Generic Connector">
 <packages>
-<package name="2EDG-2P">
+<package name="2EDG-2P-5.08MM">
 <pad name="P$2" x="2.54" y="0" drill="1.6" diameter="2.6"/>
 <pad name="P$1" x="-2.54" y="0" drill="1.6" diameter="2.6"/>
 <wire x1="-5.08" y1="2" x2="5.08" y2="2" width="0.127" layer="21"/>
@@ -1259,6 +1339,35 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 <wire x1="-3.5" y1="-17" x2="-1.5" y2="-15" width="0.127" layer="21"/>
 <wire x1="1.5" y1="-17" x2="3.5" y2="-15" width="0.127" layer="21"/>
 </package>
+<package name="2EDG-2P-5MM">
+<pad name="P$2" x="2.5" y="0" drill="1.6" diameter="2.6"/>
+<pad name="P$1" x="-2.5" y="0" drill="1.6" diameter="2.6"/>
+<wire x1="-5.8" y1="1.8" x2="5.8" y2="1.8" width="0.127" layer="21"/>
+<wire x1="5.8" y1="1.8" x2="5.8" y2="-7.8" width="0.127" layer="21"/>
+<wire x1="5.8" y1="-7.8" x2="5.8" y2="-10" width="0.127" layer="21"/>
+<wire x1="5.8" y1="-10" x2="5.8" y2="-20.1" width="0.127" layer="21"/>
+<wire x1="5.8" y1="-10" x2="4" y2="-10" width="0.127" layer="21"/>
+<wire x1="4" y1="-10" x2="1" y2="-10" width="0.127" layer="21"/>
+<wire x1="1" y1="-10" x2="-1" y2="-10" width="0.127" layer="21"/>
+<wire x1="-1" y1="-10" x2="-4" y2="-10" width="0.127" layer="21"/>
+<wire x1="-4" y1="-10" x2="-5.8" y2="-10" width="0.127" layer="21"/>
+<wire x1="-5.8" y1="-20.1" x2="-5.8" y2="-10" width="0.127" layer="21"/>
+<wire x1="-5.8" y1="-10" x2="-5.8" y2="-7.8" width="0.127" layer="21"/>
+<wire x1="-5.8" y1="-7.8" x2="-5.8" y2="1.8" width="0.127" layer="21"/>
+<wire x1="-5.8" y1="-7.8" x2="5.8" y2="-7.8" width="0.127" layer="21"/>
+<wire x1="-4" y1="-10" x2="-3" y2="-8.8" width="0.127" layer="21"/>
+<wire x1="-3" y1="-8.8" x2="-2" y2="-8.8" width="0.127" layer="21"/>
+<wire x1="-2" y1="-8.8" x2="-1" y2="-10" width="0.127" layer="21"/>
+<wire x1="1" y1="-10" x2="2" y2="-8.8" width="0.127" layer="21"/>
+<wire x1="2" y1="-8.8" x2="3" y2="-8.8" width="0.127" layer="21"/>
+<wire x1="3" y1="-8.8" x2="4" y2="-10" width="0.127" layer="21"/>
+<text x="-5.5" y="2.2" size="0.8" layer="25" font="vector" ratio="15">&gt;NAME</text>
+<wire x1="-5.8" y1="-20.1" x2="5.8" y2="-20.1" width="0.127" layer="21"/>
+<circle x="-2.5" y="-16" radius="1.5" width="0.127" layer="21"/>
+<circle x="2.5" y="-16" radius="1.5" width="0.127" layer="21"/>
+<wire x1="-3.46" y1="-17" x2="-1.46" y2="-15" width="0.127" layer="21"/>
+<wire x1="1.46" y1="-17" x2="3.46" y2="-15" width="0.127" layer="21"/>
+</package>
 </packages>
 <symbols>
 <symbol name="K">
@@ -1280,7 +1389,16 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 <gate name="-1" symbol="KV" x="0" y="0"/>
 </gates>
 <devices>
-<device name="" package="2EDG-2P">
+<device name="-5.08MM" package="2EDG-2P-5.08MM">
+<connects>
+<connect gate="-1" pin="S" pad="P$1"/>
+<connect gate="-2" pin="S" pad="P$2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="-5MM" package="2EDG-2P-5MM">
 <connects>
 <connect gate="-1" pin="S" pad="P$1"/>
 <connect gate="-2" pin="S" pad="P$2"/>
@@ -3601,7 +3719,7 @@ Logo</text>
 <attribute name="VOLTAGE" value="50V"/>
 </part>
 <part name="GND22" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="CON1" library="Generic Connector" deviceset="2EDG-2P" device=""/>
+<part name="CON1" library="Generic Connector" deviceset="2EDG-2P" device="-5.08MM"/>
 <part name="GND23" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="VCC6" library="Supply Symbol" deviceset="VDD" device=""/>
 <part name="F1" library="PTC Fuses" deviceset="PTC" device="1206">
