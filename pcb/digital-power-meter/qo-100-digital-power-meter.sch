@@ -1825,7 +1825,54 @@ Logo</text>
 </library>
 <library name="Generic Connector">
 <packages>
-<package name="2EDG-5P">
+<package name="2EDG-5P-5MM">
+<pad name="P$2" x="-5" y="0" drill="1.6" diameter="2.6"/>
+<pad name="P$1" x="-10" y="0" drill="1.6" diameter="2.6"/>
+<wire x1="-13.3" y1="1.8" x2="13.3" y2="1.8" width="0.127" layer="21"/>
+<wire x1="13.3" y1="1.8" x2="13.3" y2="-7.8" width="0.127" layer="21"/>
+<wire x1="13.3" y1="-7.8" x2="13.3" y2="-10" width="0.127" layer="21"/>
+<wire x1="13.3" y1="-10" x2="13.3" y2="-20.1" width="0.127" layer="21"/>
+<wire x1="13.3" y1="-10" x2="11.5" y2="-10" width="0.127" layer="21"/>
+<wire x1="11.5" y1="-10" x2="8.5" y2="-10" width="0.127" layer="21"/>
+<wire x1="8.5" y1="-10" x2="-8.5" y2="-10" width="0.127" layer="21"/>
+<wire x1="-8.5" y1="-10" x2="-11.5" y2="-10" width="0.127" layer="21"/>
+<wire x1="-11.5" y1="-10" x2="-13.3" y2="-10" width="0.127" layer="21"/>
+<wire x1="-13.3" y1="-20.1" x2="-13.3" y2="-10" width="0.127" layer="21"/>
+<wire x1="-13.3" y1="-10" x2="-13.3" y2="-7.8" width="0.127" layer="21"/>
+<wire x1="-13.3" y1="-7.8" x2="-13.3" y2="1.8" width="0.127" layer="21"/>
+<wire x1="-13.3" y1="-7.8" x2="13.3" y2="-7.8" width="0.127" layer="21"/>
+<wire x1="-11.5" y1="-10" x2="-10.5" y2="-8.8" width="0.127" layer="21"/>
+<wire x1="-10.5" y1="-8.8" x2="-9.5" y2="-8.8" width="0.127" layer="21"/>
+<wire x1="-9.5" y1="-8.8" x2="-8.5" y2="-10" width="0.127" layer="21"/>
+<wire x1="8.5" y1="-10" x2="9.5" y2="-8.8" width="0.127" layer="21"/>
+<wire x1="9.5" y1="-8.8" x2="10.5" y2="-8.8" width="0.127" layer="21"/>
+<wire x1="10.5" y1="-8.8" x2="11.5" y2="-10" width="0.127" layer="21"/>
+<text x="-13" y="2.2" size="0.8" layer="25" font="vector" ratio="15">&gt;NAME</text>
+<wire x1="-13.3" y1="-20.1" x2="13.3" y2="-20.1" width="0.127" layer="21"/>
+<circle x="-10" y="-16" radius="1.5" width="0.127" layer="21"/>
+<circle x="10" y="-16" radius="1.5" width="0.127" layer="21"/>
+<wire x1="-10.96" y1="-17" x2="-8.96" y2="-15" width="0.127" layer="21"/>
+<wire x1="8.96" y1="-17" x2="10.96" y2="-15" width="0.127" layer="21"/>
+<pad name="P$3" x="0" y="0" drill="1.6" diameter="2.6"/>
+<wire x1="-6.5" y1="-10" x2="-5.5" y2="-8.8" width="0.127" layer="21"/>
+<wire x1="-5.5" y1="-8.8" x2="-4.5" y2="-8.8" width="0.127" layer="21"/>
+<wire x1="-4.5" y1="-8.8" x2="-3.5" y2="-10" width="0.127" layer="21"/>
+<circle x="-5" y="-16" radius="1.5" width="0.127" layer="21"/>
+<wire x1="-6.04" y1="-17" x2="-4.04" y2="-15" width="0.127" layer="21"/>
+<pad name="P$4" x="5" y="0" drill="1.6" diameter="2.6"/>
+<pad name="P$5" x="10" y="0" drill="1.6" diameter="2.6"/>
+<wire x1="3.5" y1="-10" x2="4.5" y2="-8.8" width="0.127" layer="21"/>
+<wire x1="4.5" y1="-8.8" x2="5.5" y2="-8.8" width="0.127" layer="21"/>
+<wire x1="5.5" y1="-8.8" x2="6.5" y2="-10" width="0.127" layer="21"/>
+<circle x="5" y="-16" radius="1.5" width="0.127" layer="21"/>
+<wire x1="3.96" y1="-17" x2="5.96" y2="-15" width="0.127" layer="21"/>
+<wire x1="-1.5" y1="-10" x2="-0.5" y2="-8.8" width="0.127" layer="21"/>
+<wire x1="-0.5" y1="-8.8" x2="0.5" y2="-8.8" width="0.127" layer="21"/>
+<wire x1="0.5" y1="-8.8" x2="1.5" y2="-10" width="0.127" layer="21"/>
+<circle x="0" y="-16" radius="1.5" width="0.127" layer="21"/>
+<wire x1="-1.04" y1="-17" x2="0.96" y2="-15" width="0.127" layer="21"/>
+</package>
+<package name="2EDG-5P-5.08MM">
 <pad name="P$2" x="-5.08" y="0" drill="1.6" diameter="2.6"/>
 <pad name="P$1" x="-10.16" y="0" drill="1.6" diameter="2.6"/>
 <wire x1="-12.7" y1="2" x2="12.7" y2="2" width="0.127" layer="21"/>
@@ -1896,7 +1943,19 @@ Logo</text>
 <gate name="-5" symbol="K" x="0" y="-10.16"/>
 </gates>
 <devices>
-<device name="" package="2EDG-5P">
+<device name="-5.08MM" package="2EDG-5P-5.08MM">
+<connects>
+<connect gate="-1" pin="S" pad="P$1"/>
+<connect gate="-2" pin="S" pad="P$2"/>
+<connect gate="-3" pin="S" pad="P$3"/>
+<connect gate="-4" pin="S" pad="P$4"/>
+<connect gate="-5" pin="S" pad="P$5"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="-5MM" package="2EDG-5P-5MM">
 <connects>
 <connect gate="-1" pin="S" pad="P$1"/>
 <connect gate="-2" pin="S" pad="P$2"/>
@@ -2975,7 +3034,7 @@ Logo</text>
 <part name="R2" library="Resistor" deviceset="RESISTOR" device="-2512" value="0.012 Ohms"/>
 <part name="R3" library="Resistor" deviceset="RESISTOR" device="-2512" value="0.012 Ohms"/>
 <part name="R4" library="Resistor" deviceset="RESISTOR" device="-2512" value="0.012 Ohms"/>
-<part name="CON1" library="Generic Connector" deviceset="2EDG-5P" device=""/>
+<part name="CON1" library="Generic Connector" deviceset="2EDG-5P" device="-5MM"/>
 <part name="U1" library="Analog Devices" deviceset="LTC4151*?" device="DD" technology="H"/>
 <part name="GND2" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="VIN1" library="Supply Symbol" deviceset="VIN" device=""/>
