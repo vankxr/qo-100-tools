@@ -1,0 +1,21 @@
+# QucsTranscalc 0.0.20  /home/joao/Development/qo-100-tools/util/directional-couplers/dir_cpl_525m_20dB.trc
+#   Generated on qui Out 8 2020 at 20:05:00.
+#   It is not suggested to edit the file, use QucsTranscalc instead.
+
+<CoupledMicrostrip>
+  Er 3.5 NA
+  Mur 1 NA
+  H 0.762 mm
+  H_t 20 cm
+  T 35 um
+  Cond 4.1e+07 NA
+  Tand 0.0013 NA
+  Rough 0 mil
+  Freq 525 MHz
+  W 1.69415 mm
+  S 0.987417 mm
+  L 90 mm
+  Z0e 55.2771 Ohm
+  Z0o 45.2267 Ohm
+  Ang_l 93.7626 Deg
+</CoupledMicrostrip>
