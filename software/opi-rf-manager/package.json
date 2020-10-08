@@ -1,0 +1,16 @@
+{
+  "name": "opi-rf-manager",
+  "version": "1.0.0",
+  "description": "Orange Pi RF manager backend",
+  "main": "index.js",
+  "dependencies": {
+    "colors": "^1.4.0",
+    "i2c-bus": "^5.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "João Silva (vankxr)",
+  "license": "ISC"
+}
