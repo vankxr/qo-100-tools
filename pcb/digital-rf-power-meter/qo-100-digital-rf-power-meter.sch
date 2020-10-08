@@ -2705,6 +2705,25 @@ Logo</text>
 <text x="-1.214" y="1.8825" size="1.27" layer="25" ratio="10">&gt;NAME</text>
 <text x="-1.214" y="-3.089" size="1.27" layer="27" ratio="10">&gt;VALUE</text>
 </package>
+<package name="DFN6">
+<smd name="1" x="-0.5" y="-0.65" dx="0.25" dy="0.4" layer="1"/>
+<text x="-0.948" y="1.148" size="0.6096" layer="25">&gt;NAME</text>
+<circle x="-1.114" y="-1.117" radius="0.2" width="0" layer="21"/>
+<wire x1="-0.8" y1="0.8" x2="0.8" y2="0.8" width="0.127" layer="51"/>
+<wire x1="0.8" y1="0.8" x2="0.8" y2="-0.8" width="0.127" layer="51"/>
+<wire x1="0.8" y1="-0.8" x2="-0.8" y2="-0.8" width="0.127" layer="51"/>
+<wire x1="-0.8" y1="-0.8" x2="-0.8" y2="0.8" width="0.127" layer="51"/>
+<smd name="7" x="0" y="0" dx="1.4" dy="0.5" layer="1"/>
+<smd name="2" x="0" y="-0.65" dx="0.25" dy="0.4" layer="1"/>
+<smd name="3" x="0.5" y="-0.65" dx="0.25" dy="0.4" layer="1"/>
+<smd name="4" x="0.5" y="0.65" dx="0.25" dy="0.4" layer="1" rot="R180"/>
+<smd name="5" x="0" y="0.65" dx="0.25" dy="0.4" layer="1" rot="R180"/>
+<smd name="6" x="-0.5" y="0.65" dx="0.25" dy="0.4" layer="1" rot="R180"/>
+<wire x1="0.8" y1="-0.8" x2="0.8" y2="-0.5" width="0.127" layer="21"/>
+<wire x1="0.8" y1="0.8" x2="0.8" y2="0.5" width="0.127" layer="21"/>
+<wire x1="-0.8" y1="0.8" x2="-0.8" y2="0.5" width="0.127" layer="21"/>
+<wire x1="-0.8" y1="-0.5" x2="-0.8" y2="-0.8" width="0.127" layer="21"/>
+</package>
 </packages>
 <symbols>
 <symbol name="MCP3421">
@@ -2720,6 +2739,21 @@ Logo</text>
 <wire x1="0" y1="-12.7" x2="-15.24" y2="-12.7" width="0.254" layer="94"/>
 <text x="-15.24" y="3.556" size="1.27" layer="95">&gt;NAME</text>
 <text x="-15.24" y="1.27" size="1.27" layer="96">&gt;VALUE</text>
+</symbol>
+<symbol name="MIC94305">
+<wire x1="-20.32" y1="0" x2="0" y2="0" width="0.254" layer="94"/>
+<wire x1="0" y1="0" x2="0" y2="-20.32" width="0.254" layer="94"/>
+<wire x1="0" y1="-20.32" x2="-20.32" y2="-20.32" width="0.254" layer="94"/>
+<wire x1="-20.32" y1="-20.32" x2="-20.32" y2="0" width="0.254" layer="94"/>
+<pin name="GND@0" x="-25.4" y="-15.24" length="middle"/>
+<pin name="GND@1" x="-25.4" y="-17.78" length="middle"/>
+<pin name="VIN@1" x="-25.4" y="-5.08" length="middle"/>
+<pin name="VOUT@1" x="5.08" y="-5.08" length="middle" rot="R180"/>
+<pin name="VOUT@0" x="5.08" y="-2.54" length="middle" rot="R180"/>
+<pin name="VIN@0" x="-25.4" y="-2.54" length="middle"/>
+<pin name="EN" x="-25.4" y="-10.16" length="middle"/>
+<text x="-20.32" y="3.556" size="1.27" layer="95">&gt;NAME</text>
+<text x="-20.32" y="1.27" size="1.27" layer="96">&gt;VALUE</text>
 </symbol>
 </symbols>
 <devicesets>
@@ -2742,6 +2776,27 @@ Logo</text>
 <technology name="1"/>
 <technology name="2"/>
 <technology name="3"/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="MIC94305" prefix="U">
+<gates>
+<gate name="G$1" symbol="MIC94305" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="DFN6">
+<connects>
+<connect gate="G$1" pin="EN" pad="4"/>
+<connect gate="G$1" pin="GND@0" pad="3"/>
+<connect gate="G$1" pin="GND@1" pad="7"/>
+<connect gate="G$1" pin="VIN@0" pad="5"/>
+<connect gate="G$1" pin="VIN@1" pad="6"/>
+<connect gate="G$1" pin="VOUT@0" pad="1"/>
+<connect gate="G$1" pin="VOUT@1" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
 </technologies>
 </device>
 </devices>
@@ -3051,313 +3106,6 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 </deviceset>
 </devicesets>
 </library>
-<library name="Inductor">
-<packages>
-<package name="IND0603">
-<smd name="1" x="-0.81915" y="0" dx="0.889" dy="1.016" layer="1"/>
-<smd name="2" x="0.81915" y="0" dx="0.889" dy="1.016" layer="1"/>
-<wire x1="-0.4572" y1="-0.4826" x2="-0.4572" y2="0.4826" width="0" layer="51"/>
-<wire x1="-0.4572" y1="0.4826" x2="-0.8382" y2="0.4826" width="0" layer="51"/>
-<wire x1="-0.8382" y1="-0.4826" x2="-0.4572" y2="-0.4826" width="0" layer="51"/>
-<wire x1="0.4572" y1="0.4826" x2="0.4572" y2="-0.4826" width="0" layer="51"/>
-<wire x1="0.4572" y1="-0.4826" x2="0.8382" y2="-0.4826" width="0" layer="51"/>
-<wire x1="0.8382" y1="0.4826" x2="0.4572" y2="0.4826" width="0" layer="51"/>
-<wire x1="-0.4572" y1="-0.4826" x2="0.4572" y2="-0.4826" width="0" layer="51"/>
-<wire x1="0.8382" y1="-0.4826" x2="0.8382" y2="0.4826" width="0" layer="51"/>
-<wire x1="0.4572" y1="0.4826" x2="-0.4572" y2="0.4826" width="0" layer="51"/>
-<wire x1="-0.8382" y1="0.4826" x2="-0.8382" y2="-0.4826" width="0" layer="51"/>
-<text x="-3.4544" y="1.016" size="1.016" layer="25" ratio="10" rot="SR0">&gt;NAME</text>
-<text x="-3.4544" y="-2.032" size="1.016" layer="27" ratio="10" rot="SR0">&gt;VALUE</text>
-<wire x1="0.254" y1="0.7366" x2="1.5113" y2="0.7366" width="0.1905" layer="21"/>
-<wire x1="1.5113" y1="0.7366" x2="1.5113" y2="-0.7366" width="0.1905" layer="21"/>
-<wire x1="1.5113" y1="-0.7366" x2="0.254" y2="-0.7366" width="0.1905" layer="21"/>
-<wire x1="-0.254" y1="-0.7366" x2="-1.5113" y2="-0.7366" width="0.1905" layer="21"/>
-<wire x1="-1.5113" y1="-0.7366" x2="-1.5113" y2="0.7366" width="0.1905" layer="21"/>
-<wire x1="-1.5113" y1="0.7366" x2="-0.254" y2="0.7366" width="0.1905" layer="21"/>
-</package>
-<package name="IND0703">
-<wire x1="-3.8" y1="3.8" x2="3.8" y2="3.8" width="0.127" layer="21"/>
-<wire x1="3.8" y1="3.8" x2="3.8" y2="2" width="0.127" layer="21"/>
-<wire x1="-3.8" y1="3.8" x2="-3.8" y2="2" width="0.127" layer="21"/>
-<wire x1="-3.8" y1="-3.8" x2="3.8" y2="-3.8" width="0.127" layer="21"/>
-<wire x1="3.8" y1="-3.8" x2="3.8" y2="-2" width="0.127" layer="21"/>
-<wire x1="-3.8" y1="-3.8" x2="-3.8" y2="-2" width="0.127" layer="21"/>
-<smd name="1" x="-3.65" y="0" dx="3" dy="2" layer="1" rot="R90"/>
-<smd name="2" x="3.65" y="0" dx="3" dy="2" layer="1" rot="R90"/>
-<circle x="0" y="0" radius="2.615" width="0.127" layer="21"/>
-<wire x1="-3.8" y1="-3.8" x2="3.8" y2="-3.8" width="0.127" layer="51"/>
-<wire x1="3.8" y1="-3.8" x2="3.8" y2="3.8" width="0.127" layer="51"/>
-<wire x1="3.8" y1="3.8" x2="-3.8" y2="3.8" width="0.127" layer="51"/>
-<wire x1="-3.8" y1="3.8" x2="-3.8" y2="-3.8" width="0.127" layer="51"/>
-<text x="-5.08" y="5.08" size="1.778" layer="25">&gt;NAME</text>
-</package>
-<package name="IND1207">
-<smd name="1" x="-5.4" y="0" dx="4" dy="5.2" layer="1"/>
-<smd name="2" x="5.4" y="0" dx="4" dy="5.2" layer="1"/>
-<wire x1="5" y1="6" x2="-5" y2="6" width="0.127" layer="21"/>
-<wire x1="-5" y1="6" x2="-6" y2="5" width="0.127" layer="21" curve="90"/>
-<wire x1="-6" y1="-5" x2="-5" y2="-6" width="0.127" layer="21" curve="90"/>
-<wire x1="-5" y1="-6" x2="5" y2="-6" width="0.127" layer="21"/>
-<wire x1="5" y1="-6" x2="6" y2="-5" width="0.127" layer="21" curve="90"/>
-<wire x1="6" y1="5" x2="5" y2="6" width="0.127" layer="21" curve="90"/>
-<circle x="0" y="0" radius="3.8" width="0.127" layer="21"/>
-<text x="-5.08" y="6.35" size="1.27" layer="25">&gt;NAME</text>
-<wire x1="-6" y1="-5" x2="-6" y2="-3" width="0.127" layer="21"/>
-<wire x1="-6" y1="5" x2="-6" y2="3" width="0.127" layer="21"/>
-<wire x1="6" y1="-5" x2="6" y2="-3" width="0.127" layer="21"/>
-<wire x1="6" y1="3" x2="6" y2="5" width="0.127" layer="21"/>
-<wire x1="-6" y1="-5" x2="-5" y2="-6" width="0.127" layer="51" curve="90"/>
-<wire x1="-5" y1="-6" x2="5" y2="-6" width="0.127" layer="51"/>
-<wire x1="5" y1="-6" x2="6" y2="-5" width="0.127" layer="51" curve="90"/>
-<wire x1="6" y1="-5" x2="6" y2="5" width="0.127" layer="51"/>
-<wire x1="6" y1="5" x2="5" y2="6" width="0.127" layer="51" curve="90"/>
-<wire x1="5" y1="6" x2="-5" y2="6" width="0.127" layer="51"/>
-<wire x1="-5" y1="6" x2="-6" y2="5" width="0.127" layer="51" curve="90"/>
-<wire x1="-6" y1="5" x2="-6" y2="-5" width="0.127" layer="51"/>
-</package>
-<package name="IND1305">
-<smd name="1" x="-6" y="0" dx="5" dy="6.5" layer="1"/>
-<smd name="2" x="6" y="0" dx="5" dy="6.5" layer="1"/>
-<text x="-5.08" y="7.35" size="1.27" layer="25">&gt;NAME</text>
-<wire x1="-6.7" y1="-5.3" x2="-6.7" y2="5.3" width="0.127" layer="51"/>
-<wire x1="-6.7" y1="5.3" x2="-5.7" y2="6.3" width="0.127" layer="51" curve="-90"/>
-<wire x1="-5.7" y1="6.3" x2="5.7" y2="6.3" width="0.127" layer="51"/>
-<wire x1="5.7" y1="6.3" x2="6.7" y2="5.3" width="0.127" layer="51" curve="-90"/>
-<wire x1="6.7" y1="5.3" x2="6.7" y2="-5.3" width="0.127" layer="51"/>
-<wire x1="6.7" y1="-5.3" x2="5.7" y2="-6.3" width="0.127" layer="51" curve="-90"/>
-<wire x1="5.7" y1="-6.3" x2="-5.7" y2="-6.3" width="0.127" layer="51"/>
-<wire x1="-5.7" y1="-6.3" x2="-6.7" y2="-5.3" width="0.127" layer="51" curve="-90"/>
-<wire x1="-6.7" y1="3.4" x2="-6.7" y2="5.3" width="0.127" layer="21"/>
-<wire x1="-6.7" y1="5.3" x2="-5.7" y2="6.3" width="0.127" layer="21" curve="-90"/>
-<wire x1="-5.7" y1="6.3" x2="5.7" y2="6.3" width="0.127" layer="21"/>
-<wire x1="5.7" y1="6.3" x2="6.7" y2="5.3" width="0.127" layer="21" curve="-90"/>
-<wire x1="6.7" y1="5.3" x2="6.7" y2="3.4" width="0.127" layer="21"/>
-<wire x1="-6.7" y1="-3.4" x2="-6.7" y2="-5.3" width="0.127" layer="21"/>
-<wire x1="-6.7" y1="-5.3" x2="-5.7" y2="-6.3" width="0.127" layer="21" curve="90"/>
-<wire x1="-5.7" y1="-6.3" x2="5.7" y2="-6.3" width="0.127" layer="21"/>
-<wire x1="5.7" y1="-6.3" x2="6.7" y2="-5.3" width="0.127" layer="21" curve="90"/>
-<wire x1="6.7" y1="-5.3" x2="6.7" y2="-3.4" width="0.127" layer="21"/>
-</package>
-<package name="IND0805">
-<smd name="1" x="-0.9652" y="0" dx="1.2446" dy="1.4732" layer="1"/>
-<smd name="2" x="0.9652" y="0" dx="1.2446" dy="1.4732" layer="1"/>
-<wire x1="-0.3556" y1="-0.7366" x2="-0.3556" y2="0.7366" width="0" layer="51"/>
-<wire x1="-0.3556" y1="0.7366" x2="-1.0922" y2="0.7366" width="0" layer="51"/>
-<wire x1="-1.0922" y1="-0.7366" x2="-0.3556" y2="-0.7366" width="0" layer="51"/>
-<wire x1="0.3556" y1="0.7366" x2="0.3556" y2="-0.7366" width="0" layer="51"/>
-<wire x1="0.3556" y1="-0.7366" x2="1.0922" y2="-0.7366" width="0" layer="51"/>
-<wire x1="1.0922" y1="0.7366" x2="0.3556" y2="0.7366" width="0" layer="51"/>
-<wire x1="-0.3556" y1="-0.7366" x2="0.3556" y2="-0.7366" width="0" layer="51"/>
-<wire x1="1.0922" y1="-0.7366" x2="1.0922" y2="0.7366" width="0" layer="51"/>
-<wire x1="0.3556" y1="0.7366" x2="-0.3556" y2="0.7366" width="0" layer="51"/>
-<wire x1="-1.0922" y1="0.7366" x2="-1.0922" y2="-0.7366" width="0" layer="51"/>
-<text x="-3.6068" y="1.8288" size="2.0828" layer="25" ratio="10" rot="SR0">&gt;NAME</text>
-<text x="-3.5306" y="-3.9624" size="2.0828" layer="27" ratio="10" rot="SR0">&gt;VALUE</text>
-<wire x1="0.381" y1="1.0398" x2="1.9407" y2="1.0398" width="0.1905" layer="21"/>
-<wire x1="1.9407" y1="1.0398" x2="1.9407" y2="-1.0398" width="0.1905" layer="21"/>
-<wire x1="1.9407" y1="-1.0398" x2="0.381" y2="-1.0398" width="0.1905" layer="21"/>
-<wire x1="-0.381" y1="-1.0398" x2="-1.9407" y2="-1.0398" width="0.1905" layer="21"/>
-<wire x1="-1.9407" y1="-1.0398" x2="-1.9407" y2="1.0398" width="0.1905" layer="21"/>
-<wire x1="-1.9407" y1="1.0398" x2="-0.381" y2="1.0398" width="0.1905" layer="21"/>
-</package>
-<package name="IND2520">
-<smd name="1" x="0" y="-1.05" dx="2.2" dy="1.2" layer="1"/>
-<text x="-0.98" y="1.95" size="0.4064" layer="25">&gt;NAME</text>
-<wire x1="-1" y1="1.25" x2="1" y2="1.25" width="0.127" layer="51"/>
-<wire x1="1" y1="1.25" x2="1" y2="-1.25" width="0.127" layer="51"/>
-<wire x1="1" y1="-1.25" x2="-1" y2="-1.25" width="0.127" layer="51"/>
-<wire x1="-1" y1="-1.25" x2="-1" y2="1.25" width="0.127" layer="51"/>
-<smd name="2" x="0" y="1.05" dx="2.2" dy="1.2" layer="1"/>
-<wire x1="-1" y1="0.3" x2="-1" y2="-0.3" width="0.127" layer="21"/>
-<wire x1="1" y1="0.3" x2="1" y2="-0.3" width="0.127" layer="21"/>
-</package>
-<package name="IND0606">
-<smd name="1" x="-2.75" y="0" dx="5.7" dy="2.7" layer="1" rot="R90"/>
-<smd name="2" x="2.75" y="0" dx="5.7" dy="2.7" layer="1" rot="R90"/>
-<wire x1="-3" y1="-3" x2="3" y2="-3" width="0.127" layer="51"/>
-<wire x1="3" y1="-3" x2="3" y2="3" width="0.127" layer="51"/>
-<wire x1="3" y1="3" x2="-3" y2="3" width="0.127" layer="51"/>
-<wire x1="-3" y1="3" x2="-3" y2="-3" width="0.127" layer="51"/>
-<text x="-5.08" y="5.08" size="1.778" layer="25">&gt;NAME</text>
-<wire x1="-1" y1="3" x2="1" y2="3" width="0.127" layer="21"/>
-<wire x1="-1" y1="-3" x2="1" y2="-3" width="0.127" layer="21"/>
-</package>
-<package name="IND0505">
-<smd name="1" x="-1.95" y="0" dx="4.9" dy="2.6" layer="1" rot="R90"/>
-<smd name="2" x="1.95" y="0" dx="4.9" dy="2.6" layer="1" rot="R90"/>
-<wire x1="-2.5" y1="-2.5" x2="2.5" y2="-2.5" width="0.127" layer="51"/>
-<wire x1="2.5" y1="-2.5" x2="2.5" y2="2.5" width="0.127" layer="51"/>
-<wire x1="2.5" y1="2.5" x2="-2.5" y2="2.5" width="0.127" layer="51"/>
-<wire x1="-2.5" y1="2.5" x2="-2.5" y2="-2.5" width="0.127" layer="51"/>
-<text x="-5.08" y="3.58" size="1.778" layer="25">&gt;NAME</text>
-<wire x1="-0.5" y1="2.5" x2="0.5" y2="2.5" width="0.127" layer="21"/>
-<wire x1="-0.5" y1="-2.5" x2="0.5" y2="-2.5" width="0.127" layer="21"/>
-</package>
-<package name="IND3225">
-<smd name="1" x="0" y="-1.275" dx="2" dy="1.25" layer="1"/>
-<text x="-1.55" y="-1.58" size="0.4064" layer="25" rot="R90">&gt;NAME</text>
-<wire x1="-1.25" y1="1.6" x2="1.25" y2="1.6" width="0.127" layer="51"/>
-<wire x1="1.25" y1="1.6" x2="1.25" y2="-1.6" width="0.127" layer="51"/>
-<wire x1="1.25" y1="-1.6" x2="-1.25" y2="-1.6" width="0.127" layer="51"/>
-<wire x1="-1.25" y1="-1.6" x2="-1.25" y2="1.6" width="0.127" layer="51"/>
-<smd name="2" x="0" y="1.275" dx="2" dy="1.25" layer="1"/>
-<wire x1="-1.1" y1="-1.6" x2="-1.25" y2="-1.6" width="0.127" layer="21"/>
-<wire x1="-1.25" y1="-1.6" x2="-1.25" y2="1.6" width="0.127" layer="21"/>
-<wire x1="-1.25" y1="1.6" x2="-1.1" y2="1.6" width="0.127" layer="21"/>
-<wire x1="1.1" y1="1.6" x2="1.25" y2="1.6" width="0.127" layer="21"/>
-<wire x1="1.25" y1="1.6" x2="1.25" y2="-1.6" width="0.127" layer="21"/>
-<wire x1="1.25" y1="-1.6" x2="1.1" y2="-1.6" width="0.127" layer="21"/>
-</package>
-<package name="IND1365">
-<smd name="1" x="-6.375" y="0" dx="4" dy="5.5" layer="1"/>
-<smd name="2" x="6.375" y="0" dx="4" dy="5.5" layer="1"/>
-<text x="-5.08" y="7.35" size="1.27" layer="25">&gt;NAME</text>
-<wire x1="-3.9" y1="6.35" x2="3.9" y2="6.35" width="0.127" layer="51"/>
-<wire x1="3.9" y1="6.35" x2="6.9" y2="3.35" width="0.127" layer="51" curve="-90"/>
-<wire x1="6.9" y1="3.35" x2="6.9" y2="-3.35" width="0.127" layer="51"/>
-<wire x1="6.9" y1="-3.35" x2="3.9" y2="-6.35" width="0.127" layer="51" curve="-90"/>
-<wire x1="3.9" y1="-6.35" x2="-3.9" y2="-6.35" width="0.127" layer="51"/>
-<wire x1="-3.9" y1="-6.35" x2="-6.9" y2="-3.35" width="0.127" layer="51" curve="-90"/>
-<wire x1="-6.9" y1="-3.35" x2="-6.9" y2="3.35" width="0.127" layer="51"/>
-<wire x1="-6.9" y1="3.35" x2="-3.9" y2="6.35" width="0.127" layer="51" curve="-90"/>
-<wire x1="-6.9" y1="3.4" x2="-3.95" y2="6.35" width="0.127" layer="21" curve="-90"/>
-<wire x1="-3.95" y1="6.35" x2="3.95" y2="6.35" width="0.127" layer="21"/>
-<wire x1="3.95" y1="6.35" x2="6.9" y2="3.4" width="0.127" layer="21" curve="-90"/>
-<wire x1="-6.9" y1="-3.4" x2="-3.95" y2="-6.35" width="0.127" layer="21" curve="90"/>
-<wire x1="-3.95" y1="-6.35" x2="3.95" y2="-6.35" width="0.127" layer="21"/>
-<wire x1="3.95" y1="-6.35" x2="6.9" y2="-3.4" width="0.127" layer="21" curve="90"/>
-</package>
-</packages>
-<symbols>
-<symbol name="IND">
-<text x="-3.81" y="1.8796" size="1.778" layer="95">&gt;NAME</text>
-<text x="-3.81" y="-1.8796" size="1.778" layer="96" align="top-left">&gt;VALUE</text>
-<rectangle x1="-3.81" y1="-0.889" x2="3.81" y2="0.889" layer="94"/>
-<pin name="2" x="7.62" y="0" visible="off" length="middle" direction="pas" swaplevel="1" rot="R180"/>
-<pin name="1" x="-7.62" y="0" visible="off" length="middle" direction="pas" swaplevel="1"/>
-<text x="-3.81" y="-4.4196" size="1.778" layer="97" align="top-left">&gt;CURRENT</text>
-</symbol>
-</symbols>
-<devicesets>
-<deviceset name="INDUCTOR" prefix="L" uservalue="yes">
-<gates>
-<gate name="G$1" symbol="IND" x="0" y="0"/>
-</gates>
-<devices>
-<device name="-0603" package="IND0603">
-<connects>
-<connect gate="G$1" pin="1" pad="1"/>
-<connect gate="G$1" pin="2" pad="2"/>
-</connects>
-<technologies>
-<technology name="">
-<attribute name="CURRENT" value="" constant="no"/>
-</technology>
-</technologies>
-</device>
-<device name="-7X7X3MM" package="IND0703">
-<connects>
-<connect gate="G$1" pin="1" pad="1"/>
-<connect gate="G$1" pin="2" pad="2"/>
-</connects>
-<technologies>
-<technology name="">
-<attribute name="CURRENT" value="" constant="no"/>
-</technology>
-</technologies>
-</device>
-<device name="-12X12X7MM" package="IND1207">
-<connects>
-<connect gate="G$1" pin="1" pad="1"/>
-<connect gate="G$1" pin="2" pad="2"/>
-</connects>
-<technologies>
-<technology name="">
-<attribute name="CURRENT" value="" constant="no"/>
-</technology>
-</technologies>
-</device>
-<device name="-13X13X5MM" package="IND1305">
-<connects>
-<connect gate="G$1" pin="1" pad="1"/>
-<connect gate="G$1" pin="2" pad="2"/>
-</connects>
-<technologies>
-<technology name="">
-<attribute name="CURRENT" value="" constant="no"/>
-</technology>
-</technologies>
-</device>
-<device name="-0805" package="IND0805">
-<connects>
-<connect gate="G$1" pin="1" pad="1"/>
-<connect gate="G$1" pin="2" pad="2"/>
-</connects>
-<technologies>
-<technology name="">
-<attribute name="CURRENT" value="" constant="no"/>
-</technology>
-</technologies>
-</device>
-<device name="-2.5X2X1.2MM" package="IND2520">
-<connects>
-<connect gate="G$1" pin="1" pad="1"/>
-<connect gate="G$1" pin="2" pad="2"/>
-</connects>
-<technologies>
-<technology name="">
-<attribute name="CURRENT" value="" constant="no"/>
-</technology>
-</technologies>
-</device>
-<device name="-6X6MM" package="IND0606">
-<connects>
-<connect gate="G$1" pin="1" pad="1"/>
-<connect gate="G$1" pin="2" pad="2"/>
-</connects>
-<technologies>
-<technology name="">
-<attribute name="CURRENT" value="" constant="no"/>
-</technology>
-</technologies>
-</device>
-<device name="-5X5MM" package="IND0505">
-<connects>
-<connect gate="G$1" pin="1" pad="1"/>
-<connect gate="G$1" pin="2" pad="2"/>
-</connects>
-<technologies>
-<technology name="">
-<attribute name="CURRENT" value="" constant="no"/>
-</technology>
-</technologies>
-</device>
-<device name="-3.2XX2.5MM" package="IND3225">
-<connects>
-<connect gate="G$1" pin="1" pad="1"/>
-<connect gate="G$1" pin="2" pad="2"/>
-</connects>
-<technologies>
-<technology name="">
-<attribute name="CURRENT" value="" constant="no"/>
-</technology>
-</technologies>
-</device>
-<device name="-13X13X6.5MM" package="IND1365">
-<connects>
-<connect gate="G$1" pin="1" pad="1"/>
-<connect gate="G$1" pin="2" pad="2"/>
-</connects>
-<technologies>
-<technology name="">
-<attribute name="CURRENT" value="" constant="no"/>
-</technology>
-</technologies>
-</device>
-</devices>
-</deviceset>
-</devicesets>
-</library>
 </libraries>
 <attributes>
 <attribute name="CNAME" value="None"/>
@@ -3391,20 +3139,18 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 <part name="C7" library="Capacitor" deviceset="CAPACITOR" device="-1206" value="22uF"/>
 <part name="GND3" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="3V2" library="Supply Symbol" deviceset="3V3" device=""/>
-<part name="C1" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="330pF"/>
-<part name="L1" library="Inductor" deviceset="INDUCTOR" device="-0603" value="1.6uH"/>
-<part name="C3" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="330pF"/>
+<part name="C3" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="4.7uF"/>
 <part name="GND4" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="GND5" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="3V3" library="Supply Symbol" deviceset="3V3" device=""/>
 <part name="C4" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="DNP"/>
 <part name="C5" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="DNP"/>
 <part name="GND7" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND8" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="3V4" library="Supply Symbol" deviceset="3V3" device=""/>
-<part name="C2" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100nF"/>
+<part name="C2" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="4.7uF"/>
 <part name="GND9" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND10" library="Supply Symbol" deviceset="GND" device=""/>
+<part name="U3" library="Microchip" deviceset="MIC94305" device=""/>
+<part name="3V3" library="Supply Symbol" deviceset="3V3" device=""/>
+<part name="GND5" library="Supply Symbol" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -3497,29 +3243,13 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 <instance part="3V2" gate="G$1" x="350.52" y="68.58" smashed="yes">
 <attribute name="VALUE" x="347.98" y="66.04" size="1.778" layer="96" rot="R90"/>
 </instance>
-<instance part="C1" gate="G$1" x="43.18" y="185.42" smashed="yes" rot="R270">
-<attribute name="VALUE" x="40.4114" y="185.42" size="1.778" layer="96" ratio="10" rot="SR270" align="top-left"/>
-<attribute name="NAME" x="45.9486" y="185.42" size="1.778" layer="95" ratio="10" rot="SR270"/>
-<attribute name="VOLTAGE" x="37.8714" y="185.42" size="1.778" layer="97" ratio="10" rot="SR270" align="top-left"/>
+<instance part="C3" gate="G$1" x="71.12" y="185.42" smashed="yes" rot="R270">
+<attribute name="VALUE" x="68.3514" y="185.42" size="1.778" layer="96" ratio="10" rot="SR270" align="top-left"/>
+<attribute name="NAME" x="73.8886" y="185.42" size="1.778" layer="95" ratio="10" rot="SR270"/>
+<attribute name="VOLTAGE" x="65.8114" y="185.42" size="1.778" layer="97" ratio="10" rot="SR270" align="top-left"/>
 </instance>
-<instance part="L1" gate="G$1" x="55.88" y="203.2" smashed="yes">
-<attribute name="NAME" x="52.07" y="205.0796" size="1.778" layer="95"/>
-<attribute name="VALUE" x="52.07" y="201.3204" size="1.778" layer="96" align="top-left"/>
-<attribute name="CURRENT" x="52.07" y="198.7804" size="1.778" layer="97" align="top-left"/>
-</instance>
-<instance part="C3" gate="G$1" x="68.58" y="185.42" smashed="yes" rot="R270">
-<attribute name="VALUE" x="65.8114" y="185.42" size="1.778" layer="96" ratio="10" rot="SR270" align="top-left"/>
-<attribute name="NAME" x="71.3486" y="185.42" size="1.778" layer="95" ratio="10" rot="SR270"/>
-<attribute name="VOLTAGE" x="63.2714" y="185.42" size="1.778" layer="97" ratio="10" rot="SR270" align="top-left"/>
-</instance>
-<instance part="GND4" gate="G$1" x="68.58" y="160.02" smashed="yes">
-<attribute name="VALUE" x="68.58" y="154.94" size="1.778" layer="96" align="bottom-center"/>
-</instance>
-<instance part="GND5" gate="G$1" x="43.18" y="160.02" smashed="yes">
-<attribute name="VALUE" x="43.18" y="154.94" size="1.778" layer="96" align="bottom-center"/>
-</instance>
-<instance part="3V3" gate="G$1" x="43.18" y="210.82" smashed="yes">
-<attribute name="VALUE" x="40.64" y="208.28" size="1.778" layer="96" rot="R90"/>
+<instance part="GND4" gate="G$1" x="71.12" y="160.02" smashed="yes">
+<attribute name="VALUE" x="71.12" y="154.94" size="1.778" layer="96" align="bottom-center"/>
 </instance>
 <instance part="C4" gate="G$1" x="132.08" y="187.96" smashed="yes" rot="R270">
 <attribute name="VALUE" x="129.3114" y="187.96" size="1.778" layer="96" ratio="10" rot="SR270" align="top-left"/>
@@ -3537,9 +3267,6 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 <instance part="GND8" gate="G$1" x="144.78" y="160.02" smashed="yes">
 <attribute name="VALUE" x="144.78" y="154.94" size="1.778" layer="96" align="bottom-center"/>
 </instance>
-<instance part="3V4" gate="G$1" x="43.18" y="78.74" smashed="yes">
-<attribute name="VALUE" x="40.64" y="76.2" size="1.778" layer="96" rot="R90"/>
-</instance>
 <instance part="C2" gate="G$1" x="43.18" y="63.5" smashed="yes" rot="R270">
 <attribute name="VALUE" x="40.4114" y="63.5" size="1.778" layer="96" ratio="10" rot="SR270" align="top-left"/>
 <attribute name="NAME" x="45.9486" y="63.5" size="1.778" layer="95" ratio="10" rot="SR270"/>
@@ -3550,6 +3277,16 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 </instance>
 <instance part="GND10" gate="G$1" x="116.84" y="48.26" smashed="yes">
 <attribute name="VALUE" x="116.84" y="43.18" size="1.778" layer="96" align="bottom-center"/>
+</instance>
+<instance part="U3" gate="G$1" x="330.2" y="139.7" smashed="yes">
+<attribute name="NAME" x="309.88" y="143.256" size="1.27" layer="95"/>
+<attribute name="VALUE" x="309.88" y="140.97" size="1.27" layer="96"/>
+</instance>
+<instance part="3V3" gate="G$1" x="299.72" y="142.24" smashed="yes">
+<attribute name="VALUE" x="297.18" y="139.7" size="1.778" layer="96" rot="R90"/>
+</instance>
+<instance part="GND5" gate="G$1" x="299.72" y="114.3" smashed="yes">
+<attribute name="VALUE" x="299.72" y="109.22" size="1.778" layer="96" align="bottom-center"/>
 </instance>
 </instances>
 <busses>
@@ -3601,14 +3338,9 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 <wire x1="350.52" y1="45.72" x2="350.52" y2="53.34" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="GND5" gate="G$1" pin="GND"/>
-<pinref part="C1" gate="G$1" pin="C2"/>
-<wire x1="43.18" y1="160.02" x2="43.18" y2="177.8" width="0.1524" layer="91"/>
-</segment>
-<segment>
 <pinref part="GND4" gate="G$1" pin="GND"/>
 <pinref part="C3" gate="G$1" pin="C2"/>
-<wire x1="68.58" y1="160.02" x2="68.58" y2="177.8" width="0.1524" layer="91"/>
+<wire x1="71.12" y1="160.02" x2="71.12" y2="177.8" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="C5" gate="G$1" pin="C2"/>
@@ -3635,6 +3367,16 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 <wire x1="116.84" y1="68.58" x2="116.84" y2="63.5" width="0.1524" layer="91"/>
 <junction x="116.84" y="63.5"/>
 </segment>
+<segment>
+<pinref part="GND5" gate="G$1" pin="GND"/>
+<wire x1="299.72" y1="114.3" x2="299.72" y2="121.92" width="0.1524" layer="91"/>
+<wire x1="299.72" y1="121.92" x2="299.72" y2="124.46" width="0.1524" layer="91"/>
+<wire x1="299.72" y1="124.46" x2="304.8" y2="124.46" width="0.1524" layer="91"/>
+<wire x1="304.8" y1="121.92" x2="299.72" y2="121.92" width="0.1524" layer="91"/>
+<junction x="299.72" y="121.92"/>
+<pinref part="U3" gate="G$1" pin="GND@0"/>
+<pinref part="U3" gate="G$1" pin="GND@1"/>
+</segment>
 </net>
 <net name="3V3" class="0">
 <segment>
@@ -3654,22 +3396,18 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 <wire x1="350.52" y1="60.96" x2="350.52" y2="68.58" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="C1" gate="G$1" pin="C1"/>
-<pinref part="L1" gate="G$1" pin="1"/>
-<wire x1="43.18" y1="185.42" x2="43.18" y2="203.2" width="0.1524" layer="91"/>
-<wire x1="43.18" y1="203.2" x2="48.26" y2="203.2" width="0.1524" layer="91"/>
-<junction x="43.18" y="203.2"/>
+<pinref part="U3" gate="G$1" pin="EN"/>
+<wire x1="304.8" y1="129.54" x2="299.72" y2="129.54" width="0.1524" layer="91"/>
+<wire x1="299.72" y1="129.54" x2="299.72" y2="134.62" width="0.1524" layer="91"/>
+<pinref part="U3" gate="G$1" pin="VIN@1"/>
+<wire x1="299.72" y1="134.62" x2="304.8" y2="134.62" width="0.1524" layer="91"/>
+<pinref part="U3" gate="G$1" pin="VIN@0"/>
+<wire x1="304.8" y1="137.16" x2="299.72" y2="137.16" width="0.1524" layer="91"/>
+<wire x1="299.72" y1="137.16" x2="299.72" y2="134.62" width="0.1524" layer="91"/>
+<junction x="299.72" y="134.62"/>
 <pinref part="3V3" gate="G$1" pin="3V3"/>
-<wire x1="43.18" y1="210.82" x2="43.18" y2="203.2" width="0.1524" layer="91"/>
-</segment>
-<segment>
-<pinref part="C2" gate="G$1" pin="C1"/>
-<wire x1="43.18" y1="63.5" x2="43.18" y2="71.12" width="0.1524" layer="91"/>
-<wire x1="43.18" y1="71.12" x2="86.36" y2="71.12" width="0.1524" layer="91"/>
-<pinref part="3V4" gate="G$1" pin="3V3"/>
-<wire x1="43.18" y1="78.74" x2="43.18" y2="71.12" width="0.1524" layer="91"/>
-<junction x="43.18" y="71.12"/>
-<pinref part="U1" gate="G$1" pin="VDD"/>
+<wire x1="299.72" y1="142.24" x2="299.72" y2="137.16" width="0.1524" layer="91"/>
+<junction x="299.72" y="137.16"/>
 </segment>
 </net>
 <net name="I2C_SCL" class="0">
@@ -3712,20 +3450,39 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 <wire x1="172.72" y1="220.98" x2="195.58" y2="220.98" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="N$4" class="0">
+<net name="3V3_CLEAN" class="0">
 <segment>
-<pinref part="L1" gate="G$1" pin="2"/>
 <pinref part="C3" gate="G$1" pin="C1"/>
-<wire x1="63.5" y1="203.2" x2="68.58" y2="203.2" width="0.1524" layer="91"/>
-<wire x1="68.58" y1="203.2" x2="68.58" y2="185.42" width="0.1524" layer="91"/>
+<wire x1="71.12" y1="203.2" x2="71.12" y2="185.42" width="0.1524" layer="91"/>
 <pinref part="U2" gate="G$1" pin="VCC"/>
-<wire x1="68.58" y1="203.2" x2="81.28" y2="203.2" width="0.1524" layer="91"/>
-<junction x="68.58" y="203.2"/>
+<wire x1="71.12" y1="203.2" x2="81.28" y2="203.2" width="0.1524" layer="91"/>
 <pinref part="U2" gate="G$1" pin="EN"/>
 <wire x1="81.28" y1="203.2" x2="86.36" y2="203.2" width="0.1524" layer="91"/>
 <wire x1="86.36" y1="198.12" x2="81.28" y2="198.12" width="0.1524" layer="91"/>
 <wire x1="81.28" y1="198.12" x2="81.28" y2="203.2" width="0.1524" layer="91"/>
 <junction x="81.28" y="203.2"/>
+<wire x1="71.12" y1="203.2" x2="63.5" y2="203.2" width="0.1524" layer="91"/>
+<junction x="71.12" y="203.2"/>
+<label x="63.5" y="203.2" size="1.778" layer="95" rot="R180" xref="yes"/>
+</segment>
+<segment>
+<pinref part="C2" gate="G$1" pin="C1"/>
+<wire x1="43.18" y1="63.5" x2="43.18" y2="71.12" width="0.1524" layer="91"/>
+<wire x1="43.18" y1="71.12" x2="86.36" y2="71.12" width="0.1524" layer="91"/>
+<pinref part="U1" gate="G$1" pin="VDD"/>
+<wire x1="43.18" y1="71.12" x2="35.56" y2="71.12" width="0.1524" layer="91"/>
+<junction x="43.18" y="71.12"/>
+<label x="35.56" y="71.12" size="1.778" layer="95" rot="R180" xref="yes"/>
+</segment>
+<segment>
+<pinref part="U3" gate="G$1" pin="VOUT@0"/>
+<wire x1="335.28" y1="137.16" x2="340.36" y2="137.16" width="0.1524" layer="91"/>
+<pinref part="U3" gate="G$1" pin="VOUT@1"/>
+<wire x1="340.36" y1="137.16" x2="340.36" y2="134.62" width="0.1524" layer="91"/>
+<wire x1="340.36" y1="134.62" x2="335.28" y2="134.62" width="0.1524" layer="91"/>
+<wire x1="340.36" y1="137.16" x2="345.44" y2="137.16" width="0.1524" layer="91"/>
+<junction x="340.36" y="137.16"/>
+<label x="345.44" y="137.16" size="1.778" layer="95" xref="yes"/>
 </segment>
 </net>
 <net name="N$3" class="0">
