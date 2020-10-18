@@ -1,5 +1,3 @@
-const delay = require.main.require("./util/delay");
-
 class HPPSU
 {
     bus;
@@ -58,17 +56,6 @@ class HPPSU
 
         await this.bus.i2cWrite(this.psu_addr, buf.length, buf);
     }
-    async write_register(reg, data)
-    {
-        let buf = Buffer.alloc(4, 0);
-
-        buf.writeUInt8(reg, 0);
-        buf.writeUInt16LE(data, 1);
-
-        this.calc_checksum(buf);
-
-        await this.bus.i2cWrite(this.psu_addr, buf.length, buf);
-    }
     async read_register(reg)
     {
         let buf = Buffer.alloc(2, 0);
@@ -86,7 +73,7 @@ class HPPSU
             throw new Error("I2C Read failed");
 
         if(result.bytesRead < 3)
-            throw new Error("I2C Read failed, expected " + 3 + "bytes, got " + result.bytesRead);
+            throw new Error("I2C Read failed, expected " + 3 + " bytes, got " + result.bytesRead);
 
         if(!this.check_checksum(result.buffer))
             throw new Error("Checksum does not match");
@@ -114,7 +101,7 @@ class HPPSU
             throw new Error("I2C Read failed");
 
         if(result.bytesRead < count)
-            throw new Error("I2C Read failed, expected " + count + "bytes, got " + result.bytesRead);
+            throw new Error("I2C Read failed, expected " + count + " bytes, got " + result.bytesRead);
 
         return result.buffer;
     }
@@ -134,6 +121,14 @@ class HPPSU
     async get_ct()
     {
         return (await this.read_eeprom(0x5B, 14)).toString("utf8");
+    }
+
+    async get_id()
+    {
+        return await this.read_register(0x00);
+
+        // 0x2000 - HSTNS-PL18 - 750W
+        // 0x2100 - HSTNS-PD11 - 1200W
     }
 
     async get_input_voltage()
@@ -195,6 +190,28 @@ class HPPSU
 
         return ((msb << 16) | lsb) / 7200;
     }
+    async get_input_undervoltage_threshold()
+    {
+        return await this.read_register(0x44) / 32;
+    }
+    async set_input_undervoltage_threshold(voltage)
+    {
+        if(voltage < 0 || voltage > 65535/32)
+            throw new Error("Voltage threshold out of bounds");
+
+        await this.write_register(0x44, voltage * 32);
+    }
+    async get_input_overvoltage_threshold()
+    {
+        return await this.read_register(0x46) / 32;
+    }
+    async set_input_overvoltage_threshold(voltage)
+    {
+        if(voltage < 0 || voltage > 65535/32)
+            throw new Error("Voltage threshold out of bounds");
+
+        await this.write_register(0x46, voltage * 32);
+    }
 
     async get_output_voltage()
     {
@@ -227,6 +244,28 @@ class HPPSU
         }
 
         return ret;
+    }
+    async get_output_undervoltage_threshold()
+    {
+        return await this.read_register(0x48) / 256;
+    }
+    async set_output_undervoltage_threshold(voltage)
+    {
+        if(voltage < 0 || voltage > 65535/256)
+            throw new Error("Voltage threshold out of bounds");
+
+        await this.write_register(0x48, voltage * 256);
+    }
+    async get_output_overvoltage_threshold()
+    {
+        return await this.read_register(0x4A) / 256;
+    }
+    async set_output_overvoltage_threshold(voltage)
+    {
+        if(voltage < 0 || voltage > 65535/256)
+            throw new Error("Voltage threshold out of bounds");
+
+        await this.write_register(0x4A, voltage * 256);
     }
 
     async get_intake_temperature()
@@ -275,6 +314,12 @@ class HPPSU
     async get_status_flags()
     {
         return await this.read_register(0x02);
+
+        // Bit 0 - Main output enabled
+        // Bit 1 - Something like ready flag (?)
+        // Bit 2 - #ENABLE pin status inverted
+        // Bit 4 - Is always set but is not mentioned in disassembly (?)
+        // Bit 17-16 - 00: Invalid input voltage, 01: xxx V < Input voltage < 108V (100V nominal), 10: 108V < Input voltage < 132V (120V nominal), 11: 179V < Input voltage < 264V
     }
 
     async main_output_enabled()
@@ -285,11 +330,6 @@ class HPPSU
     /*
     write 0xXXXX to 0x3A - set yet_more_flags bit 5, check written data bit 5 is clear, ...TODO
     write 0xXXXX (not zero) to 0x3C - set yet_more_flags bit 7, set interesting_ctrl_byte_set_cmd3b, bit 6, copy written data to written_by_cmd_3d
-
-    write 0xXXXX to 0x44 - set byte_DATA_A4 bit 1, copy written date to voltage_threshold1 after some checks
-    write 0xXXXX to 0x46 - set byte_DATA_A4 bit 2, copy written date to voltage_threshold3 after some checks
-    write 0xXXXX to 0x48 - set byte_DATA_A4 bit 3, copy written data to byte_DATA_EA after some checks
-    write 0xXXXX to 0x4A - set byte_DATA_A4 bit 4, copy written data to byte_DATA_EC after some checks
 
     write 0xXXXX to 0x54 - set some_major_flags bit 5
 
