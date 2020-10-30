@@ -1,9 +1,10 @@
 # qo-100-tools
-Various tools for transmission and reception on the QO-100 sattelite bands. Includes everything I need (hopefuully) to build a fully remote managed RF frontend to be placed on the roof, near the antenna while the only thing coming to the shack would be power, two coax cables (TX IF and RX IF) and one UTP ethernet cable.
+Various tools for transmission and reception on the QO-100 sattelite bands. Includes everything I need (hopefuully) to build a fully remote managed RF frontend to be placed on the roof, near the antenna while only bringing a few cables down to the shack: power, two coax cables (TX IF and RX IF) and one UTP ethernet cable.
 
 ## Included tools
  - Upconverter - Converts HF to the uplink frequency of the sattelite (2.4 GHz)
  - PA - Boosts the output power to 20 W (v1) and 250 W (v2) maximum
+ - Directional Couplers - Experimental
  - GPSDO - GPS Disciplined Oscillator to generate different precise reference frequencies
  - LNB Controller - LNB Bias and reference injector controller
  - Digital Power Meter - Module to measure DC power, used to calculate the PA efficiency
