@@ -26,4 +26,4 @@ Various tools for transmission and reception on the QO-100 sattelite bands. Incl
 
 ## License
 
-This firmware is licensed under [MIT](LICENSE).
+The content of this repository is licensed under the [GNU General Public License v3.0](LICENSE).
