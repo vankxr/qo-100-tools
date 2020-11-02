@@ -1411,7 +1411,7 @@ design rules under a new name.</description>
 </element>
 </elements>
 <signals>
-<signal name="GND" airwireshidden="yes">
+<signal name="GND">
 <contactref element="RFCON1" pad="GND@0"/>
 <contactref element="RFCON1" pad="GND@1"/>
 <contactref element="RFCON1" pad="GND@2"/>
