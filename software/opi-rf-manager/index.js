@@ -152,7 +152,7 @@ async function main()
                 cl.ctprint(null, null, "PSU #%d Fan speed: %d RPM", i, await PSU[i].get_fan_speed());
                 cl.ctprint(null, null, "PSU #%d Fan target speed: %d RPM", i, await PSU[i].get_fan_target_speed());
                 cl.ctprint(null, null, "PSU #%d On time: %d s", i, await PSU[i].get_on_time());
-                cl.ctprint(null, null, "PSU #%d Total on time: %d hours", i, await PSU[i].get_total_on_time() / 60 / 24);
+                cl.ctprint(null, null, "PSU #%d Total on time: %d days", i, await PSU[i].get_total_on_time() / 60 / 24);
                 cl.ctprint(null, null, "PSU #%d Status flags: 0x%s", i, (await PSU[i].get_status_flags()).toString(16));
                 cl.ctprint(null, null, "PSU #%d ON: %s", i, await PSU[i].main_output_enabled());
 
