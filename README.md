@@ -1,20 +1,21 @@
 # qo-100-tools
-Various tools for transmission and reception on the QO-100 sattelite bands. Includes everything I need (hopefuully) to build a fully remote managed RF frontend to be placed on the roof, near the antenna while only bringing a few cables down to the shack: power, two coax cables (TX IF and RX IF) and one UTP ethernet cable.
+Various tools for transmission and reception on the QO-100 sattelite amateur transponder bands. Includes everything I need (hopefully) to build a fully remote managed RF frontend to be placed on the roof, near the antenna while only bringing a few cables between it and the shack: power, two coax cables (TX IF and RX IF) and one UTP ethernet cable.
 
 ## Included tools
- - Upconverter - Converts HF to the uplink frequency of the sattelite (2.4 GHz)
- - PA - Boosts the output power to 20 W (v1) and 250 W (v2) maximum
- - Directional Couplers - Experimental
+ - Upconverter - Converts the VHF/UHF IF signal to the uplink frequency of the sattelite (2.4 GHz)
+ - PA - Boosts the output power to 20 W (v1) and 250 W (v2) maximum, there is also a 10 W driver for the v2 that can be used for some QRP experiments
+ - Directional Couplers - Experimental, manually constructed with simple scalpel cut traces on some Rogers RO4350B substrate
  - GPSDO - GPS Disciplined Oscillator to generate different precise reference frequencies
- - LNB Controller - LNB Bias and reference injector controller
+ - LNB Controller - LNB Bias and reference injection controller
  - Digital Power Meter - Module to measure DC power, used to calculate the PA efficiency
  - Digital RF Power Meter - Module to measure RF power, used to calculate the PA efficiency
- - Generic Filter - Footprints to build up to 11th order Butterworth filters
+ - Generic Filter - Footprints to build up to 11th order Butterworth/Chebyshev filters
  - Orange Pi Dock - Main board to house an OPi to control the whole system
  - Relay Controller - Module to provide relay coil switching capabilities
  - RF Switch - Implements a 5PST or 4PST RF switch for routing purposes
 
 ## Dependencies
+ - [icyradio](https://github.com/vankxr/icyradio/tree/qo100) - IcyRadio Software Defined Radio to transmit and receive IF signals to the roof RF frontend
  - [icestorm](https://github.com/cliffordwolf/icestorm) - FPGA toolchain
  - [arm-none-eabi-gcc](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads) - MCUs toolchain
  - [Device CMSIS](https://www.keil.com/dd2/) - CMSIS headers defining the MCU memories, peripherals, etc...
