@@ -26,6 +26,10 @@ Various tools for transmission and reception on the QO-100 sattelite amateur tra
 
 * **João Silva** - [vankxr](https://github.com/vankxr)
 
+## Special thanks
+
+Thanks to [JLCPCB](https://jlcpcb.com) for sponsoring most of the PCBs needed for this project
+
 ## License
 
 The content of this repository is licensed under the [GNU General Public License v3.0](LICENSE).
