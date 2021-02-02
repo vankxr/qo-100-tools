@@ -16,6 +16,7 @@
 #include "crc.h"
 #include "usart.h"
 #include "i2c.h"
+#include "wdog.h"
 
 // Structs
 
@@ -42,6 +43,8 @@ static uint32_t get_free_ram();
 
 static void get_device_name(char *pszDeviceName, uint32_t ulDeviceNameSize);
 static uint16_t get_device_revision();
+
+static void wdog_warning_isr();
 
 static void i2c_slave_register_init();
 static uint8_t i2c_slave_addr_isr(uint8_t ubRnW);
@@ -211,6 +214,11 @@ uint16_t get_device_revision()
     return usRevision;
 }
 
+void wdog_warning_isr()
+{
+    DBGPRINTLN_CTX("Watchdog warning!");
+}
+
 void i2c_slave_register_init()
 {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
@@ -270,6 +278,9 @@ int init()
     msc_init(); // Init Flash, RAM and caches
 
     systick_init(); // Init system tick
+
+    wdog_init((8 <<_WDOG_CTRL_PERSEL_SHIFT) | (3 << _WDOG_CTRL_WARNSEL_SHIFT)); // Init the watchdog timer, 2049 ms timeout, 75% warning
+    wdog_set_warning_isr(wdog_warning_isr);
 
     gpio_init(); // Init GPIOs
     ldma_init(); // Init LDMA
@@ -356,9 +367,8 @@ int init()
     DBGPRINTLN_CTX("CMU - LFE Clock: %.3f kHz", (float)LFE_CLOCK_FREQ / 1000);
     DBGPRINTLN_CTX("CMU - RTCC Clock: %.3f kHz", (float)RTCC_CLOCK_FREQ / 1000);
 
-    DBGPRINTLN_CTX("Waiting 1000 ms...");
-
-    delay_ms(1000);
+    DBGPRINTLN_CTX("WDOG - Timeout period: %.3f ms", wdog_get_timeout_period());
+    DBGPRINTLN_CTX("WDOG - Warning period: %.3f ms", wdog_get_warning_period());
 
     return 0;
 }
@@ -369,6 +379,8 @@ int main()
 
     while(1)
     {
+        wdog_feed();
+
         static uint64_t ullLastLEDTick = 0;
         static uint64_t ullLastDebugPrint = 0;
 
