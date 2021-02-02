@@ -1,12 +1,16 @@
+const GPIO = require.main.require("./lib/gpio");
+
 class HPPSU
 {
     bus;
+    bus_enable_gpio;
     psu_addr;
     ee_addr;
 
-    constructor(bus, addr)
+    constructor(bus, addr, bus_enable_gpio)
     {
         this.bus = bus;
+        this.bus_enable_gpio = bus_enable_gpio;
 
         this.psu_addr = 0x58 | (addr & 0x07);
         this.ee_addr = 0x50 | (addr & 0x07);
@@ -14,11 +18,31 @@ class HPPSU
 
     async probe()
     {
-        if((await this.bus.scan(this.psu_addr)).indexOf(this.psu_addr) === -1)
-            throw new Error("Could not find PSU at address 0x" + this.psu_addr.toString(16));
+        const release = await this.bus.mutex.acquire();
 
-        if((await this.bus.scan(this.ee_addr)).indexOf(this.ee_addr) === -1)
-            throw new Error("Could not find EEPROM at address 0x" + this.ee_addr.toString(16));
+        try
+        {
+            if(this.bus_enable_gpio)
+                await this.bus_enable_gpio.set_value(GPIO.HIGH);
+
+            if((await this.bus.scan(this.psu_addr)).indexOf(this.psu_addr) === -1)
+                throw new Error("Could not find PSU at address 0x" + this.psu_addr.toString(16));
+
+            if((await this.bus.scan(this.ee_addr)).indexOf(this.ee_addr) === -1)
+                throw new Error("Could not find EEPROM at address 0x" + this.ee_addr.toString(16));
+        }
+        finally
+        {
+            try
+            {
+                if(this.bus_enable_gpio)
+                    await this.bus_enable_gpio.set_value(GPIO.LOW);
+            }
+            finally
+            {
+                release();
+            }
+        }
 
         return true;
     }
@@ -54,7 +78,27 @@ class HPPSU
 
         this.calc_checksum(buf);
 
-        await this.bus.i2cWrite(this.psu_addr, buf.length, buf);
+        const release = await this.bus.mutex.acquire();
+
+        try
+        {
+            if(this.bus_enable_gpio)
+                await this.bus_enable_gpio.set_value(GPIO.HIGH);
+
+            await this.bus.i2cWrite(this.psu_addr, buf.length, buf);
+        }
+        finally
+        {
+            try
+            {
+                if(this.bus_enable_gpio)
+                    await this.bus_enable_gpio.set_value(GPIO.LOW);
+            }
+            finally
+            {
+                release();
+            }
+        }
     }
     async read_register(reg)
     {
@@ -64,10 +108,31 @@ class HPPSU
 
         this.calc_checksum(buf);
 
-        await this.bus.i2cWrite(this.psu_addr, buf.length, buf);
+        let result;
+        const release = await this.bus.mutex.acquire();
 
-        buf = Buffer.alloc(3, 0);
-        let result = await this.bus.i2cRead(this.psu_addr, 3, buf);
+        try
+        {
+            if(this.bus_enable_gpio)
+                await this.bus_enable_gpio.set_value(GPIO.HIGH);
+
+            await this.bus.i2cWrite(this.psu_addr, buf.length, buf);
+
+            buf = Buffer.alloc(3, 0);
+            result = await this.bus.i2cRead(this.psu_addr, 3, buf);
+        }
+        finally
+        {
+            try
+            {
+                if(this.bus_enable_gpio)
+                    await this.bus_enable_gpio.set_value(GPIO.LOW);
+            }
+            finally
+            {
+                release();
+            }
+        }
 
         if(!result)
             throw new Error("I2C Read failed");
@@ -92,10 +157,31 @@ class HPPSU
 
         buf.writeUInt8(mem_addr, 0);
 
-        await this.bus.i2cWrite(this.ee_addr, buf.length, buf);
+        let result;
+        const release = await this.bus.mutex.acquire();
 
-        buf = Buffer.alloc(count, 0);
-        let result = await this.bus.i2cRead(this.ee_addr, count, buf);
+        try
+        {
+            if(this.bus_enable_gpio)
+                await this.bus_enable_gpio.set_value(GPIO.HIGH);
+
+            await this.bus.i2cWrite(this.ee_addr, buf.length, buf);
+
+            buf = Buffer.alloc(count, 0);
+            result = await this.bus.i2cRead(this.ee_addr, count, buf);
+        }
+        finally
+        {
+            try
+            {
+                if(this.bus_enable_gpio)
+                    await this.bus_enable_gpio.set_value(GPIO.LOW);
+            }
+            finally
+            {
+                release();
+            }
+        }
 
         if(!result)
             throw new Error("I2C Read failed");
@@ -316,7 +402,7 @@ class HPPSU
         return await this.read_register(0x02);
 
         // Bit 0 - Main output enabled
-        // Bit 1 - Something like ready flag (?)
+        // Bit 1 - Seems to indicate whether input voltage is present, something like ready flag (?)
         // Bit 2 - #ENABLE pin status inverted
         // Bit 4 - Is always set but is not mentioned in disassembly (?)
         // Bit 17-16 - 00: Invalid input voltage, 01: xxx V < Input voltage < 108V (100V nominal), 10: 108V < Input voltage < 132V (120V nominal), 11: 179V < Input voltage < 264V
@@ -325,6 +411,10 @@ class HPPSU
     async main_output_enabled()
     {
         return (await this.get_status_flags() & 0x05) === 0x05;
+    }
+    async input_present()
+    {
+        return (await this.get_status_flags() & 0x02) === 0x02;
     }
 
     /*

@@ -30,7 +30,14 @@ class GPIO
 
         let gpio_index = (port_number - 65) * 32 + pin_number;
 
-        await FileSystem.writeFile(GPIO.root_path + "export", gpio_index.toString());
+        try
+        {
+            await FileSystem.access(GPIO.root_path + "gpio" + gpio_index);
+        }
+        catch(e)
+        {
+            await FileSystem.writeFile(GPIO.root_path + "export", gpio_index.toString());
+        }
 
         return new GPIO(pin, gpio_index);
     }

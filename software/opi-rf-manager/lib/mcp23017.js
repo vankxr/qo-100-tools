@@ -12,8 +12,17 @@ class MCP23017
 
     async probe()
     {
-        if((await this.bus.scan(this.addr)).indexOf(this.addr) === -1)
-            throw new Error("Could not find BME280 at address 0x" + this.addr.toString(16));
+        const release = await this.bus.mutex.acquire();
+
+        try
+        {
+            if((await this.bus.scan(this.addr)).indexOf(this.addr) === -1)
+                throw new Error("Could not find MCP23017 at address 0x" + this.addr.toString(16));
+        }
+        finally
+        {
+            release();
+        }
 
         return true;
     }
@@ -25,7 +34,16 @@ class MCP23017
         buf.writeUInt8(reg, 0);
         buf.writeUInt8(data, 1);
 
-        await this.bus.i2cWrite(this.addr, buf.length, buf);
+        const release = await this.bus.mutex.acquire();
+
+        try
+        {
+            await this.bus.i2cWrite(this.addr, buf.length, buf);
+        }
+        finally
+        {
+            release();
+        }
     }
     async read_register(reg)
     {
@@ -33,9 +51,19 @@ class MCP23017
 
         buf.writeUInt8(reg, 0);
 
-        await this.bus.i2cWrite(this.addr, buf.length, buf);
+        let result;
+        const release = await this.bus.mutex.acquire();
 
-        let result = await this.bus.i2cRead(this.addr, 1, buf);
+        try
+        {
+            await this.bus.i2cWrite(this.addr, buf.length, buf);
+
+            result = await this.bus.i2cRead(this.addr, 1, buf);
+        }
+        finally
+        {
+            release();
+        }
 
         if(!result)
             throw new Error("I2C Read failed");

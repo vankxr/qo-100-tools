@@ -35,8 +35,17 @@ class BME280
 
     async probe()
     {
-        if((await this.bus.scan(this.addr)).indexOf(this.addr) === -1)
-            throw new Error("Could not find BME280 at address 0x" + this.addr.toString(16));
+        const release = await this.bus.mutex.acquire();
+
+        try
+        {
+            if((await this.bus.scan(this.addr)).indexOf(this.addr) === -1)
+                throw new Error("Could not find BME280 at address 0x" + this.addr.toString(16));
+        }
+        finally
+        {
+            release();
+        }
 
         let id = await this.get_chip_id();
 
@@ -86,7 +95,16 @@ class BME280
         for(let i = 0; i < data.length; i++)
             buf.writeUInt8(data, i + 1);
 
-        await this.bus.i2cWrite(this.addr, buf.length, buf);
+        const release = await this.bus.mutex.acquire();
+
+        try
+        {
+            await this.bus.i2cWrite(this.addr, buf.length, buf);
+        }
+        finally
+        {
+            release();
+        }
     }
     async write_register(reg, data)
     {
@@ -98,10 +116,20 @@ class BME280
 
         buf.writeUInt8(reg, 0);
 
-        await this.bus.i2cWrite(this.addr, buf.length, buf);
+        let result;
+        const release = await this.bus.mutex.acquire();
 
-        buf = Buffer.alloc(count, 0);
-        let result = await this.bus.i2cRead(this.addr, count, buf);
+        try
+        {
+            await this.bus.i2cWrite(this.addr, buf.length, buf);
+
+            buf = Buffer.alloc(count, 0);
+            result = await this.bus.i2cRead(this.addr, count, buf);
+        }
+        finally
+        {
+            release();
+        }
 
         if(!result)
             throw new Error("I2C Read failed");
