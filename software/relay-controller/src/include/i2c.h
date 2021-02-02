@@ -75,6 +75,10 @@ static inline uint8_t i2c1_read_byte(uint8_t ubAddress, uint8_t ubStop)
     return ubData;
 }
 #else   // I2C1_MODE_MASTER
+void i2c1_init(uint8_t ubAddress, uint8_t ubSCLLocation, uint8_t ubSDALocation);
+void i2c1_set_slave_addr_isr(i2c_slave_addr_isr_t pfISR);
+void i2c1_set_slave_tx_data_isr(i2c_slave_tx_data_isr_t pfISR);
+void i2c1_set_slave_rx_data_isr(i2c_slave_rx_data_isr_t pfISR);
 #endif  // I2C1_MODE_MASTER
 
 #endif  // __I2C_H__
