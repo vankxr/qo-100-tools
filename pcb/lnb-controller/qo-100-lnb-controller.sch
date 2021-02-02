@@ -5427,12 +5427,12 @@ Logo</text>
 <part name="FRAME4" library="Frame" deviceset="A2-LANDSCAPE" device=""/>
 <part name="R39" library="Resistor" deviceset="RESISTOR" device="-0603" value="12K Ohms"/>
 <part name="R38" library="Resistor" deviceset="RESISTOR" device="-0603" value="90.9K Ohms"/>
-<part name="R29" library="Resistor" deviceset="RESISTOR" device="-0603" value="2.5K Ohms"/>
+<part name="R29" library="Resistor" deviceset="RESISTOR" device="-0603" value="2.55K Ohms"/>
 <part name="D2" library="LED" deviceset="LED" device="0603">
 <attribute name="COLOR" value="RED"/>
 </part>
 <part name="GND53" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="R30" library="Resistor" deviceset="RESISTOR" device="-0603" value="2.5K Ohms"/>
+<part name="R30" library="Resistor" deviceset="RESISTOR" device="-0603" value="2.55K Ohms"/>
 <part name="D3" library="LED" deviceset="LED" device="0603">
 <attribute name="COLOR" value="RED"/>
 </part>

@@ -3,7 +3,7 @@
 <eagle version="9.6.1">
 <drawing>
 <settings>
-<setting alwaysvectorfont="yes"/>
+<setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
 <grid distance="0.1" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.05" altunitdist="mm" altunit="mm"/>
@@ -1151,12 +1151,12 @@ design rules under a new name.</description>
 <attribute name="VALUE" x="19.832" y="11.9536" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="17.8" y="14.9" size="0.8" layer="27" font="vector" ratio="10" rot="R90" display="off"/>
 </element>
-<element name="C4" library="Capacitor" package="CAP0603" value="DNP" x="19.2" y="10.5" smashed="yes">
+<element name="C4" library="Capacitor" package="CAP0603" value="10nF" x="19.2" y="10.5" smashed="yes">
 <attribute name="NAME" x="21.0536" y="10.516" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="16.2536" y="8.468" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="19.2" y="10.5" size="0.8" layer="27" font="vector" ratio="10" display="off"/>
 </element>
-<element name="C5" library="Capacitor" package="CAP0603" value="DNP" x="19.2" y="8.7" smashed="yes">
+<element name="C5" library="Capacitor" package="CAP0603" value="1uF" x="19.2" y="8.7" smashed="yes">
 <attribute name="NAME" x="21.0536" y="8.716" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="16.2536" y="6.668" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="19.2" y="8.7" size="0.8" layer="27" font="vector" ratio="10" display="off"/>

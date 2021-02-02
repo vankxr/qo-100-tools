@@ -3141,8 +3141,8 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 <part name="3V2" library="Supply Symbol" deviceset="3V3" device=""/>
 <part name="C3" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="4.7uF"/>
 <part name="GND4" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="C4" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="DNP"/>
-<part name="C5" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="DNP"/>
+<part name="C4" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="10nF"/>
+<part name="C5" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1uF"/>
 <part name="GND7" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND8" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="C2" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="4.7uF"/>

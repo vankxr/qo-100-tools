@@ -3,7 +3,7 @@
 <eagle version="9.6.1">
 <drawing>
 <settings>
-<setting alwaysvectorfont="no"/>
+<setting alwaysvectorfont="yes"/>
 <setting verticaltext="up"/>
 </settings>
 <grid distance="0.1" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.1" altunitdist="mm" altunit="mm"/>
@@ -52,7 +52,7 @@
 <layer number="42" name="bRestrict" color="1" fill="10" visible="yes" active="yes"/>
 <layer number="43" name="vRestrict" color="2" fill="10" visible="yes" active="yes"/>
 <layer number="44" name="Drills" color="7" fill="1" visible="yes" active="yes"/>
-<layer number="45" name="Holes" color="7" fill="1" visible="no" active="yes"/>
+<layer number="45" name="Holes" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="46" name="Milling" color="3" fill="1" visible="no" active="yes"/>
 <layer number="47" name="Measures" color="7" fill="1" visible="no" active="yes"/>
 <layer number="48" name="Document" color="7" fill="1" visible="yes" active="yes"/>
@@ -1363,606 +1363,606 @@ design rules under a new name.</description>
 </autorouter>
 <elements>
 <element name="C2" library="Capacitor" package="CAP0603" value="10uF" x="42.5" y="39.4" smashed="yes" rot="R180">
-<attribute name="NAME" x="45.4464" y="38.384" size="0.8" layer="25" font="vector" ratio="10" rot="SR180" align="center-left"/>
+<attribute name="NAME" x="42.9536" y="40.816" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="45.4464" y="41.432" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="-31.16" y="149.89" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
 <element name="C1" library="Capacitor" package="CAP0603" value="4.7uF" x="43.3" y="33.4" smashed="yes">
-<attribute name="NAME" x="40.3536" y="34.416" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
+<attribute name="NAME" x="45.1536" y="33.416" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="40.3536" y="31.368" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VOLTAGE" value="35V" x="127.12" y="-77.09" size="1.778" layer="27" display="off"/>
 </element>
 <element name="C6" library="Capacitor" package="CAP1206" value="10uF" x="39.5" y="26.4" smashed="yes" rot="R270">
-<attribute name="NAME" x="41.405" y="29.8544" size="0.8" layer="25" font="vector" ratio="10" rot="SR270" align="center-left"/>
+<attribute name="NAME" x="39.0456" y="29.605" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="35.563" y="29.8544" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 <attribute name="VOLTAGE" value="50V" x="-13.84" y="-12.97" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="C4" library="Capacitor" package="CAP1206" value="22uF" x="50" y="79.8" smashed="yes">
-<attribute name="NAME" x="46.5456" y="81.705" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
+<attribute name="NAME" x="47.5456" y="81.605" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="46.5456" y="75.863" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="80.48" y="26.46" size="1.778" layer="27" display="off"/>
 </element>
 <element name="C5" library="Capacitor" package="CAP0603" value="100nF" x="48" y="76.8" smashed="yes" rot="R270">
-<attribute name="NAME" x="49.016" y="79.7464" size="0.8" layer="25" font="vector" ratio="10" rot="SR270" align="center-left"/>
+<attribute name="NAME" x="46.584" y="77.1536" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="VALUE" x="45.968" y="79.7464" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="-62.49" y="-1.94" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="CON1" library="JST" package="SH-04-SIDE" value="4P-SH-SIDE" x="42.5" y="81.8" smashed="yes" rot="R180">
-<attribute name="NAME" x="46.945" y="83.705" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
+<attribute name="NAME" x="38.555" y="78.695" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
 <attribute name="VALUE" x="36.785" y="83.705" size="0.8" layer="27" font="vector" ratio="10" rot="R270" align="center-left"/>
 </element>
 <element name="CON11" library="Generic Connector" package="2EDG-2P-5MM" value="2EDG-2P-5MM" x="65" y="47.85" smashed="yes" rot="R90">
-<attribute name="NAME" x="62.8" y="42.35" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
+<attribute name="NAME" x="62.5" y="42.05" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
 </element>
 <element name="CON12" library="Generic Connector" package="2EDG-2P-5MM" value="2EDG-2P-5MM" x="65" y="35.95" smashed="yes" rot="R90">
-<attribute name="NAME" x="62.8" y="30.45" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
+<attribute name="NAME" x="62.5" y="30.15" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
 </element>
 <element name="CON13" library="Generic Connector" package="2EDG-2P-5MM" value="2EDG-2P-5MM" x="65" y="24.05" smashed="yes" rot="R90">
-<attribute name="NAME" x="62.8" y="18.55" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
+<attribute name="NAME" x="62.5" y="18.25" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
 </element>
 <element name="CON14" library="Generic Connector" package="2EDG-2P-5MM" value="2EDG-2P-5MM" x="65" y="12.15" smashed="yes" rot="R90">
-<attribute name="NAME" x="62.8" y="6.65" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
+<attribute name="NAME" x="62.5" y="6.35" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
 </element>
 <element name="CON2" library="Generic Connector" package="2EDG-2P-5MM" value="2EDG-2P-5MM" x="42.5" y="20" smashed="yes">
-<attribute name="NAME" x="37" y="22.2" size="0.8" layer="25" font="vector" ratio="10" align="center-left"/>
+<attribute name="NAME" x="36.7" y="22.5" size="0.8" layer="25" font="vector" ratio="10" align="center-left"/>
 </element>
 <element name="CON3" library="Generic Connector" package="2EDG-2P-5MM" value="2EDG-2P-5MM" x="20" y="12.15" smashed="yes" rot="R270">
-<attribute name="NAME" x="22.2" y="17.65" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
+<attribute name="NAME" x="22.5" y="17.85" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
 </element>
 <element name="CON4" library="Generic Connector" package="2EDG-2P-5MM" value="2EDG-2P-5MM" x="20" y="24.05" smashed="yes" rot="R270">
-<attribute name="NAME" x="22.2" y="29.55" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
+<attribute name="NAME" x="22.5" y="29.75" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
 </element>
 <element name="CON5" library="Generic Connector" package="2EDG-2P-5MM" value="2EDG-2P-5MM" x="20" y="35.95" smashed="yes" rot="R270">
-<attribute name="NAME" x="22.2" y="41.45" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
+<attribute name="NAME" x="22.5" y="41.65" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
 </element>
 <element name="CON6" library="Generic Connector" package="2EDG-2P-5MM" value="2EDG-2P-5MM" x="20" y="47.85" smashed="yes" rot="R270">
-<attribute name="NAME" x="22.2" y="53.35" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
+<attribute name="NAME" x="22.5" y="53.55" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
 </element>
 <element name="CON7" library="Generic Connector" package="2EDG-2P-5MM" value="2EDG-2P-5MM" x="20" y="59.75" smashed="yes" rot="R270">
-<attribute name="NAME" x="22.2" y="65.25" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
+<attribute name="NAME" x="22.5" y="65.45" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
 </element>
 <element name="CON8" library="Generic Connector" package="2EDG-2P-5MM" value="2EDG-2P-5MM" x="20" y="71.65" smashed="yes" rot="R270">
-<attribute name="NAME" x="22.2" y="77.15" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
+<attribute name="NAME" x="22.5" y="77.35" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
 </element>
 <element name="CON9" library="Generic Connector" package="2EDG-2P-5MM" value="2EDG-2P-5MM" x="65" y="71.65" smashed="yes" rot="R90">
-<attribute name="NAME" x="62.8" y="66.15" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
+<attribute name="NAME" x="62.5" y="65.85" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
 </element>
 <element name="CON10" library="Generic Connector" package="2EDG-2P-5MM" value="2EDG-2P-5MM" x="65" y="59.75" smashed="yes" rot="R90">
-<attribute name="NAME" x="62.8" y="54.25" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
+<attribute name="NAME" x="62.5" y="53.95" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
 </element>
 <element name="D6" library="Generic Diode" package="SOD-123" value="B0530W" x="24" y="12.15" smashed="yes" rot="R90">
-<attribute name="NAME" x="23" y="11.05" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
+<attribute name="NAME" x="22.7" y="11.15" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
 <attribute name="VALUE" x="25.284" y="11.05" size="0.8" layer="27" font="vector" ratio="10" rot="R90" align="center-left"/>
 </element>
 <element name="D10" library="LED" package="0603" value="LED0603" x="27.5" y="54.95" smashed="yes" rot="R180">
 <attribute name="COLOR" value="RED" x="-27.11" y="150.2" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="NAME" x="30.4464" y="53.934" size="0.8" layer="25" font="vector" ratio="10" rot="SR180" align="center-left"/>
+<attribute name="NAME" x="23.7536" y="54.966" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="30.4464" y="56.982" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 </element>
 <element name="D1" library="TVS" package="DO214AC" value="SMAJ12A" x="42.5" y="26.4" smashed="yes" rot="R270">
 <attribute name="MF" value="Littelfuse" x="-36.24" y="-12.97" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="MPN" value="SMAJ12A" x="-36.24" y="-12.97" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="NAME" x="44.2" y="28.5" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
+<attribute name="NAME" x="41.9" y="30.4" size="0.8" layer="25" font="vector" ratio="10" align="center-left"/>
 <attribute name="OC_FARNELL" value="1827602" x="-36.24" y="-12.97" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="OC_NEWARK" value="71J1937" x="-36.24" y="-12.97" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VALUE" x="39.5" y="28.5" size="0.8" layer="27" font="vector" ratio="10" rot="R270" align="center-left"/>
 </element>
 <element name="D15" library="Generic Diode" package="SOD-123" value="B0530W" x="24" y="71.65" smashed="yes" rot="R90">
-<attribute name="NAME" x="23" y="70.55" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
+<attribute name="NAME" x="22.7" y="70.65" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
 <attribute name="VALUE" x="25.284" y="70.55" size="0.8" layer="27" font="vector" ratio="10" rot="R90" align="center-left"/>
 </element>
 <element name="D11" library="LED" package="0603" value="LED0603" x="27.5" y="66.85" smashed="yes" rot="R180">
 <attribute name="COLOR" value="RED" x="-34.73" y="162.1" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="NAME" x="30.4464" y="65.834" size="0.8" layer="25" font="vector" ratio="10" rot="SR180" align="center-left"/>
+<attribute name="NAME" x="23.7536" y="66.866" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="30.4464" y="68.882" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 </element>
 <element name="D16" library="Generic Diode" package="SOD-123" value="B0530W" x="61" y="71.65" smashed="yes" rot="R270">
-<attribute name="NAME" x="62" y="72.75" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
+<attribute name="NAME" x="62.4" y="72.65" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
 <attribute name="VALUE" x="59.716" y="72.75" size="0.8" layer="27" font="vector" ratio="10" rot="R270" align="center-left"/>
 </element>
 <element name="D12" library="LED" package="0603" value="LED0603" x="57.5" y="76.45" smashed="yes">
 <attribute name="COLOR" value="RED" x="127.35" y="-18.8" size="1.778" layer="27" display="off"/>
-<attribute name="NAME" x="54.5536" y="77.466" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
+<attribute name="NAME" x="59.3536" y="76.466" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="54.5536" y="74.418" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 </element>
 <element name="D17" library="Generic Diode" package="SOD-123" value="B0530W" x="61" y="59.75" smashed="yes" rot="R270">
-<attribute name="NAME" x="62" y="60.85" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
+<attribute name="NAME" x="62.4" y="60.75" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
 <attribute name="VALUE" x="59.716" y="60.85" size="0.8" layer="27" font="vector" ratio="10" rot="R270" align="center-left"/>
 </element>
 <element name="D13" library="LED" package="0603" value="LED0603" x="57.5" y="64.55" smashed="yes">
 <attribute name="COLOR" value="RED" x="134.97" y="-30.7" size="1.778" layer="27" display="off"/>
-<attribute name="NAME" x="54.5536" y="65.566" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
+<attribute name="NAME" x="59.3536" y="64.566" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="54.5536" y="62.518" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 </element>
 <element name="D22" library="Generic Diode" package="SOD-123" value="B0530W" x="61" y="47.85" smashed="yes" rot="R270">
-<attribute name="NAME" x="62" y="48.95" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
+<attribute name="NAME" x="62.3" y="48.85" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
 <attribute name="VALUE" x="59.716" y="48.95" size="0.8" layer="27" font="vector" ratio="10" rot="R270" align="center-left"/>
 </element>
 <element name="D18" library="LED" package="0603" value="LED0603" x="57.5" y="52.65" smashed="yes">
 <attribute name="COLOR" value="RED" x="142.59" y="-42.6" size="1.778" layer="27" display="off"/>
-<attribute name="NAME" x="54.5536" y="53.666" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
+<attribute name="NAME" x="59.3536" y="52.666" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="54.5536" y="50.618" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 </element>
 <element name="D2" library="LED" package="0603" value="LED0603" x="27.5" y="7.35" smashed="yes" rot="R180">
 <attribute name="COLOR" value="RED" x="3.37" y="102.6" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="NAME" x="30.4464" y="6.334" size="0.8" layer="25" font="vector" ratio="10" rot="SR180" align="center-left"/>
+<attribute name="NAME" x="24.4536" y="7.366" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="30.4464" y="9.382" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 </element>
 <element name="D23" library="Generic Diode" package="SOD-123" value="B0530W" x="61" y="35.95" smashed="yes" rot="R270">
-<attribute name="NAME" x="62" y="37.05" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
+<attribute name="NAME" x="62.3" y="36.95" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
 <attribute name="VALUE" x="59.716" y="37.05" size="0.8" layer="27" font="vector" ratio="10" rot="R270" align="center-left"/>
 </element>
 <element name="D19" library="LED" package="0603" value="LED0603" x="57.5" y="40.75" smashed="yes">
 <attribute name="COLOR" value="RED" x="150.21" y="-54.5" size="1.778" layer="27" display="off"/>
-<attribute name="NAME" x="54.5536" y="41.766" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
+<attribute name="NAME" x="59.3536" y="40.766" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="54.5536" y="38.718" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 </element>
 <element name="D24" library="Generic Diode" package="SOD-123" value="B0530W" x="61" y="24.05" smashed="yes" rot="R270">
-<attribute name="NAME" x="62" y="25.15" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
+<attribute name="NAME" x="62.4" y="25.05" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
 <attribute name="VALUE" x="59.716" y="25.15" size="0.8" layer="27" font="vector" ratio="10" rot="R270" align="center-left"/>
 </element>
 <element name="D20" library="LED" package="0603" value="LED0603" x="57.5" y="28.85" smashed="yes">
 <attribute name="COLOR" value="RED" x="157.83" y="-66.4" size="1.778" layer="27" display="off"/>
-<attribute name="NAME" x="54.5536" y="29.866" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
+<attribute name="NAME" x="59.3536" y="28.866" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="54.5536" y="26.818" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 </element>
 <element name="D25" library="Generic Diode" package="SOD-123" value="B0530W" x="61" y="12.15" smashed="yes" rot="R270">
-<attribute name="NAME" x="62" y="13.25" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
+<attribute name="NAME" x="62.4" y="13.15" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
 <attribute name="VALUE" x="59.716" y="13.25" size="0.8" layer="27" font="vector" ratio="10" rot="R270" align="center-left"/>
 </element>
 <element name="D21" library="LED" package="0603" value="LED0603" x="57.5" y="16.95" smashed="yes">
 <attribute name="COLOR" value="RED" x="165.45" y="-78.3" size="1.778" layer="27" display="off"/>
-<attribute name="NAME" x="54.5536" y="17.966" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
+<attribute name="NAME" x="59.3536" y="16.966" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="54.5536" y="14.918" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 </element>
 <element name="D7" library="Generic Diode" package="SOD-123" value="B0530W" x="24" y="24.05" smashed="yes" rot="R90">
-<attribute name="NAME" x="23" y="22.95" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
+<attribute name="NAME" x="22.7" y="23.05" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
 <attribute name="VALUE" x="25.284" y="22.95" size="0.8" layer="27" font="vector" ratio="10" rot="R90" align="center-left"/>
 </element>
 <element name="D3" library="LED" package="0603" value="LED0603" x="27.5" y="19.25" smashed="yes" rot="R180">
 <attribute name="COLOR" value="RED" x="-4.25" y="114.5" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="NAME" x="30.4464" y="18.234" size="0.8" layer="25" font="vector" ratio="10" rot="SR180" align="center-left"/>
+<attribute name="NAME" x="24.3536" y="19.266" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="30.4464" y="21.282" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 </element>
 <element name="D8" library="Generic Diode" package="SOD-123" value="B0530W" x="24" y="35.95" smashed="yes" rot="R90">
-<attribute name="NAME" x="23" y="34.85" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
+<attribute name="NAME" x="22.7" y="34.95" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
 <attribute name="VALUE" x="25.284" y="34.85" size="0.8" layer="27" font="vector" ratio="10" rot="R90" align="center-left"/>
 </element>
 <element name="D4" library="LED" package="0603" value="LED0603" x="27.5" y="31.15" smashed="yes" rot="R180">
 <attribute name="COLOR" value="RED" x="-11.87" y="126.4" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="NAME" x="30.4464" y="30.134" size="0.8" layer="25" font="vector" ratio="10" rot="SR180" align="center-left"/>
+<attribute name="NAME" x="24.4536" y="31.166" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="30.4464" y="33.182" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 </element>
 <element name="D9" library="Generic Diode" package="SOD-123" value="B0530W" x="24" y="47.85" smashed="yes" rot="R90">
-<attribute name="NAME" x="23" y="46.75" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
+<attribute name="NAME" x="22.7" y="46.85" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
 <attribute name="VALUE" x="25.284" y="46.75" size="0.8" layer="27" font="vector" ratio="10" rot="R90" align="center-left"/>
 </element>
 <element name="D5" library="LED" package="0603" value="LED0603" x="27.5" y="43.05" smashed="yes" rot="R180">
 <attribute name="COLOR" value="RED" x="-19.49" y="138.3" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="NAME" x="30.4464" y="42.034" size="0.8" layer="25" font="vector" ratio="10" rot="SR180" align="center-left"/>
+<attribute name="NAME" x="24.4536" y="43.066" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="30.4464" y="45.082" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 </element>
 <element name="D14" library="Generic Diode" package="SOD-123" value="B0530W" x="24" y="59.75" smashed="yes" rot="R90">
-<attribute name="NAME" x="23" y="58.65" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
+<attribute name="NAME" x="22.7" y="58.75" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
 <attribute name="VALUE" x="25.284" y="58.65" size="0.8" layer="27" font="vector" ratio="10" rot="R90" align="center-left"/>
 </element>
 <element name="F1" library="PTC Fuses" package="1206" value="2.6A Hold" x="45.5" y="26.4" smashed="yes" rot="R270">
 <attribute name="HOLD" value="3A" x="-33.24" y="-24.4" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="NAME" x="47.07" y="27.67" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
+<attribute name="NAME" x="45.03" y="29.67" size="0.8" layer="25" font="vector" ratio="10" align="center-left"/>
 <attribute name="OCLCSC" value="C207041" x="-33.24" y="-24.4" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="TRIP" value="6A" x="-33.24" y="-24.4" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VALUE" x="42.86" y="27.67" size="0.8" layer="27" font="vector" ratio="10" rot="R270" align="center-left"/>
 </element>
 <element name="JP1" library="Pin Header" package="1X02" package3d_urn="urn:adsk.eagle:package:22435/2" value="PINHD-1X2" x="32.8" y="8.15" smashed="yes">
-<attribute name="NAME" x="30.1838" y="9.9788" size="0.8" layer="25" font="vector" ratio="10" align="center-left"/>
+<attribute name="NAME" x="36.0212" y="7.2838" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
 <attribute name="VALUE" x="30.26" y="4.975" size="0.8" layer="27" font="vector" ratio="10" align="center-left"/>
 </element>
 <element name="JP10" library="Pin Header" package="1X02" package3d_urn="urn:adsk.eagle:package:22435/2" value="PINHD-1X2" x="52.2" y="39.95" smashed="yes" rot="R180">
-<attribute name="NAME" x="54.8162" y="38.1212" size="0.8" layer="25" font="vector" ratio="10" rot="R180" align="center-left"/>
+<attribute name="NAME" x="48.9788" y="41.2162" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
 <attribute name="VALUE" x="54.74" y="43.125" size="0.8" layer="27" font="vector" ratio="10" rot="R180" align="center-left"/>
 </element>
 <element name="JP11" library="Pin Header" package="1X02" package3d_urn="urn:adsk.eagle:package:22435/2" value="PINHD-1X2" x="52.2" y="28.05" smashed="yes" rot="R180">
-<attribute name="NAME" x="54.8162" y="26.2212" size="0.8" layer="25" font="vector" ratio="10" rot="R180" align="center-left"/>
+<attribute name="NAME" x="48.9788" y="29.3162" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
 <attribute name="VALUE" x="54.74" y="31.225" size="0.8" layer="27" font="vector" ratio="10" rot="R180" align="center-left"/>
 </element>
 <element name="JP12" library="Pin Header" package="1X02" package3d_urn="urn:adsk.eagle:package:22435/2" value="PINHD-1X2" x="52.2" y="16.15" smashed="yes" rot="R180">
-<attribute name="NAME" x="54.8162" y="14.3212" size="0.8" layer="25" font="vector" ratio="10" rot="R180" align="center-left"/>
+<attribute name="NAME" x="48.9788" y="17.2162" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
 <attribute name="VALUE" x="54.74" y="19.325" size="0.8" layer="27" font="vector" ratio="10" rot="R180" align="center-left"/>
 </element>
 <element name="JP2" library="Pin Header" package="1X02" package3d_urn="urn:adsk.eagle:package:22435/2" value="PINHD-1X2" x="32.8" y="20.05" smashed="yes">
-<attribute name="NAME" x="30.1838" y="21.8788" size="0.8" layer="25" font="vector" ratio="10" align="center-left"/>
+<attribute name="NAME" x="36.0212" y="19.1838" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
 <attribute name="VALUE" x="30.26" y="16.875" size="0.8" layer="27" font="vector" ratio="10" align="center-left"/>
 </element>
 <element name="JP3" library="Pin Header" package="1X02" package3d_urn="urn:adsk.eagle:package:22435/2" value="PINHD-1X2" x="32.8" y="31.95" smashed="yes">
-<attribute name="NAME" x="30.1838" y="33.7788" size="0.8" layer="25" font="vector" ratio="10" align="center-left"/>
+<attribute name="NAME" x="36.0788" y="32.9162" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
 <attribute name="VALUE" x="30.26" y="28.775" size="0.8" layer="27" font="vector" ratio="10" align="center-left"/>
 </element>
 <element name="JP4" library="Pin Header" package="1X02" package3d_urn="urn:adsk.eagle:package:22435/2" value="PINHD-1X2" x="32.8" y="43.85" smashed="yes">
-<attribute name="NAME" x="30.1838" y="45.6788" size="0.8" layer="25" font="vector" ratio="10" align="center-left"/>
+<attribute name="NAME" x="36.1212" y="43.0838" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
 <attribute name="VALUE" x="30.26" y="40.675" size="0.8" layer="27" font="vector" ratio="10" align="center-left"/>
 </element>
 <element name="JP5" library="Pin Header" package="1X02" package3d_urn="urn:adsk.eagle:package:22435/2" value="PINHD-1X2" x="32.8" y="55.75" smashed="yes">
-<attribute name="NAME" x="30.1838" y="57.5788" size="0.8" layer="25" font="vector" ratio="10" align="center-left"/>
+<attribute name="NAME" x="36.0212" y="54.8838" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
 <attribute name="VALUE" x="30.26" y="52.575" size="0.8" layer="27" font="vector" ratio="10" align="center-left"/>
 </element>
 <element name="JP6" library="Pin Header" package="1X02" package3d_urn="urn:adsk.eagle:package:22435/2" value="PINHD-1X2" x="32.8" y="67.65" smashed="yes">
-<attribute name="NAME" x="30.1838" y="69.4788" size="0.8" layer="25" font="vector" ratio="10" align="center-left"/>
+<attribute name="NAME" x="36.1212" y="66.7838" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
 <attribute name="VALUE" x="30.26" y="64.475" size="0.8" layer="27" font="vector" ratio="10" align="center-left"/>
 </element>
 <element name="JP7" library="Pin Header" package="1X02" package3d_urn="urn:adsk.eagle:package:22435/2" value="PINHD-1X2" x="52.2" y="75.65" smashed="yes" rot="R180">
-<attribute name="NAME" x="54.8162" y="73.8212" size="0.8" layer="25" font="vector" ratio="10" rot="R180" align="center-left"/>
+<attribute name="NAME" x="49.6162" y="74.0212" size="0.8" layer="25" font="vector" ratio="10" rot="R180" align="center-left"/>
 <attribute name="VALUE" x="54.74" y="78.825" size="0.8" layer="27" font="vector" ratio="10" rot="R180" align="center-left"/>
 </element>
 <element name="JP8" library="Pin Header" package="1X02" package3d_urn="urn:adsk.eagle:package:22435/2" value="PINHD-1X2" x="52.2" y="63.75" smashed="yes" rot="R180">
-<attribute name="NAME" x="54.8162" y="61.9212" size="0.8" layer="25" font="vector" ratio="10" rot="R180" align="center-left"/>
+<attribute name="NAME" x="48.8788" y="64.6162" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
 <attribute name="VALUE" x="54.74" y="66.925" size="0.8" layer="27" font="vector" ratio="10" rot="R180" align="center-left"/>
 </element>
 <element name="JP9" library="Pin Header" package="1X02" package3d_urn="urn:adsk.eagle:package:22435/2" value="PINHD-1X2" x="52.2" y="51.85" smashed="yes" rot="R180">
-<attribute name="NAME" x="54.8162" y="50.0212" size="0.8" layer="25" font="vector" ratio="10" rot="R180" align="center-left"/>
+<attribute name="NAME" x="51.6162" y="54.1212" size="0.8" layer="25" font="vector" ratio="10" rot="R180" align="center-left"/>
 <attribute name="VALUE" x="54.74" y="55.025" size="0.8" layer="27" font="vector" ratio="10" rot="R180" align="center-left"/>
 </element>
-<element name="LOGO1" library="Silkscreen" package="JS_5MM" value="JS-5MM" x="59.5" y="8.9" smashed="yes"/>
+<element name="LOGO1" library="Silkscreen" package="JS_5MM" value="JS-5MM" x="55.4" y="7.5" smashed="yes"/>
 <element name="Q1" library="Alpha Omega" package="SOT23" value="AO3400" x="27.5" y="12.15" smashed="yes" rot="R180">
-<attribute name="NAME" x="29.9638" y="9.9402" size="0.8" layer="25" font="vector" ratio="10" rot="SR180" align="center-left"/>
+<attribute name="NAME" x="25.4362" y="11.0598" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="29.9892" y="15.198" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 </element>
 <element name="Q10" library="Alpha Omega" package="SOT23" value="AO3400" x="57.5" y="35.95" smashed="yes">
-<attribute name="NAME" x="55.0362" y="38.1598" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
+<attribute name="NAME" x="58.9402" y="33.2362" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="VALUE" x="55.0108" y="32.902" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 </element>
 <element name="Q11" library="Alpha Omega" package="SOT23" value="AO3400" x="57.5" y="24.05" smashed="yes">
-<attribute name="NAME" x="55.0362" y="26.2598" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
+<attribute name="NAME" x="58.9402" y="21.5362" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="VALUE" x="55.0108" y="21.002" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 </element>
 <element name="Q12" library="Alpha Omega" package="SOT23" value="AO3400" x="57.5" y="12.15" smashed="yes">
-<attribute name="NAME" x="55.0362" y="14.3598" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
+<attribute name="NAME" x="58.9402" y="9.5362" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="VALUE" x="55.0108" y="9.102" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 </element>
 <element name="Q2" library="Alpha Omega" package="SOT23" value="AO3400" x="27.5" y="24.05" smashed="yes" rot="R180">
-<attribute name="NAME" x="29.9638" y="21.8402" size="0.8" layer="25" font="vector" ratio="10" rot="SR180" align="center-left"/>
+<attribute name="NAME" x="25.3362" y="22.9598" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="29.9892" y="27.098" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 </element>
 <element name="Q3" library="Alpha Omega" package="SOT23" value="AO3400" x="27.5" y="35.95" smashed="yes" rot="R180">
-<attribute name="NAME" x="29.9638" y="33.7402" size="0.8" layer="25" font="vector" ratio="10" rot="SR180" align="center-left"/>
+<attribute name="NAME" x="25.3362" y="34.8598" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="29.9892" y="38.998" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 </element>
 <element name="Q4" library="Alpha Omega" package="SOT23" value="AO3400" x="27.5" y="47.85" smashed="yes" rot="R180">
-<attribute name="NAME" x="29.9638" y="45.6402" size="0.8" layer="25" font="vector" ratio="10" rot="SR180" align="center-left"/>
+<attribute name="NAME" x="25.3362" y="46.7598" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="29.9892" y="50.898" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 </element>
 <element name="Q5" library="Alpha Omega" package="SOT23" value="AO3400" x="27.5" y="59.75" smashed="yes" rot="R180">
-<attribute name="NAME" x="29.9638" y="57.5402" size="0.8" layer="25" font="vector" ratio="10" rot="SR180" align="center-left"/>
+<attribute name="NAME" x="25.3362" y="58.6598" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="29.9892" y="62.798" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 </element>
 <element name="Q6" library="Alpha Omega" package="SOT23" value="AO3400" x="27.5" y="71.65" smashed="yes" rot="R180">
-<attribute name="NAME" x="29.9638" y="69.4402" size="0.8" layer="25" font="vector" ratio="10" rot="SR180" align="center-left"/>
+<attribute name="NAME" x="25.2362" y="70.4598" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="29.9892" y="74.698" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 </element>
 <element name="Q7" library="Alpha Omega" package="SOT23" value="AO3400" x="57.5" y="71.65" smashed="yes">
-<attribute name="NAME" x="55.0362" y="73.8598" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
+<attribute name="NAME" x="59.1402" y="69.7362" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="VALUE" x="55.0108" y="68.602" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 </element>
 <element name="Q8" library="Alpha Omega" package="SOT23" value="AO3400" x="57.5" y="59.75" smashed="yes">
-<attribute name="NAME" x="55.0362" y="61.9598" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
+<attribute name="NAME" x="59.0402" y="57.8362" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="VALUE" x="55.0108" y="56.702" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 </element>
 <element name="Q9" library="Alpha Omega" package="SOT23" value="AO3400" x="57.5" y="47.85" smashed="yes">
-<attribute name="NAME" x="55.0362" y="50.0598" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
+<attribute name="NAME" x="59.0402" y="45.8362" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="VALUE" x="55.0108" y="44.802" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 </element>
 <element name="R1" library="Resistor" package="RES0603" value="1K Ohms" x="34.6" y="12.15" smashed="yes" rot="R270">
-<attribute name="NAME" x="35.616" y="15.6044" size="0.8" layer="25" font="vector" ratio="10" rot="SR270" align="center-left"/>
+<attribute name="NAME" x="34.484" y="13.9956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="-65.73" y="-27.22" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VALUE" x="32.568" y="15.6044" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 </element>
 <element name="R10" library="Resistor" package="RES0603" value="1K Ohms" x="50.4" y="35.95" smashed="yes" rot="R90">
-<attribute name="NAME" x="49.384" y="32.4956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
+<attribute name="NAME" x="50.384" y="32.1956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="150.73" y="143.9" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VALUE" x="52.432" y="32.4956" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 </element>
 <element name="R11" library="Resistor" package="RES0603" value="1K Ohms" x="50.4" y="24.05" smashed="yes" rot="R90">
-<attribute name="NAME" x="49.384" y="20.5956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
+<attribute name="NAME" x="50.384" y="20.2956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="150.73" y="139.62" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VALUE" x="52.432" y="20.5956" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 </element>
 <element name="R12" library="Resistor" package="RES0603" value="1K Ohms" x="50.4" y="12.15" smashed="yes" rot="R90">
-<attribute name="NAME" x="49.384" y="8.6956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
+<attribute name="NAME" x="50.284" y="8.3956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="155.81" y="28.66" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VALUE" x="52.432" y="8.6956" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 </element>
 <element name="R21" library="Resistor" package="RES0603" value="22 Ohms" x="32.8" y="12.15" smashed="yes" rot="R90">
-<attribute name="NAME" x="31.784" y="8.6956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
+<attribute name="NAME" x="32.784" y="13.9956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="138.21" y="66.76" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VALUE" x="34.832" y="8.6956" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 </element>
 <element name="R25" library="Resistor" package="RES0603" value="10K Ohms" x="31" y="12.15" smashed="yes" rot="R270">
-<attribute name="NAME" x="32.016" y="15.6044" size="0.8" layer="25" font="vector" ratio="10" rot="SR270" align="center-left"/>
+<attribute name="NAME" x="30.984" y="13.9956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="-54.09" y="-85.64" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VALUE" x="28.968" y="15.6044" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 </element>
 <element name="R17" library="Resistor" package="RES0603" value="5.1K Ohms" x="27.5" y="9.15" smashed="yes" rot="R180">
-<attribute name="NAME" x="30.9544" y="8.134" size="0.8" layer="25" font="vector" ratio="10" rot="SR180" align="center-left"/>
+<attribute name="NAME" x="23.7456" y="8.766" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="-30.92" y="86.62" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="VALUE" x="30.9544" y="11.182" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 </element>
 <element name="R2" library="Resistor" package="RES0603" value="1K Ohms" x="34.6" y="24.05" smashed="yes" rot="R270">
-<attribute name="NAME" x="35.616" y="27.5044" size="0.8" layer="25" font="vector" ratio="10" rot="SR270" align="center-left"/>
+<attribute name="NAME" x="34.584" y="25.8956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="-65.73" y="-22.94" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VALUE" x="32.568" y="27.5044" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 </element>
 <element name="R22" library="Resistor" package="RES0603" value="22 Ohms" x="32.8" y="24.05" smashed="yes" rot="R90">
-<attribute name="NAME" x="31.784" y="20.5956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
+<attribute name="NAME" x="32.784" y="25.8956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="138.21" y="86.28" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VALUE" x="34.832" y="20.5956" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 </element>
 <element name="R26" library="Resistor" package="RES0603" value="10K Ohms" x="31" y="24.05" smashed="yes" rot="R270">
-<attribute name="NAME" x="32.016" y="27.5044" size="0.8" layer="25" font="vector" ratio="10" rot="SR270" align="center-left"/>
+<attribute name="NAME" x="30.984" y="25.8956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="-54.09" y="-82.63" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VALUE" x="28.968" y="27.5044" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 </element>
 <element name="R18" library="Resistor" package="RES0603" value="5.1K Ohms" x="27.5" y="21.05" smashed="yes" rot="R180">
-<attribute name="NAME" x="30.9544" y="20.034" size="0.8" layer="25" font="vector" ratio="10" rot="SR180" align="center-left"/>
+<attribute name="NAME" x="23.7456" y="20.666" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="-39.81" y="98.52" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="VALUE" x="30.9544" y="23.082" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 </element>
 <element name="R23" library="Resistor" package="RES0603" value="22 Ohms" x="32.8" y="35.95" smashed="yes" rot="R90">
-<attribute name="NAME" x="31.784" y="32.4956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
+<attribute name="NAME" x="32.784" y="37.7956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="138.21" y="105.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VALUE" x="34.832" y="32.4956" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 </element>
 <element name="R27" library="Resistor" package="RES0603" value="10K Ohms" x="31" y="35.95" smashed="yes" rot="R270">
-<attribute name="NAME" x="32.016" y="39.4044" size="0.8" layer="25" font="vector" ratio="10" rot="SR270" align="center-left"/>
+<attribute name="NAME" x="30.984" y="37.7956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="-54.09" y="-79.62" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VALUE" x="28.968" y="39.4044" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 </element>
 <element name="R19" library="Resistor" package="RES0603" value="5.1K Ohms" x="27.5" y="32.95" smashed="yes" rot="R180">
-<attribute name="NAME" x="30.9544" y="31.934" size="0.8" layer="25" font="vector" ratio="10" rot="SR180" align="center-left"/>
+<attribute name="NAME" x="23.7456" y="32.566" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="-48.7" y="110.42" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="VALUE" x="30.9544" y="34.982" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 </element>
 <element name="R24" library="Resistor" package="RES0603" value="22 Ohms" x="32.8" y="47.85" smashed="yes" rot="R90">
-<attribute name="NAME" x="31.784" y="44.3956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
+<attribute name="NAME" x="32.784" y="49.6956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="138.21" y="125.32" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VALUE" x="34.832" y="44.3956" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 </element>
 <element name="R28" library="Resistor" package="RES0603" value="10K Ohms" x="31" y="47.85" smashed="yes" rot="R270">
-<attribute name="NAME" x="32.016" y="51.3044" size="0.8" layer="25" font="vector" ratio="10" rot="SR270" align="center-left"/>
+<attribute name="NAME" x="30.984" y="49.6956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="-59.17" y="31.34" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VALUE" x="28.968" y="51.3044" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 </element>
 <element name="R20" library="Resistor" package="RES0603" value="5.1K Ohms" x="27.5" y="44.85" smashed="yes" rot="R180">
-<attribute name="NAME" x="30.9544" y="43.834" size="0.8" layer="25" font="vector" ratio="10" rot="SR180" align="center-left"/>
+<attribute name="NAME" x="23.7456" y="44.466" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="-57.59" y="122.32" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="VALUE" x="30.9544" y="46.882" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 </element>
 <element name="R33" library="Resistor" package="RES0603" value="22 Ohms" x="32.8" y="59.75" smashed="yes" rot="R90">
-<attribute name="NAME" x="31.784" y="56.2956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
+<attribute name="NAME" x="32.784" y="61.5956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="138.21" y="144.84" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VALUE" x="34.832" y="56.2956" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 </element>
 <element name="R3" library="Resistor" package="RES0603" value="1K Ohms" x="34.6" y="35.95" smashed="yes" rot="R270">
-<attribute name="NAME" x="35.616" y="39.4044" size="0.8" layer="25" font="vector" ratio="10" rot="SR270" align="center-left"/>
+<attribute name="NAME" x="34.484" y="37.7956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="-65.73" y="-18.66" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VALUE" x="32.568" y="39.4044" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 </element>
 <element name="R37" library="Resistor" package="RES0603" value="10K Ohms" x="31" y="59.75" smashed="yes" rot="R270">
-<attribute name="NAME" x="32.016" y="63.2044" size="0.8" layer="25" font="vector" ratio="10" rot="SR270" align="center-left"/>
+<attribute name="NAME" x="30.984" y="61.5956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="-59.17" y="34.35" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VALUE" x="28.968" y="63.2044" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 </element>
 <element name="R29" library="Resistor" package="RES0603" value="5.1K Ohms" x="27.5" y="56.75" smashed="yes" rot="R180">
-<attribute name="NAME" x="30.9544" y="55.734" size="0.8" layer="25" font="vector" ratio="10" rot="SR180" align="center-left"/>
+<attribute name="NAME" x="23.8456" y="56.366" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="-66.48" y="134.22" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="VALUE" x="30.9544" y="58.782" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 </element>
 <element name="R34" library="Resistor" package="RES0603" value="22 Ohms" x="32.8" y="71.65" smashed="yes" rot="R90">
-<attribute name="NAME" x="31.784" y="68.1956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
+<attribute name="NAME" x="32.0956" y="73.816" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="138.21" y="164.36" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VALUE" x="34.832" y="68.1956" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 </element>
 <element name="R38" library="Resistor" package="RES0603" value="10K Ohms" x="31" y="71.65" smashed="yes" rot="R270">
-<attribute name="NAME" x="32.016" y="75.1044" size="0.8" layer="25" font="vector" ratio="10" rot="SR270" align="center-left"/>
+<attribute name="NAME" x="30.984" y="73.4956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="-59.17" y="37.36" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VALUE" x="28.968" y="75.1044" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 </element>
 <element name="R30" library="Resistor" package="RES0603" value="5.1K Ohms" x="27.5" y="68.65" smashed="yes" rot="R180">
-<attribute name="NAME" x="30.9544" y="67.634" size="0.8" layer="25" font="vector" ratio="10" rot="SR180" align="center-left"/>
+<attribute name="NAME" x="23.8456" y="68.366" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="-75.37" y="146.12" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="VALUE" x="30.9544" y="70.682" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 </element>
 <element name="R35" library="Resistor" package="RES0603" value="22 Ohms" x="52.2" y="71.65" smashed="yes" rot="R270">
-<attribute name="NAME" x="53.216" y="75.1044" size="0.8" layer="25" font="vector" ratio="10" rot="SR270" align="center-left"/>
+<attribute name="NAME" x="52.184" y="67.8956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="-53.21" y="-28.68" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VALUE" x="50.168" y="75.1044" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 </element>
 <element name="R39" library="Resistor" package="RES0603" value="10K Ohms" x="54" y="71.65" smashed="yes" rot="R90">
-<attribute name="NAME" x="52.984" y="68.1956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
+<attribute name="NAME" x="54.084" y="67.8956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="144.17" y="114.83" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VALUE" x="56.032" y="68.1956" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 </element>
 <element name="R31" library="Resistor" package="RES0603" value="5.1K Ohms" x="57.5" y="74.65" smashed="yes">
-<attribute name="NAME" x="54.0456" y="75.666" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
+<attribute name="NAME" x="59.3456" y="74.966" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="169.26" y="-2.82" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="54.0456" y="72.618" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 </element>
 <element name="R36" library="Resistor" package="RES0603" value="22 Ohms" x="52.2" y="59.75" smashed="yes" rot="R270">
-<attribute name="NAME" x="53.216" y="63.2044" size="0.8" layer="25" font="vector" ratio="10" rot="SR270" align="center-left"/>
+<attribute name="NAME" x="52.184" y="55.9956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="-53.21" y="-48.2" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VALUE" x="50.168" y="63.2044" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 </element>
 <element name="R40" library="Resistor" package="RES0603" value="10K Ohms" x="54" y="59.75" smashed="yes" rot="R90">
-<attribute name="NAME" x="52.984" y="56.2956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
+<attribute name="NAME" x="53.984" y="55.9956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="144.17" y="111.82" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VALUE" x="56.032" y="56.2956" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 </element>
 <element name="R4" library="Resistor" package="RES0603" value="1K Ohms" x="34.6" y="47.85" smashed="yes" rot="R270">
-<attribute name="NAME" x="35.616" y="51.3044" size="0.8" layer="25" font="vector" ratio="10" rot="SR270" align="center-left"/>
+<attribute name="NAME" x="34.584" y="49.6956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="-65.73" y="-14.38" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VALUE" x="32.568" y="51.3044" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 </element>
 <element name="R32" library="Resistor" package="RES0603" value="5.1K Ohms" x="57.5" y="62.75" smashed="yes">
-<attribute name="NAME" x="54.0456" y="63.766" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
+<attribute name="NAME" x="59.3456" y="63.166" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="75.28" y="-22.34" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="54.0456" y="60.718" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 </element>
 <element name="R45" library="Resistor" package="RES0603" value="22 Ohms" x="52.2" y="47.85" smashed="yes" rot="R270">
-<attribute name="NAME" x="53.216" y="51.3044" size="0.8" layer="25" font="vector" ratio="10" rot="SR270" align="center-left"/>
+<attribute name="NAME" x="52.184" y="44.0956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="-53.21" y="-67.72" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VALUE" x="50.168" y="51.3044" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 </element>
 <element name="R49" library="Resistor" package="RES0603" value="10K Ohms" x="54" y="47.85" smashed="yes" rot="R90">
-<attribute name="NAME" x="52.984" y="44.3956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
+<attribute name="NAME" x="54.084" y="44.0956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="144.17" y="108.81" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VALUE" x="56.032" y="44.3956" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 </element>
 <element name="R41" library="Resistor" package="RES0603" value="5.1K Ohms" x="57.5" y="50.85" smashed="yes">
-<attribute name="NAME" x="54.0456" y="51.866" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
+<attribute name="NAME" x="59.3456" y="51.166" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="84.17" y="-34.24" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="54.0456" y="48.818" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 </element>
 <element name="R46" library="Resistor" package="RES0603" value="22 Ohms" x="52.2" y="35.95" smashed="yes" rot="R270">
-<attribute name="NAME" x="53.216" y="39.4044" size="0.8" layer="25" font="vector" ratio="10" rot="SR270" align="center-left"/>
+<attribute name="NAME" x="52.184" y="32.1956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="-58.29" y="19.44" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VALUE" x="50.168" y="39.4044" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 </element>
 <element name="R50" library="Resistor" package="RES0603" value="10K Ohms" x="54" y="35.95" smashed="yes" rot="R90">
-<attribute name="NAME" x="52.984" y="32.4956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
+<attribute name="NAME" x="53.984" y="32.1956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="144.17" y="105.8" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VALUE" x="56.032" y="32.4956" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 </element>
 <element name="R42" library="Resistor" package="RES0603" value="5.1K Ohms" x="57.5" y="38.95" smashed="yes">
-<attribute name="NAME" x="54.0456" y="39.966" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
+<attribute name="NAME" x="59.3456" y="39.266" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="93.06" y="-46.14" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="54.0456" y="36.918" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 </element>
 <element name="R47" library="Resistor" package="RES0603" value="22 Ohms" x="52.2" y="24.05" smashed="yes" rot="R270">
-<attribute name="NAME" x="53.216" y="27.5044" size="0.8" layer="25" font="vector" ratio="10" rot="SR270" align="center-left"/>
+<attribute name="NAME" x="52.284" y="20.2956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="-58.29" y="-0.08" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VALUE" x="50.168" y="27.5044" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 </element>
 <element name="R51" library="Resistor" package="RES0603" value="10K Ohms" x="54" y="24.05" smashed="yes" rot="R90">
-<attribute name="NAME" x="52.984" y="20.5956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
+<attribute name="NAME" x="53.984" y="20.2956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="144.17" y="102.79" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VALUE" x="56.032" y="20.5956" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 </element>
 <element name="R43" library="Resistor" package="RES0603" value="5.1K Ohms" x="57.5" y="27.05" smashed="yes">
-<attribute name="NAME" x="54.0456" y="28.066" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
+<attribute name="NAME" x="59.3456" y="27.366" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="101.95" y="-58.04" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="54.0456" y="25.018" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 </element>
 <element name="R5" library="Resistor" package="RES0603" value="1K Ohms" x="34.6" y="59.75" smashed="yes" rot="R270">
-<attribute name="NAME" x="35.616" y="63.2044" size="0.8" layer="25" font="vector" ratio="10" rot="SR270" align="center-left"/>
+<attribute name="NAME" x="34.584" y="61.5956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="-65.73" y="-10.1" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VALUE" x="32.568" y="63.2044" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 </element>
 <element name="R48" library="Resistor" package="RES0603" value="22 Ohms" x="52.2" y="12.15" smashed="yes" rot="R270">
-<attribute name="NAME" x="53.216" y="15.6044" size="0.8" layer="25" font="vector" ratio="10" rot="SR270" align="center-left"/>
+<attribute name="NAME" x="52.184" y="8.3956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="-58.29" y="-19.6" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VALUE" x="50.168" y="15.6044" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 </element>
 <element name="R52" library="Resistor" package="RES0603" value="10K Ohms" x="54" y="12.15" smashed="yes" rot="R90">
-<attribute name="NAME" x="52.984" y="8.6956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
+<attribute name="NAME" x="53.984" y="8.3956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="144.17" y="99.78" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VALUE" x="56.032" y="8.6956" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 </element>
 <element name="R44" library="Resistor" package="RES0603" value="5.1K Ohms" x="57.5" y="15.15" smashed="yes">
-<attribute name="NAME" x="54.0456" y="16.166" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
+<attribute name="NAME" x="59.3456" y="15.466" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="110.84" y="-69.94" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="54.0456" y="13.118" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 </element>
 <element name="R6" library="Resistor" package="RES0603" value="1K Ohms" x="34.6" y="71.65" smashed="yes" rot="R270">
-<attribute name="NAME" x="35.616" y="75.1044" size="0.8" layer="25" font="vector" ratio="10" rot="SR270" align="center-left"/>
+<attribute name="NAME" x="36.084" y="71.9956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="-65.73" y="-5.82" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VALUE" x="32.568" y="75.1044" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 </element>
 <element name="R7" library="Resistor" package="RES0603" value="1K Ohms" x="50.4" y="71.65" smashed="yes" rot="R90">
-<attribute name="NAME" x="49.384" y="68.1956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
+<attribute name="NAME" x="50.384" y="68.5956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="150.73" y="156.74" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VALUE" x="52.432" y="68.1956" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 </element>
 <element name="R8" library="Resistor" package="RES0603" value="1K Ohms" x="50.4" y="59.75" smashed="yes" rot="R90">
-<attribute name="NAME" x="49.384" y="56.2956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
+<attribute name="NAME" x="50.384" y="56.7956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="150.73" y="152.46" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VALUE" x="52.432" y="56.2956" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 </element>
 <element name="R9" library="Resistor" package="RES0603" value="1K Ohms" x="50.4" y="47.85" smashed="yes" rot="R90">
-<attribute name="NAME" x="49.384" y="44.3956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
+<attribute name="NAME" x="50.384" y="44.7956" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="150.73" y="148.18" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VALUE" x="52.432" y="44.3956" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 </element>
 <element name="SJ4" library="Solder Jumper" package="SJ_S" value="" x="44.5" y="75.3" smashed="yes">
-<attribute name="NAME" x="44.5" y="76.443" size="0.8" layer="25" font="vector" ratio="10" align="center-left"/>
+<attribute name="NAME" x="43.7" y="76.943" size="0.8" layer="25" font="vector" ratio="10" align="center-left"/>
 <attribute name="VALUE" x="44.5" y="74.157" size="0.6096" layer="27" font="vector" ratio="20" align="top-center"/>
 </element>
 <element name="U1" library="Microchip" package="SOT23" value="MCP1792-3.3" x="42.5" y="36.4" smashed="yes" rot="R180">
-<attribute name="NAME" x="43.714" y="34.5175" size="0.8" layer="25" font="vector" ratio="10" rot="R180" align="center-left"/>
+<attribute name="NAME" x="41.014" y="37.7175" size="0.8" layer="25" font="vector" ratio="10" rot="R180" align="center-left"/>
 <attribute name="VALUE" x="43.714" y="39.489" size="0.8" layer="27" font="vector" ratio="10" rot="R180" align="center-left"/>
 </element>
 <element name="R13" library="Resistor" package="RES0603" value="10K Ohms" x="44.5" y="69.4" smashed="yes">
-<attribute name="NAME" x="41.0456" y="70.416" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
+<attribute name="NAME" x="40.7456" y="69.416" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="38" y="69.4" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="41.0456" y="67.368" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 </element>
 <element name="C3" library="Capacitor" package="CAP0603" value="100nF" x="43.5" y="45.3" smashed="yes" rot="R270">
-<attribute name="NAME" x="44.516" y="48.2464" size="0.8" layer="25" font="vector" ratio="10" rot="SR270" align="center-left"/>
+<attribute name="NAME" x="43.484" y="42.3536" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="VALUE" x="41.468" y="48.2464" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="55.8" y="45.3" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="C7" library="Capacitor" package="CAP0603" value="1uF" x="48" y="53.1" smashed="yes" rot="R90">
-<attribute name="NAME" x="46.984" y="50.1536" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
+<attribute name="NAME" x="47.984" y="54.9536" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="VALUE" x="50.032" y="50.1536" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="40.8" y="48" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="R14" library="Resistor" package="RES0603" value="330 Ohms" x="41.7" y="58.4" smashed="yes" rot="R270">
-<attribute name="NAME" x="42.716" y="61.8544" size="0.8" layer="25" font="vector" ratio="10" rot="SR270" align="center-left"/>
+<attribute name="NAME" x="41.684" y="60.3456" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="33.6" y="58.4" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VALUE" x="39.668" y="61.8544" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 </element>
 <element name="D26" library="LED" package="0603" value="LED0603" x="40" y="58.4" smashed="yes" rot="R90">
 <attribute name="COLOR" value="BLUE" x="53.2" y="50.8" size="1.778" layer="27" rot="R90" display="off"/>
-<attribute name="NAME" x="38.984" y="55.4536" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
+<attribute name="NAME" x="39.884" y="60.3536" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="VALUE" x="42.032" y="55.4536" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 </element>
 <element name="C8" library="Capacitor" package="CAP0603" value="100nF" x="43.4" y="58.4" smashed="yes" rot="R90">
-<attribute name="NAME" x="42.384" y="55.4536" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
+<attribute name="NAME" x="43.384" y="60.3536" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="VALUE" x="45.432" y="55.4536" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="51.5" y="48.2" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
 <element name="C9" library="Capacitor" package="CAP0603" value="100nF" x="48" y="49.7" smashed="yes" rot="R270">
-<attribute name="NAME" x="49.016" y="52.6464" size="0.8" layer="25" font="vector" ratio="10" rot="SR270" align="center-left"/>
+<attribute name="NAME" x="47.984" y="46.7536" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="VALUE" x="45.968" y="52.6464" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="39.9" y="49.7" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="U2" library="EFM32" package="QFN32_0.5P_TG" value="EFM32TG11B120F128GM32" x="42.5" y="51.4" smashed="yes">
-<attribute name="NAME" x="40.5" y="54.7" size="0.8" layer="25" font="vector" ratio="10" align="center-left"/>
+<attribute name="NAME" x="40.5" y="55.1" size="0.8" layer="25" font="vector" ratio="10" align="center-left"/>
 </element>
 <element name="R15" library="Resistor" package="RES0603" value="1K Ohms" x="44.5" y="71.1" smashed="yes">
-<attribute name="NAME" x="41.0456" y="72.116" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
+<attribute name="NAME" x="40.7456" y="71.116" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="37.9" y="47.7" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="41.0456" y="69.068" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 </element>
 <element name="R16" library="Resistor" package="RES0603" value="1K Ohms" x="44.5" y="72.8" smashed="yes">
-<attribute name="NAME" x="41.0456" y="73.816" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
+<attribute name="NAME" x="40.7456" y="72.816" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="30.9" y="44.3" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="41.0456" y="70.768" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 </element>
 <element name="R53" library="Resistor" package="RES0603" value="10K Ohms" x="40" y="31.7" smashed="yes" rot="R180">
-<attribute name="NAME" x="43.4544" y="30.684" size="0.8" layer="25" font="vector" ratio="10" rot="SR180" align="center-left"/>
+<attribute name="NAME" x="41.8456" y="31.716" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="40" y="26.6" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="VALUE" x="43.4544" y="33.732" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 </element>
 <element name="R54" library="Resistor" package="RES0603" value="100K Ohms" x="40" y="33.4" smashed="yes">
-<attribute name="NAME" x="36.5456" y="34.416" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
+<attribute name="NAME" x="38.4456" y="34.816" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="40" y="28.3" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="36.5456" y="31.368" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 </element>
 <element name="C24" library="Capacitor" package="CAP0603" value="470pF" x="41.2" y="45.3" smashed="yes" rot="R270">
-<attribute name="NAME" x="42.216" y="48.2464" size="0.8" layer="25" font="vector" ratio="10" rot="SR270" align="center-left"/>
+<attribute name="NAME" x="41.184" y="41.6536" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="VALUE" x="39.168" y="48.2464" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="41.2" y="45.3" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
 <element name="TC1" library="TagConnect" package="TC2050-IDC" value="TC2050-IDC" x="30" y="78.2" smashed="yes" rot="R180">
-<attribute name="NAME" x="23.65" y="80.74" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
+<attribute name="NAME" x="24.85" y="78.94" size="0.8" layer="25" font="vector" ratio="10" rot="R270" align="center-left"/>
 <attribute name="VALUE" x="35.715" y="80.74" size="0.8" layer="27" font="vector" ratio="10" rot="R270" align="center-left"/>
 </element>
 </elements>
@@ -2038,6 +2038,622 @@ design rules under a new name.</description>
 <via x="36.1" y="75.2" extent="1-16" drill="0.3"/>
 <via x="36.1" y="74.4" extent="1-16" drill="0.3"/>
 <via x="36.1" y="73.6" extent="1-16" drill="0.3"/>
+<via x="39.2" y="47.5" extent="1-16" drill="0.3"/>
+<via x="39.2" y="46.7" extent="1-16" drill="0.3"/>
+<via x="38.4" y="46.7" extent="1-16" drill="0.3"/>
+<via x="38.4" y="45.9" extent="1-16" drill="0.3"/>
+<via x="47.3" y="46.5" extent="1-16" drill="0.3"/>
+<via x="46.5" y="47.3" extent="1-16" drill="0.3"/>
+<via x="45.7" y="48.1" extent="1-16" drill="0.3"/>
+<via x="45.4" y="54.3" extent="1-16" drill="0.3"/>
+<via x="37.7" y="55.6" extent="1-16" drill="0.3"/>
+<via x="38.5" y="54.8" extent="1-16" drill="0.3"/>
+<via x="28.8" y="52.3" extent="1-16" drill="0.3"/>
+<via x="28.8" y="51.5" extent="1-16" drill="0.3"/>
+<via x="28" y="52.3" extent="1-16" drill="0.3"/>
+<via x="28" y="51.5" extent="1-16" drill="0.3"/>
+<via x="27.2" y="52.3" extent="1-16" drill="0.3"/>
+<via x="27.2" y="51.5" extent="1-16" drill="0.3"/>
+<via x="26.4" y="52.3" extent="1-16" drill="0.3"/>
+<via x="26.4" y="51.5" extent="1-16" drill="0.3"/>
+<via x="25.6" y="52.3" extent="1-16" drill="0.3"/>
+<via x="25.6" y="51.5" extent="1-16" drill="0.3"/>
+<via x="28.8" y="16.6" extent="1-16" drill="0.3"/>
+<via x="28.8" y="15.8" extent="1-16" drill="0.3"/>
+<via x="28" y="16.6" extent="1-16" drill="0.3"/>
+<via x="28" y="15.8" extent="1-16" drill="0.3"/>
+<via x="27.2" y="16.6" extent="1-16" drill="0.3"/>
+<via x="27.2" y="15.8" extent="1-16" drill="0.3"/>
+<via x="26.4" y="16.6" extent="1-16" drill="0.3"/>
+<via x="26.4" y="15.8" extent="1-16" drill="0.3"/>
+<via x="25.6" y="16.6" extent="1-16" drill="0.3"/>
+<via x="25.6" y="15.8" extent="1-16" drill="0.3"/>
+<via x="28.8" y="28.5" extent="1-16" drill="0.3"/>
+<via x="28.8" y="27.7" extent="1-16" drill="0.3"/>
+<via x="28" y="28.5" extent="1-16" drill="0.3"/>
+<via x="28" y="27.7" extent="1-16" drill="0.3"/>
+<via x="27.2" y="28.5" extent="1-16" drill="0.3"/>
+<via x="27.2" y="27.7" extent="1-16" drill="0.3"/>
+<via x="26.4" y="28.5" extent="1-16" drill="0.3"/>
+<via x="26.4" y="27.7" extent="1-16" drill="0.3"/>
+<via x="25.6" y="28.5" extent="1-16" drill="0.3"/>
+<via x="25.6" y="27.7" extent="1-16" drill="0.3"/>
+<via x="28.8" y="40.4" extent="1-16" drill="0.3"/>
+<via x="28.8" y="39.6" extent="1-16" drill="0.3"/>
+<via x="28" y="40.4" extent="1-16" drill="0.3"/>
+<via x="28" y="39.6" extent="1-16" drill="0.3"/>
+<via x="27.2" y="40.4" extent="1-16" drill="0.3"/>
+<via x="27.2" y="39.6" extent="1-16" drill="0.3"/>
+<via x="26.4" y="40.4" extent="1-16" drill="0.3"/>
+<via x="26.4" y="39.6" extent="1-16" drill="0.3"/>
+<via x="25.6" y="40.4" extent="1-16" drill="0.3"/>
+<via x="25.6" y="39.6" extent="1-16" drill="0.3"/>
+<via x="28.8" y="64.2" extent="1-16" drill="0.3"/>
+<via x="28.8" y="63.4" extent="1-16" drill="0.3"/>
+<via x="28" y="64.2" extent="1-16" drill="0.3"/>
+<via x="28" y="63.4" extent="1-16" drill="0.3"/>
+<via x="27.2" y="64.2" extent="1-16" drill="0.3"/>
+<via x="27.2" y="63.4" extent="1-16" drill="0.3"/>
+<via x="26.4" y="64.2" extent="1-16" drill="0.3"/>
+<via x="26.4" y="63.4" extent="1-16" drill="0.3"/>
+<via x="25.6" y="64.2" extent="1-16" drill="0.3"/>
+<via x="25.6" y="63.4" extent="1-16" drill="0.3"/>
+<via x="71.4" y="73.2" extent="1-16" drill="0.3"/>
+<via x="72.2" y="73.2" extent="1-16" drill="0.3"/>
+<via x="71.4" y="72.4" extent="1-16" drill="0.3"/>
+<via x="72.2" y="72.4" extent="1-16" drill="0.3"/>
+<via x="71.4" y="71.6" extent="1-16" drill="0.3"/>
+<via x="72.2" y="71.6" extent="1-16" drill="0.3"/>
+<via x="71.4" y="70.8" extent="1-16" drill="0.3"/>
+<via x="72.2" y="70.8" extent="1-16" drill="0.3"/>
+<via x="71.4" y="70" extent="1-16" drill="0.3"/>
+<via x="72.2" y="70" extent="1-16" drill="0.3"/>
+<via x="71.4" y="69.2" extent="1-16" drill="0.3"/>
+<via x="72.2" y="69.2" extent="1-16" drill="0.3"/>
+<via x="71.4" y="68.4" extent="1-16" drill="0.3"/>
+<via x="72.2" y="68.4" extent="1-16" drill="0.3"/>
+<via x="71.4" y="67.6" extent="1-16" drill="0.3"/>
+<via x="72.2" y="67.6" extent="1-16" drill="0.3"/>
+<via x="71.4" y="66.8" extent="1-16" drill="0.3"/>
+<via x="72.2" y="66.8" extent="1-16" drill="0.3"/>
+<via x="71.4" y="66" extent="1-16" drill="0.3"/>
+<via x="72.2" y="66" extent="1-16" drill="0.3"/>
+<via x="71.4" y="65.2" extent="1-16" drill="0.3"/>
+<via x="72.2" y="65.2" extent="1-16" drill="0.3"/>
+<via x="71.4" y="64.4" extent="1-16" drill="0.3"/>
+<via x="72.2" y="64.4" extent="1-16" drill="0.3"/>
+<via x="71.4" y="63.6" extent="1-16" drill="0.3"/>
+<via x="72.2" y="63.6" extent="1-16" drill="0.3"/>
+<via x="71.4" y="62.8" extent="1-16" drill="0.3"/>
+<via x="72.2" y="62.8" extent="1-16" drill="0.3"/>
+<via x="71.4" y="62" extent="1-16" drill="0.3"/>
+<via x="72.2" y="62" extent="1-16" drill="0.3"/>
+<via x="60.9" y="67.7" extent="1-16" drill="0.3"/>
+<via x="60.9" y="66.9" extent="1-16" drill="0.3"/>
+<via x="60.1" y="67.7" extent="1-16" drill="0.3"/>
+<via x="60.1" y="66.9" extent="1-16" drill="0.3"/>
+<via x="59.3" y="67.7" extent="1-16" drill="0.3"/>
+<via x="59.3" y="66.9" extent="1-16" drill="0.3"/>
+<via x="58.5" y="67.7" extent="1-16" drill="0.3"/>
+<via x="58.5" y="66.9" extent="1-16" drill="0.3"/>
+<via x="57.7" y="67.7" extent="1-16" drill="0.3"/>
+<via x="57.7" y="66.9" extent="1-16" drill="0.3"/>
+<via x="71.4" y="13.2" extent="1-16" drill="0.3"/>
+<via x="72.2" y="13.2" extent="1-16" drill="0.3"/>
+<via x="71.4" y="12.4" extent="1-16" drill="0.3"/>
+<via x="72.2" y="12.4" extent="1-16" drill="0.3"/>
+<via x="71.4" y="11.6" extent="1-16" drill="0.3"/>
+<via x="72.2" y="11.6" extent="1-16" drill="0.3"/>
+<via x="71.4" y="25.2" extent="1-16" drill="0.3"/>
+<via x="72.2" y="25.2" extent="1-16" drill="0.3"/>
+<via x="71.4" y="24.4" extent="1-16" drill="0.3"/>
+<via x="72.2" y="24.4" extent="1-16" drill="0.3"/>
+<via x="71.4" y="23.6" extent="1-16" drill="0.3"/>
+<via x="72.2" y="23.6" extent="1-16" drill="0.3"/>
+<via x="71.4" y="22.8" extent="1-16" drill="0.3"/>
+<via x="72.2" y="22.8" extent="1-16" drill="0.3"/>
+<via x="71.4" y="22" extent="1-16" drill="0.3"/>
+<via x="72.2" y="22" extent="1-16" drill="0.3"/>
+<via x="71.4" y="21.2" extent="1-16" drill="0.3"/>
+<via x="72.2" y="21.2" extent="1-16" drill="0.3"/>
+<via x="71.4" y="20.4" extent="1-16" drill="0.3"/>
+<via x="72.2" y="20.4" extent="1-16" drill="0.3"/>
+<via x="71.4" y="19.6" extent="1-16" drill="0.3"/>
+<via x="72.2" y="19.6" extent="1-16" drill="0.3"/>
+<via x="71.4" y="18.8" extent="1-16" drill="0.3"/>
+<via x="72.2" y="18.8" extent="1-16" drill="0.3"/>
+<via x="71.4" y="18" extent="1-16" drill="0.3"/>
+<via x="72.2" y="18" extent="1-16" drill="0.3"/>
+<via x="71.4" y="17.2" extent="1-16" drill="0.3"/>
+<via x="72.2" y="17.2" extent="1-16" drill="0.3"/>
+<via x="71.4" y="16.4" extent="1-16" drill="0.3"/>
+<via x="72.2" y="16.4" extent="1-16" drill="0.3"/>
+<via x="71.4" y="15.6" extent="1-16" drill="0.3"/>
+<via x="72.2" y="15.6" extent="1-16" drill="0.3"/>
+<via x="71.4" y="14.8" extent="1-16" drill="0.3"/>
+<via x="72.2" y="14.8" extent="1-16" drill="0.3"/>
+<via x="71.4" y="14" extent="1-16" drill="0.3"/>
+<via x="72.2" y="14" extent="1-16" drill="0.3"/>
+<via x="71.4" y="37.2" extent="1-16" drill="0.3"/>
+<via x="72.2" y="37.2" extent="1-16" drill="0.3"/>
+<via x="71.4" y="36.4" extent="1-16" drill="0.3"/>
+<via x="72.2" y="36.4" extent="1-16" drill="0.3"/>
+<via x="71.4" y="35.6" extent="1-16" drill="0.3"/>
+<via x="72.2" y="35.6" extent="1-16" drill="0.3"/>
+<via x="71.4" y="34.8" extent="1-16" drill="0.3"/>
+<via x="72.2" y="34.8" extent="1-16" drill="0.3"/>
+<via x="71.4" y="34" extent="1-16" drill="0.3"/>
+<via x="72.2" y="34" extent="1-16" drill="0.3"/>
+<via x="71.4" y="33.2" extent="1-16" drill="0.3"/>
+<via x="72.2" y="33.2" extent="1-16" drill="0.3"/>
+<via x="71.4" y="32.4" extent="1-16" drill="0.3"/>
+<via x="72.2" y="32.4" extent="1-16" drill="0.3"/>
+<via x="71.4" y="31.6" extent="1-16" drill="0.3"/>
+<via x="72.2" y="31.6" extent="1-16" drill="0.3"/>
+<via x="71.4" y="30.8" extent="1-16" drill="0.3"/>
+<via x="72.2" y="30.8" extent="1-16" drill="0.3"/>
+<via x="71.4" y="30" extent="1-16" drill="0.3"/>
+<via x="72.2" y="30" extent="1-16" drill="0.3"/>
+<via x="71.4" y="29.2" extent="1-16" drill="0.3"/>
+<via x="72.2" y="29.2" extent="1-16" drill="0.3"/>
+<via x="71.4" y="28.4" extent="1-16" drill="0.3"/>
+<via x="72.2" y="28.4" extent="1-16" drill="0.3"/>
+<via x="71.4" y="27.6" extent="1-16" drill="0.3"/>
+<via x="72.2" y="27.6" extent="1-16" drill="0.3"/>
+<via x="71.4" y="26.8" extent="1-16" drill="0.3"/>
+<via x="72.2" y="26.8" extent="1-16" drill="0.3"/>
+<via x="71.4" y="26" extent="1-16" drill="0.3"/>
+<via x="72.2" y="26" extent="1-16" drill="0.3"/>
+<via x="71.4" y="49.2" extent="1-16" drill="0.3"/>
+<via x="72.2" y="49.2" extent="1-16" drill="0.3"/>
+<via x="71.4" y="48.4" extent="1-16" drill="0.3"/>
+<via x="72.2" y="48.4" extent="1-16" drill="0.3"/>
+<via x="71.4" y="47.6" extent="1-16" drill="0.3"/>
+<via x="72.2" y="47.6" extent="1-16" drill="0.3"/>
+<via x="71.4" y="46.8" extent="1-16" drill="0.3"/>
+<via x="72.2" y="46.8" extent="1-16" drill="0.3"/>
+<via x="71.4" y="46" extent="1-16" drill="0.3"/>
+<via x="72.2" y="46" extent="1-16" drill="0.3"/>
+<via x="71.4" y="45.2" extent="1-16" drill="0.3"/>
+<via x="72.2" y="45.2" extent="1-16" drill="0.3"/>
+<via x="71.4" y="44.4" extent="1-16" drill="0.3"/>
+<via x="72.2" y="44.4" extent="1-16" drill="0.3"/>
+<via x="71.4" y="43.6" extent="1-16" drill="0.3"/>
+<via x="72.2" y="43.6" extent="1-16" drill="0.3"/>
+<via x="71.4" y="42.8" extent="1-16" drill="0.3"/>
+<via x="72.2" y="42.8" extent="1-16" drill="0.3"/>
+<via x="71.4" y="42" extent="1-16" drill="0.3"/>
+<via x="72.2" y="42" extent="1-16" drill="0.3"/>
+<via x="71.4" y="41.2" extent="1-16" drill="0.3"/>
+<via x="72.2" y="41.2" extent="1-16" drill="0.3"/>
+<via x="71.4" y="40.4" extent="1-16" drill="0.3"/>
+<via x="72.2" y="40.4" extent="1-16" drill="0.3"/>
+<via x="71.4" y="39.6" extent="1-16" drill="0.3"/>
+<via x="72.2" y="39.6" extent="1-16" drill="0.3"/>
+<via x="71.4" y="38.8" extent="1-16" drill="0.3"/>
+<via x="72.2" y="38.8" extent="1-16" drill="0.3"/>
+<via x="71.4" y="38" extent="1-16" drill="0.3"/>
+<via x="72.2" y="38" extent="1-16" drill="0.3"/>
+<via x="71.4" y="61.2" extent="1-16" drill="0.3"/>
+<via x="72.2" y="61.2" extent="1-16" drill="0.3"/>
+<via x="71.4" y="60.4" extent="1-16" drill="0.3"/>
+<via x="72.2" y="60.4" extent="1-16" drill="0.3"/>
+<via x="71.4" y="59.6" extent="1-16" drill="0.3"/>
+<via x="72.2" y="59.6" extent="1-16" drill="0.3"/>
+<via x="71.4" y="58.8" extent="1-16" drill="0.3"/>
+<via x="72.2" y="58.8" extent="1-16" drill="0.3"/>
+<via x="71.4" y="58" extent="1-16" drill="0.3"/>
+<via x="72.2" y="58" extent="1-16" drill="0.3"/>
+<via x="71.4" y="57.2" extent="1-16" drill="0.3"/>
+<via x="72.2" y="57.2" extent="1-16" drill="0.3"/>
+<via x="71.4" y="56.4" extent="1-16" drill="0.3"/>
+<via x="72.2" y="56.4" extent="1-16" drill="0.3"/>
+<via x="71.4" y="55.6" extent="1-16" drill="0.3"/>
+<via x="72.2" y="55.6" extent="1-16" drill="0.3"/>
+<via x="71.4" y="54.8" extent="1-16" drill="0.3"/>
+<via x="72.2" y="54.8" extent="1-16" drill="0.3"/>
+<via x="71.4" y="54" extent="1-16" drill="0.3"/>
+<via x="72.2" y="54" extent="1-16" drill="0.3"/>
+<via x="71.4" y="53.2" extent="1-16" drill="0.3"/>
+<via x="72.2" y="53.2" extent="1-16" drill="0.3"/>
+<via x="71.4" y="52.4" extent="1-16" drill="0.3"/>
+<via x="72.2" y="52.4" extent="1-16" drill="0.3"/>
+<via x="71.4" y="51.6" extent="1-16" drill="0.3"/>
+<via x="72.2" y="51.6" extent="1-16" drill="0.3"/>
+<via x="71.4" y="50.8" extent="1-16" drill="0.3"/>
+<via x="72.2" y="50.8" extent="1-16" drill="0.3"/>
+<via x="71.4" y="50" extent="1-16" drill="0.3"/>
+<via x="72.2" y="50" extent="1-16" drill="0.3"/>
+<via x="12.8" y="73.2" extent="1-16" drill="0.3"/>
+<via x="13.6" y="73.2" extent="1-16" drill="0.3"/>
+<via x="12.8" y="72.4" extent="1-16" drill="0.3"/>
+<via x="13.6" y="72.4" extent="1-16" drill="0.3"/>
+<via x="12.8" y="71.6" extent="1-16" drill="0.3"/>
+<via x="13.6" y="71.6" extent="1-16" drill="0.3"/>
+<via x="12.8" y="70.8" extent="1-16" drill="0.3"/>
+<via x="13.6" y="70.8" extent="1-16" drill="0.3"/>
+<via x="12.8" y="70" extent="1-16" drill="0.3"/>
+<via x="13.6" y="70" extent="1-16" drill="0.3"/>
+<via x="12.8" y="69.2" extent="1-16" drill="0.3"/>
+<via x="13.6" y="69.2" extent="1-16" drill="0.3"/>
+<via x="12.8" y="68.4" extent="1-16" drill="0.3"/>
+<via x="13.6" y="68.4" extent="1-16" drill="0.3"/>
+<via x="12.8" y="67.6" extent="1-16" drill="0.3"/>
+<via x="13.6" y="67.6" extent="1-16" drill="0.3"/>
+<via x="12.8" y="66.8" extent="1-16" drill="0.3"/>
+<via x="13.6" y="66.8" extent="1-16" drill="0.3"/>
+<via x="12.8" y="66" extent="1-16" drill="0.3"/>
+<via x="13.6" y="66" extent="1-16" drill="0.3"/>
+<via x="12.8" y="65.2" extent="1-16" drill="0.3"/>
+<via x="13.6" y="65.2" extent="1-16" drill="0.3"/>
+<via x="12.8" y="64.4" extent="1-16" drill="0.3"/>
+<via x="13.6" y="64.4" extent="1-16" drill="0.3"/>
+<via x="12.8" y="63.6" extent="1-16" drill="0.3"/>
+<via x="13.6" y="63.6" extent="1-16" drill="0.3"/>
+<via x="12.8" y="62.8" extent="1-16" drill="0.3"/>
+<via x="13.6" y="62.8" extent="1-16" drill="0.3"/>
+<via x="12.8" y="62" extent="1-16" drill="0.3"/>
+<via x="13.6" y="62" extent="1-16" drill="0.3"/>
+<via x="12.8" y="13.2" extent="1-16" drill="0.3"/>
+<via x="13.6" y="13.2" extent="1-16" drill="0.3"/>
+<via x="12.8" y="12.4" extent="1-16" drill="0.3"/>
+<via x="13.6" y="12.4" extent="1-16" drill="0.3"/>
+<via x="12.8" y="11.6" extent="1-16" drill="0.3"/>
+<via x="13.6" y="11.6" extent="1-16" drill="0.3"/>
+<via x="12.8" y="25.2" extent="1-16" drill="0.3"/>
+<via x="13.6" y="25.2" extent="1-16" drill="0.3"/>
+<via x="12.8" y="24.4" extent="1-16" drill="0.3"/>
+<via x="13.6" y="24.4" extent="1-16" drill="0.3"/>
+<via x="12.8" y="23.6" extent="1-16" drill="0.3"/>
+<via x="13.6" y="23.6" extent="1-16" drill="0.3"/>
+<via x="12.8" y="22.8" extent="1-16" drill="0.3"/>
+<via x="13.6" y="22.8" extent="1-16" drill="0.3"/>
+<via x="12.8" y="22" extent="1-16" drill="0.3"/>
+<via x="13.6" y="22" extent="1-16" drill="0.3"/>
+<via x="12.8" y="21.2" extent="1-16" drill="0.3"/>
+<via x="13.6" y="21.2" extent="1-16" drill="0.3"/>
+<via x="12.8" y="20.4" extent="1-16" drill="0.3"/>
+<via x="13.6" y="20.4" extent="1-16" drill="0.3"/>
+<via x="12.8" y="19.6" extent="1-16" drill="0.3"/>
+<via x="13.6" y="19.6" extent="1-16" drill="0.3"/>
+<via x="12.8" y="18.8" extent="1-16" drill="0.3"/>
+<via x="13.6" y="18.8" extent="1-16" drill="0.3"/>
+<via x="12.8" y="18" extent="1-16" drill="0.3"/>
+<via x="13.6" y="18" extent="1-16" drill="0.3"/>
+<via x="12.8" y="17.2" extent="1-16" drill="0.3"/>
+<via x="13.6" y="17.2" extent="1-16" drill="0.3"/>
+<via x="12.8" y="16.4" extent="1-16" drill="0.3"/>
+<via x="13.6" y="16.4" extent="1-16" drill="0.3"/>
+<via x="12.8" y="15.6" extent="1-16" drill="0.3"/>
+<via x="13.6" y="15.6" extent="1-16" drill="0.3"/>
+<via x="12.8" y="14.8" extent="1-16" drill="0.3"/>
+<via x="13.6" y="14.8" extent="1-16" drill="0.3"/>
+<via x="12.8" y="14" extent="1-16" drill="0.3"/>
+<via x="13.6" y="14" extent="1-16" drill="0.3"/>
+<via x="12.8" y="37.2" extent="1-16" drill="0.3"/>
+<via x="13.6" y="37.2" extent="1-16" drill="0.3"/>
+<via x="12.8" y="36.4" extent="1-16" drill="0.3"/>
+<via x="13.6" y="36.4" extent="1-16" drill="0.3"/>
+<via x="12.8" y="35.6" extent="1-16" drill="0.3"/>
+<via x="13.6" y="35.6" extent="1-16" drill="0.3"/>
+<via x="12.8" y="34.8" extent="1-16" drill="0.3"/>
+<via x="13.6" y="34.8" extent="1-16" drill="0.3"/>
+<via x="12.8" y="34" extent="1-16" drill="0.3"/>
+<via x="13.6" y="34" extent="1-16" drill="0.3"/>
+<via x="12.8" y="33.2" extent="1-16" drill="0.3"/>
+<via x="13.6" y="33.2" extent="1-16" drill="0.3"/>
+<via x="12.8" y="32.4" extent="1-16" drill="0.3"/>
+<via x="13.6" y="32.4" extent="1-16" drill="0.3"/>
+<via x="12.8" y="31.6" extent="1-16" drill="0.3"/>
+<via x="13.6" y="31.6" extent="1-16" drill="0.3"/>
+<via x="12.8" y="30.8" extent="1-16" drill="0.3"/>
+<via x="13.6" y="30.8" extent="1-16" drill="0.3"/>
+<via x="12.8" y="30" extent="1-16" drill="0.3"/>
+<via x="13.6" y="30" extent="1-16" drill="0.3"/>
+<via x="12.8" y="29.2" extent="1-16" drill="0.3"/>
+<via x="13.6" y="29.2" extent="1-16" drill="0.3"/>
+<via x="12.8" y="28.4" extent="1-16" drill="0.3"/>
+<via x="13.6" y="28.4" extent="1-16" drill="0.3"/>
+<via x="12.8" y="27.6" extent="1-16" drill="0.3"/>
+<via x="13.6" y="27.6" extent="1-16" drill="0.3"/>
+<via x="12.8" y="26.8" extent="1-16" drill="0.3"/>
+<via x="13.6" y="26.8" extent="1-16" drill="0.3"/>
+<via x="12.8" y="26" extent="1-16" drill="0.3"/>
+<via x="13.6" y="26" extent="1-16" drill="0.3"/>
+<via x="12.8" y="49.2" extent="1-16" drill="0.3"/>
+<via x="13.6" y="49.2" extent="1-16" drill="0.3"/>
+<via x="12.8" y="48.4" extent="1-16" drill="0.3"/>
+<via x="13.6" y="48.4" extent="1-16" drill="0.3"/>
+<via x="12.8" y="47.6" extent="1-16" drill="0.3"/>
+<via x="13.6" y="47.6" extent="1-16" drill="0.3"/>
+<via x="12.8" y="46.8" extent="1-16" drill="0.3"/>
+<via x="13.6" y="46.8" extent="1-16" drill="0.3"/>
+<via x="12.8" y="46" extent="1-16" drill="0.3"/>
+<via x="13.6" y="46" extent="1-16" drill="0.3"/>
+<via x="12.8" y="45.2" extent="1-16" drill="0.3"/>
+<via x="13.6" y="45.2" extent="1-16" drill="0.3"/>
+<via x="12.8" y="44.4" extent="1-16" drill="0.3"/>
+<via x="13.6" y="44.4" extent="1-16" drill="0.3"/>
+<via x="12.8" y="43.6" extent="1-16" drill="0.3"/>
+<via x="13.6" y="43.6" extent="1-16" drill="0.3"/>
+<via x="12.8" y="42.8" extent="1-16" drill="0.3"/>
+<via x="13.6" y="42.8" extent="1-16" drill="0.3"/>
+<via x="12.8" y="42" extent="1-16" drill="0.3"/>
+<via x="13.6" y="42" extent="1-16" drill="0.3"/>
+<via x="12.8" y="41.2" extent="1-16" drill="0.3"/>
+<via x="13.6" y="41.2" extent="1-16" drill="0.3"/>
+<via x="12.8" y="40.4" extent="1-16" drill="0.3"/>
+<via x="13.6" y="40.4" extent="1-16" drill="0.3"/>
+<via x="12.8" y="39.6" extent="1-16" drill="0.3"/>
+<via x="13.6" y="39.6" extent="1-16" drill="0.3"/>
+<via x="12.8" y="38.8" extent="1-16" drill="0.3"/>
+<via x="13.6" y="38.8" extent="1-16" drill="0.3"/>
+<via x="12.8" y="38" extent="1-16" drill="0.3"/>
+<via x="13.6" y="38" extent="1-16" drill="0.3"/>
+<via x="12.8" y="61.2" extent="1-16" drill="0.3"/>
+<via x="13.6" y="61.2" extent="1-16" drill="0.3"/>
+<via x="12.8" y="60.4" extent="1-16" drill="0.3"/>
+<via x="13.6" y="60.4" extent="1-16" drill="0.3"/>
+<via x="12.8" y="59.6" extent="1-16" drill="0.3"/>
+<via x="13.6" y="59.6" extent="1-16" drill="0.3"/>
+<via x="12.8" y="58.8" extent="1-16" drill="0.3"/>
+<via x="13.6" y="58.8" extent="1-16" drill="0.3"/>
+<via x="12.8" y="58" extent="1-16" drill="0.3"/>
+<via x="13.6" y="58" extent="1-16" drill="0.3"/>
+<via x="12.8" y="57.2" extent="1-16" drill="0.3"/>
+<via x="13.6" y="57.2" extent="1-16" drill="0.3"/>
+<via x="12.8" y="56.4" extent="1-16" drill="0.3"/>
+<via x="13.6" y="56.4" extent="1-16" drill="0.3"/>
+<via x="12.8" y="55.6" extent="1-16" drill="0.3"/>
+<via x="13.6" y="55.6" extent="1-16" drill="0.3"/>
+<via x="12.8" y="54.8" extent="1-16" drill="0.3"/>
+<via x="13.6" y="54.8" extent="1-16" drill="0.3"/>
+<via x="12.8" y="54" extent="1-16" drill="0.3"/>
+<via x="13.6" y="54" extent="1-16" drill="0.3"/>
+<via x="12.8" y="53.2" extent="1-16" drill="0.3"/>
+<via x="13.6" y="53.2" extent="1-16" drill="0.3"/>
+<via x="12.8" y="52.4" extent="1-16" drill="0.3"/>
+<via x="13.6" y="52.4" extent="1-16" drill="0.3"/>
+<via x="12.8" y="51.6" extent="1-16" drill="0.3"/>
+<via x="13.6" y="51.6" extent="1-16" drill="0.3"/>
+<via x="12.8" y="50.8" extent="1-16" drill="0.3"/>
+<via x="13.6" y="50.8" extent="1-16" drill="0.3"/>
+<via x="12.8" y="50" extent="1-16" drill="0.3"/>
+<via x="13.6" y="50" extent="1-16" drill="0.3"/>
+<via x="39.7" y="14.8" extent="1-16" drill="0.3"/>
+<via x="40.5" y="14.8" extent="1-16" drill="0.3"/>
+<via x="39.7" y="14" extent="1-16" drill="0.3"/>
+<via x="40.5" y="14" extent="1-16" drill="0.3"/>
+<via x="39.7" y="13.2" extent="1-16" drill="0.3"/>
+<via x="40.5" y="13.2" extent="1-16" drill="0.3"/>
+<via x="39.7" y="18" extent="1-16" drill="0.3"/>
+<via x="40.5" y="18" extent="1-16" drill="0.3"/>
+<via x="39.7" y="17.2" extent="1-16" drill="0.3"/>
+<via x="40.5" y="17.2" extent="1-16" drill="0.3"/>
+<via x="39.7" y="16.4" extent="1-16" drill="0.3"/>
+<via x="40.5" y="16.4" extent="1-16" drill="0.3"/>
+<via x="39.7" y="15.6" extent="1-16" drill="0.3"/>
+<via x="40.5" y="15.6" extent="1-16" drill="0.3"/>
+<via x="38.1" y="14.8" extent="1-16" drill="0.3"/>
+<via x="38.9" y="14.8" extent="1-16" drill="0.3"/>
+<via x="38.1" y="14" extent="1-16" drill="0.3"/>
+<via x="38.9" y="14" extent="1-16" drill="0.3"/>
+<via x="38.1" y="13.2" extent="1-16" drill="0.3"/>
+<via x="38.9" y="13.2" extent="1-16" drill="0.3"/>
+<via x="38.1" y="18" extent="1-16" drill="0.3"/>
+<via x="38.9" y="18" extent="1-16" drill="0.3"/>
+<via x="38.1" y="17.2" extent="1-16" drill="0.3"/>
+<via x="38.9" y="17.2" extent="1-16" drill="0.3"/>
+<via x="38.1" y="16.4" extent="1-16" drill="0.3"/>
+<via x="38.9" y="16.4" extent="1-16" drill="0.3"/>
+<via x="38.1" y="15.6" extent="1-16" drill="0.3"/>
+<via x="38.9" y="15.6" extent="1-16" drill="0.3"/>
+<via x="44" y="43.2" extent="1-16" drill="0.3"/>
+<via x="44" y="42.4" extent="1-16" drill="0.3"/>
+<via x="43.2" y="43.2" extent="1-16" drill="0.3"/>
+<via x="43.2" y="42.4" extent="1-16" drill="0.3"/>
+<via x="42.4" y="43.2" extent="1-16" drill="0.3"/>
+<via x="42.4" y="42.4" extent="1-16" drill="0.3"/>
+<via x="41.6" y="43.2" extent="1-16" drill="0.3"/>
+<via x="41.6" y="42.4" extent="1-16" drill="0.3"/>
+<via x="40.8" y="43.2" extent="1-16" drill="0.3"/>
+<via x="40.8" y="42.4" extent="1-16" drill="0.3"/>
+<via x="50.9" y="56" extent="1-16" drill="0.3"/>
+<via x="50.9" y="55.2" extent="1-16" drill="0.3"/>
+<via x="50.1" y="56" extent="1-16" drill="0.3"/>
+<via x="50.1" y="55.2" extent="1-16" drill="0.3"/>
+<via x="49.3" y="56" extent="1-16" drill="0.3"/>
+<via x="49.3" y="55.2" extent="1-16" drill="0.3"/>
+<via x="48.5" y="56" extent="1-16" drill="0.3"/>
+<via x="48.5" y="55.2" extent="1-16" drill="0.3"/>
+<via x="47.7" y="56" extent="1-16" drill="0.3"/>
+<via x="47.7" y="55.2" extent="1-16" drill="0.3"/>
+<via x="45" y="67.7" extent="1-16" drill="0.3"/>
+<via x="45" y="66.9" extent="1-16" drill="0.3"/>
+<via x="44.2" y="67.7" extent="1-16" drill="0.3"/>
+<via x="44.2" y="66.9" extent="1-16" drill="0.3"/>
+<via x="43.4" y="67.7" extent="1-16" drill="0.3"/>
+<via x="43.4" y="66.9" extent="1-16" drill="0.3"/>
+<via x="42.6" y="67.7" extent="1-16" drill="0.3"/>
+<via x="42.6" y="66.9" extent="1-16" drill="0.3"/>
+<via x="41.8" y="67.7" extent="1-16" drill="0.3"/>
+<via x="41.8" y="66.9" extent="1-16" drill="0.3"/>
+<via x="47.5" y="74.6" extent="1-16" drill="0.3"/>
+<via x="48.3" y="74.6" extent="1-16" drill="0.3"/>
+<via x="47.5" y="73.8" extent="1-16" drill="0.3"/>
+<via x="48.3" y="73.8" extent="1-16" drill="0.3"/>
+<via x="47.5" y="73" extent="1-16" drill="0.3"/>
+<via x="48.3" y="73" extent="1-16" drill="0.3"/>
+<via x="47.5" y="72.2" extent="1-16" drill="0.3"/>
+<via x="48.3" y="72.2" extent="1-16" drill="0.3"/>
+<via x="47.5" y="71.4" extent="1-16" drill="0.3"/>
+<via x="48.3" y="71.4" extent="1-16" drill="0.3"/>
+<via x="56.3" y="80.3" extent="1-16" drill="0.3"/>
+<via x="56.3" y="79.5" extent="1-16" drill="0.3"/>
+<via x="55.5" y="80.3" extent="1-16" drill="0.3"/>
+<via x="55.5" y="79.5" extent="1-16" drill="0.3"/>
+<via x="54.7" y="80.3" extent="1-16" drill="0.3"/>
+<via x="54.7" y="79.5" extent="1-16" drill="0.3"/>
+<via x="53.9" y="80.3" extent="1-16" drill="0.3"/>
+<via x="53.9" y="79.5" extent="1-16" drill="0.3"/>
+<via x="53.1" y="80.3" extent="1-16" drill="0.3"/>
+<via x="53.1" y="79.5" extent="1-16" drill="0.3"/>
+<via x="44.1" y="81.2" extent="1-16" drill="0.3"/>
+<via x="44.1" y="80.4" extent="1-16" drill="0.3"/>
+<via x="43.3" y="81.2" extent="1-16" drill="0.3"/>
+<via x="43.3" y="80.4" extent="1-16" drill="0.3"/>
+<via x="42.5" y="81.2" extent="1-16" drill="0.3"/>
+<via x="42.5" y="80.4" extent="1-16" drill="0.3"/>
+<via x="41.7" y="81.2" extent="1-16" drill="0.3"/>
+<via x="41.7" y="80.4" extent="1-16" drill="0.3"/>
+<via x="40.9" y="81.2" extent="1-16" drill="0.3"/>
+<via x="40.9" y="80.4" extent="1-16" drill="0.3"/>
+<via x="29" y="73.3" extent="1-16" drill="0.3"/>
+<via x="28.2" y="73.3" extent="1-16" drill="0.3"/>
+<via x="29.7" y="72.9" extent="1-16" drill="0.3"/>
+<via x="29.7" y="72.1" extent="1-16" drill="0.3"/>
+<via x="29" y="71.8" extent="1-16" drill="0.3"/>
+<via x="28.2" y="71.8" extent="1-16" drill="0.3"/>
+<via x="56" y="70" extent="1-16" drill="0.3"/>
+<via x="56.8" y="70" extent="1-16" drill="0.3"/>
+<via x="55.3" y="70.4" extent="1-16" drill="0.3"/>
+<via x="55.3" y="71.2" extent="1-16" drill="0.3"/>
+<via x="56" y="71.5" extent="1-16" drill="0.3"/>
+<via x="56.8" y="71.5" extent="1-16" drill="0.3"/>
+<via x="60.9" y="8.2" extent="1-16" drill="0.3"/>
+<via x="60.9" y="7.4" extent="1-16" drill="0.3"/>
+<via x="60.1" y="8.2" extent="1-16" drill="0.3"/>
+<via x="60.1" y="7.4" extent="1-16" drill="0.3"/>
+<via x="59.3" y="8.2" extent="1-16" drill="0.3"/>
+<via x="59.3" y="7.4" extent="1-16" drill="0.3"/>
+<via x="58.5" y="8.2" extent="1-16" drill="0.3"/>
+<via x="58.5" y="7.4" extent="1-16" drill="0.3"/>
+<via x="57.7" y="8.2" extent="1-16" drill="0.3"/>
+<via x="57.7" y="7.4" extent="1-16" drill="0.3"/>
+<via x="29" y="13.8" extent="1-16" drill="0.3"/>
+<via x="28.2" y="13.8" extent="1-16" drill="0.3"/>
+<via x="29.7" y="13.4" extent="1-16" drill="0.3"/>
+<via x="29.7" y="12.6" extent="1-16" drill="0.3"/>
+<via x="29" y="12.3" extent="1-16" drill="0.3"/>
+<via x="28.2" y="12.3" extent="1-16" drill="0.3"/>
+<via x="56" y="10.5" extent="1-16" drill="0.3"/>
+<via x="56.8" y="10.5" extent="1-16" drill="0.3"/>
+<via x="55.3" y="10.9" extent="1-16" drill="0.3"/>
+<via x="55.3" y="11.7" extent="1-16" drill="0.3"/>
+<via x="56" y="12" extent="1-16" drill="0.3"/>
+<via x="56.8" y="12" extent="1-16" drill="0.3"/>
+<via x="60.9" y="20.1" extent="1-16" drill="0.3"/>
+<via x="60.9" y="19.3" extent="1-16" drill="0.3"/>
+<via x="60.1" y="20.1" extent="1-16" drill="0.3"/>
+<via x="60.1" y="19.3" extent="1-16" drill="0.3"/>
+<via x="59.3" y="20.1" extent="1-16" drill="0.3"/>
+<via x="59.3" y="19.3" extent="1-16" drill="0.3"/>
+<via x="58.5" y="20.1" extent="1-16" drill="0.3"/>
+<via x="58.5" y="19.3" extent="1-16" drill="0.3"/>
+<via x="57.7" y="20.1" extent="1-16" drill="0.3"/>
+<via x="57.7" y="19.3" extent="1-16" drill="0.3"/>
+<via x="29" y="25.7" extent="1-16" drill="0.3"/>
+<via x="28.2" y="25.7" extent="1-16" drill="0.3"/>
+<via x="29.7" y="25.3" extent="1-16" drill="0.3"/>
+<via x="29.7" y="24.5" extent="1-16" drill="0.3"/>
+<via x="29" y="24.2" extent="1-16" drill="0.3"/>
+<via x="28.2" y="24.2" extent="1-16" drill="0.3"/>
+<via x="56" y="22.4" extent="1-16" drill="0.3"/>
+<via x="56.8" y="22.4" extent="1-16" drill="0.3"/>
+<via x="55.3" y="22.8" extent="1-16" drill="0.3"/>
+<via x="55.3" y="23.6" extent="1-16" drill="0.3"/>
+<via x="56" y="23.9" extent="1-16" drill="0.3"/>
+<via x="56.8" y="23.9" extent="1-16" drill="0.3"/>
+<via x="60.9" y="32" extent="1-16" drill="0.3"/>
+<via x="60.9" y="31.2" extent="1-16" drill="0.3"/>
+<via x="60.1" y="32" extent="1-16" drill="0.3"/>
+<via x="60.1" y="31.2" extent="1-16" drill="0.3"/>
+<via x="59.3" y="32" extent="1-16" drill="0.3"/>
+<via x="59.3" y="31.2" extent="1-16" drill="0.3"/>
+<via x="58.5" y="32" extent="1-16" drill="0.3"/>
+<via x="58.5" y="31.2" extent="1-16" drill="0.3"/>
+<via x="57.7" y="32" extent="1-16" drill="0.3"/>
+<via x="57.7" y="31.2" extent="1-16" drill="0.3"/>
+<via x="29" y="37.6" extent="1-16" drill="0.3"/>
+<via x="28.2" y="37.6" extent="1-16" drill="0.3"/>
+<via x="29.7" y="37.2" extent="1-16" drill="0.3"/>
+<via x="29.7" y="36.4" extent="1-16" drill="0.3"/>
+<via x="29" y="36.1" extent="1-16" drill="0.3"/>
+<via x="28.2" y="36.1" extent="1-16" drill="0.3"/>
+<via x="56" y="34.3" extent="1-16" drill="0.3"/>
+<via x="56.8" y="34.3" extent="1-16" drill="0.3"/>
+<via x="55.3" y="34.7" extent="1-16" drill="0.3"/>
+<via x="55.3" y="35.5" extent="1-16" drill="0.3"/>
+<via x="56" y="35.8" extent="1-16" drill="0.3"/>
+<via x="56.8" y="35.8" extent="1-16" drill="0.3"/>
+<via x="60.9" y="43.9" extent="1-16" drill="0.3"/>
+<via x="60.9" y="43.1" extent="1-16" drill="0.3"/>
+<via x="60.1" y="43.9" extent="1-16" drill="0.3"/>
+<via x="60.1" y="43.1" extent="1-16" drill="0.3"/>
+<via x="59.3" y="43.9" extent="1-16" drill="0.3"/>
+<via x="59.3" y="43.1" extent="1-16" drill="0.3"/>
+<via x="58.5" y="43.9" extent="1-16" drill="0.3"/>
+<via x="58.5" y="43.1" extent="1-16" drill="0.3"/>
+<via x="57.7" y="43.9" extent="1-16" drill="0.3"/>
+<via x="57.7" y="43.1" extent="1-16" drill="0.3"/>
+<via x="29" y="49.5" extent="1-16" drill="0.3"/>
+<via x="28.2" y="49.5" extent="1-16" drill="0.3"/>
+<via x="29.7" y="49.1" extent="1-16" drill="0.3"/>
+<via x="29.7" y="48.3" extent="1-16" drill="0.3"/>
+<via x="29" y="48" extent="1-16" drill="0.3"/>
+<via x="28.2" y="48" extent="1-16" drill="0.3"/>
+<via x="56" y="46.2" extent="1-16" drill="0.3"/>
+<via x="56.8" y="46.2" extent="1-16" drill="0.3"/>
+<via x="55.3" y="46.6" extent="1-16" drill="0.3"/>
+<via x="55.3" y="47.4" extent="1-16" drill="0.3"/>
+<via x="56" y="47.7" extent="1-16" drill="0.3"/>
+<via x="56.8" y="47.7" extent="1-16" drill="0.3"/>
+<via x="60.9" y="55.8" extent="1-16" drill="0.3"/>
+<via x="60.9" y="55" extent="1-16" drill="0.3"/>
+<via x="60.1" y="55.8" extent="1-16" drill="0.3"/>
+<via x="60.1" y="55" extent="1-16" drill="0.3"/>
+<via x="59.3" y="55.8" extent="1-16" drill="0.3"/>
+<via x="59.3" y="55" extent="1-16" drill="0.3"/>
+<via x="58.5" y="55.8" extent="1-16" drill="0.3"/>
+<via x="58.5" y="55" extent="1-16" drill="0.3"/>
+<via x="57.7" y="55.8" extent="1-16" drill="0.3"/>
+<via x="57.7" y="55" extent="1-16" drill="0.3"/>
+<via x="29" y="61.4" extent="1-16" drill="0.3"/>
+<via x="28.2" y="61.4" extent="1-16" drill="0.3"/>
+<via x="29.7" y="61" extent="1-16" drill="0.3"/>
+<via x="29.7" y="60.2" extent="1-16" drill="0.3"/>
+<via x="29" y="59.9" extent="1-16" drill="0.3"/>
+<via x="28.2" y="59.9" extent="1-16" drill="0.3"/>
+<via x="56" y="58.1" extent="1-16" drill="0.3"/>
+<via x="56.8" y="58.1" extent="1-16" drill="0.3"/>
+<via x="55.3" y="58.5" extent="1-16" drill="0.3"/>
+<via x="55.3" y="59.3" extent="1-16" drill="0.3"/>
+<via x="56" y="59.6" extent="1-16" drill="0.3"/>
+<via x="56.8" y="59.6" extent="1-16" drill="0.3"/>
+<via x="42.7" y="61.3" extent="1-16" drill="0.3"/>
+<via x="42.7" y="60.5" extent="1-16" drill="0.3"/>
+<via x="41.9" y="61.3" extent="1-16" drill="0.3"/>
+<via x="41.9" y="60.5" extent="1-16" drill="0.3"/>
+<via x="41.1" y="61.3" extent="1-16" drill="0.3"/>
+<via x="41.1" y="60.5" extent="1-16" drill="0.3"/>
+<via x="40.7" y="30.4" extent="1-16" drill="0.3"/>
+<via x="40.7" y="29.6" extent="1-16" drill="0.3"/>
+<via x="39.9" y="30.4" extent="1-16" drill="0.3"/>
+<via x="39.9" y="29.6" extent="1-16" drill="0.3"/>
+<via x="39.1" y="30.4" extent="1-16" drill="0.3"/>
+<via x="39.1" y="29.6" extent="1-16" drill="0.3"/>
+<via x="45.6" y="34.3" extent="1-16" drill="0.3"/>
+<via x="46.4" y="34.3" extent="1-16" drill="0.3"/>
+<via x="45.6" y="33.5" extent="1-16" drill="0.3"/>
+<via x="46.4" y="33.5" extent="1-16" drill="0.3"/>
+<via x="45.6" y="32.7" extent="1-16" drill="0.3"/>
+<via x="46.4" y="32.7" extent="1-16" drill="0.3"/>
+<via x="39.9" y="77.3" extent="1-16" drill="0.3"/>
+<via x="40.7" y="77.3" extent="1-16" drill="0.3"/>
+<via x="39.9" y="76.5" extent="1-16" drill="0.3"/>
+<via x="40.7" y="76.5" extent="1-16" drill="0.3"/>
+<via x="39.9" y="75.7" extent="1-16" drill="0.3"/>
+<via x="40.7" y="75.7" extent="1-16" drill="0.3"/>
 </signal>
 <signal name="3V3">
 <contactref element="C5" pad="1"/>
@@ -2140,8 +2756,9 @@ design rules under a new name.</description>
 <wire x1="48.4" y1="51.1" x2="46.9" y2="51.1" width="0.6096" layer="16"/>
 <wire x1="53.47" y1="46.03" x2="53.47" y2="45.7" width="0.6096" layer="16"/>
 <wire x1="48.4" y1="51.1" x2="53.47" y2="46.03" width="0.6096" layer="16"/>
-<wire x1="42.75" y1="53.9" x2="42.75" y2="56.93085" width="0.3048" layer="1"/>
-<wire x1="42.75" y1="56.93085" x2="43.4" y2="57.58085" width="0.3048" layer="1"/>
+<wire x1="42.75" y1="53.9" x2="42.75" y2="56.43085" width="0.3048" layer="1"/>
+<wire x1="43.4" y1="57.08085" x2="42.75" y2="56.43085" width="0.3048" layer="1"/>
+<wire x1="43.4" y1="57.08085" x2="43.4" y2="57.58085" width="0.3048" layer="1"/>
 <wire x1="43.4" y1="57.58085" x2="43.41915" y2="57.6" width="0.6096" layer="1"/>
 <wire x1="43.41915" y1="57.6" x2="49.2" y2="57.6" width="0.6096" layer="1"/>
 <wire x1="45.31915" y1="71.1" x2="45.31915" y2="69.4" width="0.8128" layer="1"/>
@@ -3044,11 +3661,17 @@ design rules under a new name.</description>
 <mfgpreviewcolor name="substratecolor" color="0xFF786E46"/>
 </mfgpreviewcolors>
 <errors>
-<approved hash="19,1,6a4c6c20fe16f87a"/>
-<approved hash="19,1,e1b3e2503c663f85"/>
-<approved hash="19,1,41b2425014661784"/>
-<approved hash="19,1,4612420014361024"/>
-<approved hash="19,1,e613e2003c363825"/>
+<approved hash="19,1,c043c300cd36ce75"/>
+<approved hash="19,1,acf9ae453c733ecf"/>
+<approved hash="19,1,c043c3083d3e3e75"/>
+<approved hash="19,1,bcf9be7bcc4dcecf"/>
+<approved hash="19,1,ba41b93bcb0dc877"/>
+<approved hash="19,1,66436506f330f075"/>
+<approved hash="19,1,595b5a11cc27cf6d"/>
+<approved hash="19,1,6a786d20ff16f84e"/>
+<approved hash="19,1,595b5a1dc42bc76d"/>
+<approved hash="19,1,a792a20c3c3a39a4"/>
+<approved hash="19,1,a792a200343631a4"/>
 </errors>
 </board>
 </drawing>

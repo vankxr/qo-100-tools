@@ -7168,17 +7168,6 @@ H2+ 512MB</text>
 <text x="-15.24" y="3.556" size="1.27" layer="95">&gt;NAME</text>
 <text x="-15.24" y="1.27" size="1.27" layer="96">&gt;VALUE</text>
 </symbol>
-<symbol name="MCP1525">
-<pin name="VOUT" x="5.08" y="-2.54" length="middle" rot="R180"/>
-<pin name="GND" x="-22.86" y="-7.62" length="middle"/>
-<pin name="VDD" x="-22.86" y="-2.54" length="middle"/>
-<wire x1="-17.78" y1="-10.16" x2="-17.78" y2="0" width="0.254" layer="94"/>
-<wire x1="-17.78" y1="0" x2="0" y2="0" width="0.254" layer="94"/>
-<wire x1="0" y1="0" x2="0" y2="-10.16" width="0.254" layer="94"/>
-<wire x1="0" y1="-10.16" x2="-17.78" y2="-10.16" width="0.254" layer="94"/>
-<text x="-17.78" y="3.556" size="1.27" layer="95">&gt;NAME</text>
-<text x="-17.78" y="1.27" size="1.27" layer="96">&gt;VALUE</text>
-</symbol>
 </symbols>
 <devicesets>
 <deviceset name="MCP1703-*" prefix="U">
@@ -7285,23 +7274,6 @@ H2+ 512MB</text>
 <technology name="5"/>
 <technology name="6"/>
 <technology name="7"/>
-</technologies>
-</device>
-</devices>
-</deviceset>
-<deviceset name="MCP1525" prefix="U">
-<gates>
-<gate name="G$1" symbol="MCP1525" x="0" y="0"/>
-</gates>
-<devices>
-<device name="" package="SOT23">
-<connects>
-<connect gate="G$1" pin="GND" pad="3"/>
-<connect gate="G$1" pin="VDD" pad="1"/>
-<connect gate="G$1" pin="VOUT" pad="2"/>
-</connects>
-<technologies>
-<technology name=""/>
 </technologies>
 </device>
 </devices>
@@ -9625,6 +9597,61 @@ Source: &lt;a href="http://www.littelfuse.com/~/media/electronics/datasheets/tvs
 </deviceset>
 </devicesets>
 </library>
+<library name="Texas Instruments">
+<packages>
+<package name="SOT23">
+<wire x1="-0.9" y1="1.55" x2="0.9" y2="1.55" width="0.127" layer="21"/>
+<wire x1="-0.9" y1="-1.55" x2="0.9" y2="-1.55" width="0.127" layer="21"/>
+<wire x1="-0.9" y1="1.55" x2="-0.9" y2="-1.55" width="0.127" layer="51"/>
+<wire x1="0.9" y1="1.55" x2="0.9" y2="-1.55" width="0.127" layer="51"/>
+<smd name="1" x="-1.4" y="0.95" dx="1" dy="0.55" layer="1"/>
+<smd name="2" x="-1.4" y="-0.95" dx="1" dy="0.55" layer="1"/>
+<text x="-1.214" y="1.8825" size="1.27" layer="25" ratio="10">&gt;NAME</text>
+<text x="-1.214" y="-3.089" size="1.27" layer="27" ratio="10">&gt;VALUE</text>
+<smd name="3" x="1.394" y="0" dx="1" dy="0.55" layer="1"/>
+<wire x1="-0.9" y1="0.4" x2="-0.9" y2="-0.4" width="0.127" layer="21"/>
+<wire x1="0.9" y1="-1.55" x2="0.9" y2="-0.6" width="0.127" layer="21"/>
+<wire x1="0.9" y1="1.55" x2="0.9" y2="0.6" width="0.127" layer="21"/>
+</package>
+</packages>
+<symbols>
+<symbol name="REF30XX">
+<pin name="VOUT" x="5.08" y="-2.54" length="middle" rot="R180"/>
+<pin name="GND" x="-22.86" y="-7.62" length="middle"/>
+<pin name="VDD" x="-22.86" y="-2.54" length="middle"/>
+<wire x1="-17.78" y1="-10.16" x2="-17.78" y2="0" width="0.254" layer="94"/>
+<wire x1="-17.78" y1="0" x2="0" y2="0" width="0.254" layer="94"/>
+<wire x1="0" y1="0" x2="0" y2="-10.16" width="0.254" layer="94"/>
+<wire x1="0" y1="-10.16" x2="-17.78" y2="-10.16" width="0.254" layer="94"/>
+<text x="-17.78" y="3.556" size="1.27" layer="95">&gt;NAME</text>
+<text x="-17.78" y="1.27" size="1.27" layer="96">&gt;VALUE</text>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="REF30*AIDBZ" prefix="U">
+<gates>
+<gate name="G$1" symbol="REF30XX" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="SOT23">
+<connects>
+<connect gate="G$1" pin="GND" pad="3"/>
+<connect gate="G$1" pin="VDD" pad="1"/>
+<connect gate="G$1" pin="VOUT" pad="2"/>
+</connects>
+<technologies>
+<technology name="12"/>
+<technology name="20"/>
+<technology name="25"/>
+<technology name="30"/>
+<technology name="33"/>
+<technology name="40"/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
 </libraries>
 <attributes>
 <attribute name="CNAME" value="None"/>
@@ -9836,7 +9863,7 @@ Source: &lt;a href="http://www.littelfuse.com/~/media/electronics/datasheets/tvs
 <part name="CON19" library="JST" deviceset="2P" device="-PH-TOP"/>
 <part name="U11" library="Maxim Integrated" deviceset="DS2484" device=""/>
 <part name="U16" library="Microchip" deviceset="MCP3221-A*" device="" technology="0"/>
-<part name="U13" library="Microchip" deviceset="MCP1525" device=""/>
+<part name="U13" library="Texas Instruments" deviceset="REF30*AIDBZ" device="" technology="30"/>
 <part name="3V64" library="Supply Symbol" deviceset="3V3" device=""/>
 <part name="GND45" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND46" library="Supply Symbol" deviceset="GND" device=""/>
@@ -12757,7 +12784,7 @@ DS. Eq. 3 &amp; Table 1</text>
 <pinref part="5V00006" gate="G$1" pin="5V0"/>
 </segment>
 </net>
-<net name="2V5_ADC_CLEAN" class="0">
+<net name="3V0_ADC_CLEAN" class="0">
 <segment>
 <pinref part="U16" gate="G$1" pin="VDD"/>
 <pinref part="U13" gate="G$1" pin="VOUT"/>
