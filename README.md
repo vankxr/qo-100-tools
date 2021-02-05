@@ -1,8 +1,8 @@
 # qo-100-tools
-Various tools for transmission and reception on the QO-100 sattelite amateur transponder bands. Includes everything I need (hopefully) to build a fully remote managed RF frontend to be placed on the roof, near the antenna while only bringing a few cables between it and the shack: power, two coax cables (TX IF and RX IF) and one UTP ethernet cable.
+Various tools for transmission and reception on the QO-100 satellite amateur transponder bands. Includes everything I need (hopefully) to build a fully remote managed RF frontend to be placed on the roof, near the antenna while only bringing a few cables between it and the shack: power, two coax cables (TX IF and RX IF) and one UTP ethernet cable.
 
 ## Included tools
- - Upconverter - Converts the VHF/UHF IF signal to the uplink frequency of the sattelite (2.4 GHz)
+ - Upconverter - Converts the VHF/UHF IF signal to the uplink frequency of the satellite (2.4 GHz)
  - PA - Boosts the output power to 20 W (v1) and 250 W (v2) maximum, there is also a 10 W driver for the v2 that can be used for some QRP experiments
  - Directional Couplers - Experimental, manually constructed with simple scalpel cut traces on some Rogers RO4350B substrate
  - GPSDO - GPS Disciplined Oscillator to generate different precise reference frequencies
@@ -10,7 +10,7 @@ Various tools for transmission and reception on the QO-100 sattelite amateur tra
  - Digital Power Meter - Module to measure DC power, used to calculate the PA efficiency
  - Digital RF Power Meter - Module to measure RF power, used to calculate the PA efficiency
  - Generic Filter - Footprints to build up to 11th order Butterworth/Chebyshev filters
- - Orange Pi Dock - Main board to house an OPi to control the whole system
+ - Orange Pi Dock - Main board to house an OPi that will be the main brain of the system
  - Relay Controller - Module to provide relay coil switching capabilities
  - RF Switch - Implements a 5PST or 4PST RF switch for routing purposes
 
@@ -28,7 +28,8 @@ Various tools for transmission and reception on the QO-100 sattelite amateur tra
 
 ## Special thanks
 
-Thanks to [JLCPCB](https://jlcpcb.com) for sponsoring most of the PCBs needed for this project
+Thanks to [JLCPCB](https://jlcpcb.com) for sponsoring most of the PCBs needed for this project.
+Thanks to [raplin](https://github.com/raplin) for the work on [reverse engineering the HP power supplies](https://github.com/raplin/DPS-1200FB)
 
 ## License
 
