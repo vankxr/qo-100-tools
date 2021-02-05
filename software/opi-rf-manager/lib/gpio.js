@@ -1,9 +1,15 @@
+const Util = require("util");
 const FileSystem = require("fs").promises;
+const ChildProcess = require("child_process");
+const Exec = Util.promisify(ChildProcess.exec);
 
 class GPIO
 {
     static INPUT = "in";
     static OUTPUT = "out";
+    static PULLUP = "up";
+    static PULLDOWN = "down";
+    static NOPULL = "off";
     static HIGH = "1";
     static LOW = "0";
     static ANY = "X";
@@ -91,8 +97,32 @@ class GPIO
             throw new Error("Invalid direction");
 
         await FileSystem.writeFile(this.path + "direction", direction);
+    }
+    async set_pull(pull)
+    {
+        if(!this.exported)
+            throw new Error("GPIO not exported");
 
-        return true;
+        if(pull !== GPIO.PULLUP && pull !== GPIO.PULLDOWN && pull !== GPIO.NOPULL)
+            throw new Error("Invalid pull type");
+
+        try
+        {
+            await FileSystem.access("/usr/bin/hx_soc_gpio_pull_cfg", require("fs").constants.X_OK);
+        }
+        catch(e)
+        {
+            throw new Error("H2+/H3 SoC GPIO pull utility executable does not exist or is not executable: " + e);
+        }
+
+        try
+        {
+            const {stdout, stderr} = await Exec(Util.format("/usr/bin/hx_soc_gpio_pull_cfg %d %s", this.index, pull.toUpperCase()));
+        }
+        catch(e)
+        {
+            throw new Error("H2+/H3 SoC GPIO pull utility executable failed: " + e);
+        }
     }
     async set_value(value)
     {
@@ -103,8 +133,6 @@ class GPIO
             throw new Error("Invalid value");
 
         await FileSystem.writeFile(this.path + "value", value);
-
-        return true;
     }
     async get_value()
     {
@@ -137,8 +165,6 @@ class GPIO
         this.event.last_value = await this.get_value();
         this.event.value = value;
         this.event.timer = setInterval(this.poll, interval);
-
-        return true;
     }
     async disable_event_polling()
     {
@@ -148,8 +174,6 @@ class GPIO
         clearInterval(this.event.timer);
 
         this.event.timer = null;
-
-        return true;
     }
 
     async poll()

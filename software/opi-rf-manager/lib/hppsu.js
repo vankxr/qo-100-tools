@@ -6,14 +6,19 @@ class HPPSU
     bus_enable_gpio;
     psu_addr;
     ee_addr;
+    present_gpio;
+    enable_gpio;
 
-    constructor(bus, addr, bus_enable_gpio)
+    constructor(bus, addr, bus_enable_gpio, present_gpio, enable_gpio)
     {
         this.bus = bus;
         this.bus_enable_gpio = bus_enable_gpio;
 
         this.psu_addr = 0x58 | (addr & 0x07);
         this.ee_addr = 0x50 | (addr & 0x07);
+
+        this.present_gpio = present_gpio;
+        this.enable_gpio = enable_gpio;
     }
 
     async probe()
@@ -405,14 +410,14 @@ class HPPSU
         // Bit 1 - Seems to indicate whether input voltage is present, something like ready flag (?)
         // Bit 2 - #ENABLE pin status inverted
         // Bit 4 - Is always set but is not mentioned in disassembly (?)
-        // Bit 17-16 - 00: Invalid input voltage, 01: xxx V < Input voltage < 108V (100V nominal), 10: 108V < Input voltage < 132V (120V nominal), 11: 179V < Input voltage < 264V
+        // Bit 9-8 - 00: Invalid input voltage, 01: xxx V < Input voltage < 108V (100V nominal), 10: 108V < Input voltage < 132V (120V/127V nominal), 11: 179V < Input voltage < 264V (230V nominal)
     }
 
-    async main_output_enabled()
+    async is_main_output_enabled()
     {
         return (await this.get_status_flags() & 0x05) === 0x05;
     }
-    async input_present()
+    async is_input_present()
     {
         return (await this.get_status_flags() & 0x02) === 0x02;
     }
@@ -425,6 +430,24 @@ class HPPSU
 
     eeprom at address 0x1F has 0x2E
     */
+
+    async is_present()
+    {
+        if(!this.present_gpio)
+            throw new Error("No present GPIO defined");
+
+        return (await this.present_gpio.get_value()) === GPIO.LOW;
+    }
+    async set_enable(enable)
+    {
+        if(!this.enable_gpio)
+            throw new Error("No enable GPIO defined");
+
+        if(enable)
+            await this.enable_gpio.set_value(GPIO.LOW);
+
+        await this.enable_gpio.set_direction(enable ? GPIO.OUTPUT : GPIO.INPUT);
+    }
 }
 
 module.exports = HPPSU;

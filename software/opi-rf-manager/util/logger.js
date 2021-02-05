@@ -1,4 +1,5 @@
 const Colors = require('colors/safe');
+const Util = require("util");
 const FileSystem = require('fs');
 
 class Logger
@@ -28,11 +29,12 @@ class Logger
             out += pre + " - ";
 
         out += message;
+        out = Util.format(out, ...args);
 
         if(color_fn)
             out = color_fn(out);
 
-        console.log(out, ...args);
+        console.log(out);
 
         return out;
     }
@@ -50,11 +52,12 @@ class Logger
             out += pre + " - ";
 
         out += message;
+        out = Util.format(out, ...args);
 
         if(color_fn)
             out = color_fn(out);
 
-        console.log(out, ...args);
+        console.log(out);
 
         return out;
     }

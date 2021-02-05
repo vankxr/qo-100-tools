@@ -1,6 +1,9 @@
+const GPIO = require.main.require("./lib/gpio");
+
 class BME280
 {
     bus;
+    bus_enable_gpio;
     addr;
     calibration = {
         read: false,
@@ -24,9 +27,10 @@ class BME280
         H6: undefined
     };
 
-    constructor(bus, addr)
+    constructor(bus, addr, bus_enable_gpio)
     {
         this.bus = bus;
+        this.bus_enable_gpio = bus_enable_gpio;
 
         this.addr = 0x76 | (addr & 0x01);
 
@@ -39,12 +43,23 @@ class BME280
 
         try
         {
+            if(this.bus_enable_gpio)
+                await this.bus_enable_gpio.set_value(GPIO.HIGH);
+
             if((await this.bus.scan(this.addr)).indexOf(this.addr) === -1)
                 throw new Error("Could not find BME280 at address 0x" + this.addr.toString(16));
         }
         finally
         {
-            release();
+            try
+            {
+                if(this.bus_enable_gpio)
+                    await this.bus_enable_gpio.set_value(GPIO.LOW);
+            }
+            finally
+            {
+                release();
+            }
         }
 
         let id = await this.get_chip_id();
@@ -93,17 +108,28 @@ class BME280
         buf.writeUInt8(reg, 0);
 
         for(let i = 0; i < data.length; i++)
-            buf.writeUInt8(data, i + 1);
+            buf.writeUInt8(data[i], i + 1);
 
         const release = await this.bus.mutex.acquire();
 
         try
         {
+            if(this.bus_enable_gpio)
+                await this.bus_enable_gpio.set_value(GPIO.HIGH);
+
             await this.bus.i2cWrite(this.addr, buf.length, buf);
         }
         finally
         {
-            release();
+            try
+            {
+                if(this.bus_enable_gpio)
+                    await this.bus_enable_gpio.set_value(GPIO.LOW);
+            }
+            finally
+            {
+                release();
+            }
         }
     }
     async write_register(reg, data)
@@ -121,6 +147,9 @@ class BME280
 
         try
         {
+            if(this.bus_enable_gpio)
+                await this.bus_enable_gpio.set_value(GPIO.HIGH);
+
             await this.bus.i2cWrite(this.addr, buf.length, buf);
 
             buf = Buffer.alloc(count, 0);
@@ -128,7 +157,15 @@ class BME280
         }
         finally
         {
-            release();
+            try
+            {
+                if(this.bus_enable_gpio)
+                    await this.bus_enable_gpio.set_value(GPIO.LOW);
+            }
+            finally
+            {
+                release();
+            }
         }
 
         if(!result)
@@ -284,8 +321,10 @@ class BME280
         {
             await this.write_register(0xF4, (config & 0xFC) | 0x01);
 
-            while(((await this.read_register(0xF4)) & 0x03) != 0x00);
+            //while(((await this.read_register(0xF4)) & 0x03) != 0x00);
         }
+
+        while((await this.read_register(0xF3)) & 0x08);
     }
     async sleep()
     {
@@ -350,7 +389,7 @@ class BME280
             temperature: T,
             humidity: H,
             pressure: P / 100
-        }
+        };
     }
     async get_temperature()
     {
