@@ -28,8 +28,8 @@ Various tools for transmission and reception on the QO-100 satellite amateur tra
 
 ## Special thanks
 
-Thanks to [JLCPCB](https://jlcpcb.com) for sponsoring most of the PCBs needed for this project.
-Thanks to [raplin](https://github.com/raplin) for the work on [reverse engineering the HP power supplies](https://github.com/raplin/DPS-1200FB)
+* [JLCPCB](https://jlcpcb.com) for sponsoring most of the PCBs needed for this project.
+* [raplin](https://github.com/raplin) for the work on [reverse engineering the HP power supplies](https://github.com/raplin/DPS-1200FB)
 
 ## License
 
