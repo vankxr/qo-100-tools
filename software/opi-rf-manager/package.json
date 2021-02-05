@@ -14,5 +14,5 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "João Silva (vankxr)",
-  "license": "ISC"
+  "license": "GPL-3.0"
 }
