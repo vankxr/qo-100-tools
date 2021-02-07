@@ -1,60 +1,22 @@
 const GPIO = require.main.require("./lib/gpio");
+const { I2C, I2CDevice} = require.main.require("./lib/i2c");
 
-class HPPSU
+class HPPSUMCU extends I2CDevice
 {
-    bus;
-    bus_enable_gpio;
-    psu_addr;
-    ee_addr;
-    present_gpio;
-    enable_gpio;
-
-    constructor(bus, addr, bus_enable_gpio, present_gpio, enable_gpio)
+    constructor(bus, addr, bus_enable_gpio)
     {
-        this.bus = bus;
-        this.bus_enable_gpio = bus_enable_gpio;
-
-        this.psu_addr = 0x58 | (addr & 0x07);
-        this.ee_addr = 0x50 | (addr & 0x07);
-
-        this.present_gpio = present_gpio;
-        this.enable_gpio = enable_gpio;
-    }
-
-    async probe()
-    {
-        const release = await this.bus.mutex.acquire();
-
-        try
-        {
-            if(this.bus_enable_gpio)
-                await this.bus_enable_gpio.set_value(GPIO.HIGH);
-
-            if((await this.bus.scan(this.psu_addr)).indexOf(this.psu_addr) === -1)
-                throw new Error("Could not find PSU at address 0x" + this.psu_addr.toString(16));
-
-            if((await this.bus.scan(this.ee_addr)).indexOf(this.ee_addr) === -1)
-                throw new Error("Could not find EEPROM at address 0x" + this.ee_addr.toString(16));
-        }
-        finally
-        {
-            try
-            {
-                if(this.bus_enable_gpio)
-                    await this.bus_enable_gpio.set_value(GPIO.LOW);
-            }
-            finally
-            {
-                release();
-            }
-        }
-
-        return true;
+        if(bus instanceof I2CDevice)
+            super(bus.bus, bus.addr, bus.bus_enable_gpio);
+        else
+            super(bus, 0x58 | (addr & 0x07), bus_enable_gpio);
     }
 
     calc_checksum(buf)
     {
-        let cs = (this.psu_addr << 1);
+        if(!(buf instanceof Buffer))
+            throw new Error("Invalid buffer");
+
+        let cs = (this.addr << 1);
 
         for(let i = 0; i < buf.length - 1; i++)
             cs += buf.readUInt8(i);
@@ -63,6 +25,9 @@ class HPPSU
     }
     check_checksum(buf)
     {
+        if(!(buf instanceof Buffer))
+            throw new Error("Invalid buffer");
+
         let cs = 0;
 
         for(let i = 0; i < buf.length; i++)
@@ -74,8 +39,14 @@ class HPPSU
         return false;
     }
 
-    async write_register(reg, data)
+    async write(reg, data)
     {
+        if(typeof(reg) !== "number" || reg < 0 || reg > 255)
+            throw new Error("Invalid register");
+
+        if(typeof(data) !== "number" || reg < 0 || reg > 65535)
+            throw new Error("Invalid data");
+
         let buf = Buffer.alloc(4, 0);
 
         buf.writeUInt8(reg, 0);
@@ -83,140 +54,122 @@ class HPPSU
 
         this.calc_checksum(buf);
 
-        const release = await this.bus.mutex.acquire();
-
-        try
-        {
-            if(this.bus_enable_gpio)
-                await this.bus_enable_gpio.set_value(GPIO.HIGH);
-
-            await this.bus.i2cWrite(this.psu_addr, buf.length, buf);
-        }
-        finally
-        {
-            try
-            {
-                if(this.bus_enable_gpio)
-                    await this.bus_enable_gpio.set_value(GPIO.LOW);
-            }
-            finally
-            {
-                release();
-            }
-        }
+        await super.write(buf);
     }
-    async read_register(reg)
+    async read(reg)
     {
+        if(typeof(reg) !== "number" || reg < 0 || reg > 255)
+            throw new Error("Invalid register");
+
         let buf = Buffer.alloc(2, 0);
 
         buf.writeUInt8(reg, 0);
 
         this.calc_checksum(buf);
 
-        let result;
-        const release = await this.bus.mutex.acquire();
+        await super.write(buf);
 
-        try
-        {
-            if(this.bus_enable_gpio)
-                await this.bus_enable_gpio.set_value(GPIO.HIGH);
+        let result = await super.read(3);
 
-            await this.bus.i2cWrite(this.psu_addr, buf.length, buf);
-
-            buf = Buffer.alloc(3, 0);
-            result = await this.bus.i2cRead(this.psu_addr, 3, buf);
-        }
-        finally
-        {
-            try
-            {
-                if(this.bus_enable_gpio)
-                    await this.bus_enable_gpio.set_value(GPIO.LOW);
-            }
-            finally
-            {
-                release();
-            }
-        }
-
-        if(!result)
-            throw new Error("I2C Read failed");
-
-        if(result.bytesRead < 3)
-            throw new Error("I2C Read failed, expected " + 3 + " bytes, got " + result.bytesRead);
-
-        if(!this.check_checksum(result.buffer))
+        if(!this.check_checksum(result))
             throw new Error("Checksum does not match");
 
-        return result.buffer.readUInt16LE(0);
+        return result.readUInt16LE(0);
     }
-    async read_mcu_eeprom(mem_addr)
+    async read_eeprom(mem_addr)
     {
-        await this.write_register(0x56, mem_addr);
+        await this.write(0x56, mem_addr);
 
-        return await this.read_register(0x56) >> 8;
+        return (await this.read(0x56)) >> 8;
     }
-    async read_eeprom(mem_addr, count)
+}
+class HPPSUEEPROM extends I2CDevice
+{
+    constructor(bus, addr, bus_enable_gpio)
     {
-        let buf = Buffer.alloc(1, 0);
+        if(bus instanceof I2CDevice)
+            super(bus.bus, bus.addr, bus.bus_enable_gpio);
+        else
+            super(bus, 0x50 | (addr & 0x07), bus_enable_gpio);
+    }
+
+    async write(mem_addr, data)
+    {
+        if(typeof(mem_addr) !== "number" || mem_addr < 0 || mem_addr > 255)
+            throw new Error("Invalid memory address");
+
+        if(typeof(data) === "number")
+            data = [data];
+
+        if(Array.isArray(data))
+            data = Buffer.from(data);
+
+        if(!(data instanceof Buffer))
+            throw new Error("Invalid data");
+
+        let buf = Buffer.alloc(data.length + 1, 0);
 
         buf.writeUInt8(mem_addr, 0);
+        data.copy(buf, 1, 0);
 
-        let result;
-        const release = await this.bus.mutex.acquire();
+        await super.write(buf);
+    }
+    async read(mem_addr, count)
+    {
+        if(typeof(mem_addr) !== "number" || mem_addr < 0 || mem_addr > 255)
+            throw new Error("Invalid memory address");
 
-        try
-        {
-            if(this.bus_enable_gpio)
-                await this.bus_enable_gpio.set_value(GPIO.HIGH);
+        if(typeof(count) !== "number" || count < 1)
+            throw new Error("Invalid count");
 
-            await this.bus.i2cWrite(this.ee_addr, buf.length, buf);
+        await super.write(mem_addr);
 
-            buf = Buffer.alloc(count, 0);
-            result = await this.bus.i2cRead(this.ee_addr, count, buf);
-        }
-        finally
-        {
-            try
-            {
-                if(this.bus_enable_gpio)
-                    await this.bus_enable_gpio.set_value(GPIO.LOW);
-            }
-            finally
-            {
-                release();
-            }
-        }
+        return super.read(count);
+    }
+}
 
-        if(!result)
-            throw new Error("I2C Read failed");
+class HPPSU
+{
+    mcu;
+    eeprom;
+    present_gpio;
+    enable_gpio;
 
-        if(result.bytesRead < count)
-            throw new Error("I2C Read failed, expected " + count + " bytes, got " + result.bytesRead);
+    constructor(bus, addr, bus_enable_gpio, present_gpio, enable_gpio)
+    {
+        this.mcu = new HPPSUMCU(bus, addr, bus_enable_gpio);
+        this.eeprom = new HPPSUEEPROM(bus, addr, bus_enable_gpio);
 
-        return result.buffer;
+        this.present_gpio = present_gpio;
+        this.enable_gpio = enable_gpio;
+    }
+
+    async probe()
+    {
+        await this.mcu.probe();
+        await this.eeprom.probe();
     }
 
     async get_spn()
     {
-        return (await this.read_eeprom(0x12, 10)).toString("utf8");
+        return (await this.eeprom.read(0x12, 10)).toString("utf8");
     }
     async get_date()
     {
-        return (await this.read_eeprom(0x1D, 8)).toString("utf8");
+        return (await this.eeprom.read(0x1D, 8)).toString("utf8");
     }
     async get_name()
     {
-        return (await this.read_eeprom(0x32, 26)).toString("utf8");
+        return (await this.eeprom.read(0x32, 26)).toString("utf8");
     }
     async get_ct()
     {
-        return (await this.read_eeprom(0x5B, 14)).toString("utf8");
+        return (await this.eeprom.read(0x5B, 14)).toString("utf8");
     }
 
     async get_id()
     {
-        return await this.read_register(0x00);
+        return await this.mcu.read(0x00);
 
         // 0x2000 - HSTNS-PL18 - 750W
         // 0x2100 - HSTNS-PD11 - 1200W
@@ -224,25 +177,25 @@ class HPPSU
 
     async get_input_voltage()
     {
-        return await this.read_register(0x08) / 32;
+        return await this.mcu.read(0x08) / 32;
     }
     async get_input_current()
     {
-        return await this.read_register(0x0A) / 64;
+        return await this.mcu.read(0x0A) / 64;
     }
     async get_peak_input_current()
     {
-        return await this.read_register(0x34) / 64;
+        return await this.mcu.read(0x34) / 64;
     }
     async clear_peak_input_current()
     {
-        await this.write_register(0x34, 0);
+        await this.mcu.write(0x34, 0);
 
         // write 0x0000 to 0x34 - clear peak input current
     }
     async get_input_power()
     {
-        let ret = await this.read_register(0x0C);
+        let ret = await this.mcu.read(0x0C);
 
         if(ret <= 50)
         {
@@ -256,7 +209,7 @@ class HPPSU
     }
     async get_peak_input_power()
     {
-        let ret = await this.read_register(0x32);
+        let ret = await this.mcu.read(0x32);
 
         if(ret <= 50)
         {
@@ -270,61 +223,65 @@ class HPPSU
     }
     async clear_peak_input_power()
     {
-        await this.write_register(0x32, 0);
+        await this.mcu.write(0x32, 0);
 
         // write 0x0000 to 0x32 - clear peak input power
     }
     async get_input_energy()
     {
-        let lsb = await this.read_register(0x2C);
-        let msb = await this.read_register(0x2E);
+        let lsb = await this.mcu.read(0x2C);
+        let msb = await this.mcu.read(0x2E);
 
         return ((msb << 16) | lsb) / 7200;
     }
     async get_input_undervoltage_threshold()
     {
-        return await this.read_register(0x44) / 32;
+        return await this.mcu.read(0x44) / 32;
     }
     async set_input_undervoltage_threshold(voltage)
     {
         if(voltage < 0 || voltage > 65535/32)
             throw new Error("Voltage threshold out of bounds");
 
-        await this.write_register(0x44, voltage * 32);
+        await this.mcu.write(0x44, voltage * 32);
+
+        // write 0xXXXX to 0x44 - set byte_DATA_A4 bit 1, signal that input UV threshold has changed
     }
     async get_input_overvoltage_threshold()
     {
-        return await this.read_register(0x46) / 32;
+        return await this.mcu.read(0x46) / 32;
     }
     async set_input_overvoltage_threshold(voltage)
     {
         if(voltage < 0 || voltage > 65535/32)
             throw new Error("Voltage threshold out of bounds");
 
-        await this.write_register(0x46, voltage * 32);
+        await this.mcu.write(0x46, voltage * 32);
+
+        // write 0xXXXX to 0x44 - set byte_DATA_A4 bit 2, signal that input OV threshold has changed
     }
 
     async get_output_voltage()
     {
-        return await this.read_register(0x0E) / 256;
+        return await this.mcu.read(0x0E) / 256;
     }
     async get_output_current()
     {
-        return await this.read_register(0x10) / 32;
+        return await this.mcu.read(0x10) / 32;
     }
     async get_peak_output_current()
     {
-        return await this.read_register(0x36) / 32;
+        return await this.mcu.read(0x36) / 32;
     }
     async clear_peak_output_current()
     {
-        await this.write_register(0x36, 0);
+        await this.mcu.write(0x36, 0);
 
         // write 0x0000 to 0x36 - clear peak output current
     }
     async get_output_power()
     {
-        let ret = await this.read_register(0x12) * 2;
+        let ret = await this.mcu.read(0x12) * 2;
 
         if(ret <= 72)
         {
@@ -338,79 +295,83 @@ class HPPSU
     }
     async get_output_undervoltage_threshold()
     {
-        return await this.read_register(0x48) / 256;
+        return await this.mcu.read(0x48) / 256;
     }
     async set_output_undervoltage_threshold(voltage)
     {
         if(voltage < 0 || voltage > 65535/256)
             throw new Error("Voltage threshold out of bounds");
 
-        await this.write_register(0x48, voltage * 256);
+        await this.mcu.write(0x48, voltage * 256);
+
+        // write 0xXXXX to 0x48 - set byte_DATA_A4 bit 3, signal that output UV threshold has changed
     }
     async get_output_overvoltage_threshold()
     {
-        return await this.read_register(0x4A) / 256;
+        return await this.mcu.read(0x4A) / 256;
     }
     async set_output_overvoltage_threshold(voltage)
     {
         if(voltage < 0 || voltage > 65535/256)
             throw new Error("Voltage threshold out of bounds");
 
-        await this.write_register(0x4A, voltage * 256);
+        await this.mcu.write(0x4A, voltage * 256);
+
+        // write 0xXXXX to 0x4A - set byte_DATA_A4 bit 4, signal that output OV threshold has changed
     }
 
     async get_intake_temperature()
     {
-        return await this.read_register(0x1A) / 64;
+        return await this.mcu.read(0x1A) / 64;
     }
     async get_internal_temperature()
     {
-        return await this.read_register(0x1C) / 64;
+        return await this.mcu.read(0x1C) / 64;
     }
 
     async get_fan_speed()
     {
-        return await this.read_register(0x1E);
+        return await this.mcu.read(0x1E);
     }
     async get_fan_target_speed()
     {
-        return await this.read_register(0x40);
+        return await this.mcu.read(0x40);
     }
     async set_fan_target_speed(rpm)
     {
-        await this.write_register(0x40, rpm);
+        await this.mcu.write(0x40, rpm);
 
         // write 0xXXXX to 0x40 - set surprise_more_flags bit 5, probably signal that fan speed has changed
     }
 
     async get_total_on_time()
     {
-        let xlsb = await this.read_mcu_eeprom(0x19);
-        let lsb = await this.read_mcu_eeprom(0x1A);
-        let msb = await this.read_mcu_eeprom(0x1B);
+        let xlsb = await this.mcu.read_eeprom(0x19);
+        let lsb = await this.mcu.read_eeprom(0x1A);
+        let msb = await this.mcu.read_eeprom(0x1B);
 
         return (msb << 16) | (lsb << 8) | xlsb;
     }
     async get_on_time()
     {
-        return await this.read_register(0x30) / 2;
+        return await this.mcu.read(0x30) / 2;
     }
     async clear_on_time_and_energy()
     {
-        await this.write_register(0x30, 0);
+        await this.mcu.write(0x30, 0);
 
         // write 0x0000 to 0x30 - set i2c_flags1 bit 2 and 7 (requests clear of on_time and energy)
     }
 
     async get_status_flags()
     {
-        return await this.read_register(0x02);
+        return await this.mcu.read(0x02);
 
         // Bit 0 - Main output enabled
         // Bit 1 - Seems to indicate whether input voltage is present, something like ready flag (?)
         // Bit 2 - #ENABLE pin status inverted
         // Bit 4 - Is always set but is not mentioned in disassembly (?)
-        // Bit 9-8 - 00: Invalid input voltage, 01: xxx V < Input voltage < 108V (100V nominal), 10: 108V < Input voltage < 132V (120V/127V nominal), 11: 179V < Input voltage < 264V (230V nominal)
+        // Bit 9-8 - 00: Invalid input voltage, 01: Input voltage < 108V (100V nominal), 10: 108V < Input voltage < 132V (120V/127V nominal), 11: 179V < Input voltage < 264V (230V nominal)
     }
 
     async is_main_output_enabled()
@@ -423,10 +384,13 @@ class HPPSU
     }
 
     /*
-    write 0xXXXX to 0x3A - set yet_more_flags bit 5, check written data bit 5 is clear, ...TODO
+    write 0xXXXX to 0x3A - set yet_more_flags bit 5, check written data bit 5 is clear, ...TODO: check asm label cmd_not_4b
     write 0xXXXX (not zero) to 0x3C - set yet_more_flags bit 7, set interesting_ctrl_byte_set_cmd3b, bit 6, copy written data to written_by_cmd_3d
 
-    write 0xXXXX to 0x54 - set some_major_flags bit 5
+    write 0xXXXX to 0x50 - writes value to byte_DATA_EE and byte_DATA_EF // Related to temperature, maybe "warning" threshold
+    write 0xXXXX to 0x52 - writes value to byte_DATA_A5 and byte_DATA_A6 // Related to temperature, maybe "critical" threshold
+
+    write 0xXXXX to 0x54 - writes value to counter_for_eeprom_logging (LSB) and tag_for_eeprom_logging (MSB), set some_major_flags bit 5
 
     eeprom at address 0x1F has 0x2E
     */

@@ -1,10 +1,7 @@
-const GPIO = require.main.require("./lib/gpio");
+const { I2C, I2CDevice} = require.main.require("./lib/i2c");
 
-class BME280
+class BME280 extends I2CDevice
 {
-    bus;
-    bus_enable_gpio;
-    addr;
     calibration = {
         read: false,
         T1: undefined,
@@ -29,50 +26,61 @@ class BME280
 
     constructor(bus, addr, bus_enable_gpio)
     {
-        this.bus = bus;
-        this.bus_enable_gpio = bus_enable_gpio;
-
-        this.addr = 0x76 | (addr & 0x01);
+        if(bus instanceof I2CDevice)
+            super(bus.bus, bus.addr, bus.bus_enable_gpio);
+        else
+            super(bus, 0x76 | (addr & 0x01), bus_enable_gpio);
 
         this.calibration.read = false;
     }
 
     async probe()
     {
-        const release = await this.bus.mutex.acquire();
-
-        try
-        {
-            if(this.bus_enable_gpio)
-                await this.bus_enable_gpio.set_value(GPIO.HIGH);
-
-            if((await this.bus.scan(this.addr)).indexOf(this.addr) === -1)
-                throw new Error("Could not find BME280 at address 0x" + this.addr.toString(16));
-        }
-        finally
-        {
-            try
-            {
-                if(this.bus_enable_gpio)
-                    await this.bus_enable_gpio.set_value(GPIO.LOW);
-            }
-            finally
-            {
-                release();
-            }
-        }
+        await super.probe();
 
         let id = await this.get_chip_id();
 
         if(id !== 0x60)
             throw new Error("Unknown BME280 chip ID 0x" + id.toString(16));
+    }
 
-        return true;
+    async write(reg, data)
+    {
+        if(typeof(reg) !== "number" || reg < 0 || reg > 255)
+            throw new Error("Invalid register");
+
+        if(typeof(data) === "number")
+            data = [data];
+
+        if(Array.isArray(data))
+            data = Buffer.from(data);
+
+        if(!(data instanceof Buffer))
+            throw new Error("Invalid data");
+
+        let buf = Buffer.alloc(data.length + 1, 0);
+
+        buf.writeUInt8(reg, 0);
+        data.copy(buf, 1, 0);
+
+        await super.write(buf);
+    }
+    async read(reg, count = 1)
+    {
+        if(typeof(reg) !== "number" || reg < 0 || reg > 255)
+            throw new Error("Invalid register");
+
+        if(typeof(count) !== "number" || count < 1)
+            throw new Error("Invalid count");
+
+        await super.write(reg);
+
+        return super.read(count);
     }
 
     async read_calibration()
     {
-        let buf = await this.read_burst(0x88, 26);
+        let buf = await this.read(0x88, 26);
 
         this.calibration.T1 = buf.readUInt16LE(0);
         this.calibration.T2 = buf.readInt16LE(2);
@@ -90,7 +98,7 @@ class BME280
 
         this.calibration.H1 = buf.readUInt8(25);
 
-        buf = await this.read_burst(0xE1, 7);
+        buf = await this.read(0xE1, 7);
 
         this.calibration.H2 = buf.readInt16LE(0);
         this.calibration.H3 = buf.readUInt8(2);
@@ -99,88 +107,6 @@ class BME280
         this.calibration.H6 = buf.readInt8(6);
 
         this.calibration.read = true;
-    }
-
-    async write_burst(reg, data)
-    {
-        let buf = Buffer.alloc(data.length + 1, 0);
-
-        buf.writeUInt8(reg, 0);
-
-        for(let i = 0; i < data.length; i++)
-            buf.writeUInt8(data[i], i + 1);
-
-        const release = await this.bus.mutex.acquire();
-
-        try
-        {
-            if(this.bus_enable_gpio)
-                await this.bus_enable_gpio.set_value(GPIO.HIGH);
-
-            await this.bus.i2cWrite(this.addr, buf.length, buf);
-        }
-        finally
-        {
-            try
-            {
-                if(this.bus_enable_gpio)
-                    await this.bus_enable_gpio.set_value(GPIO.LOW);
-            }
-            finally
-            {
-                release();
-            }
-        }
-    }
-    async write_register(reg, data)
-    {
-        await this.write_burst(reg, [data]);
-    }
-    async read_burst(reg, count)
-    {
-        let buf = Buffer.alloc(1, 0);
-
-        buf.writeUInt8(reg, 0);
-
-        let result;
-        const release = await this.bus.mutex.acquire();
-
-        try
-        {
-            if(this.bus_enable_gpio)
-                await this.bus_enable_gpio.set_value(GPIO.HIGH);
-
-            await this.bus.i2cWrite(this.addr, buf.length, buf);
-
-            buf = Buffer.alloc(count, 0);
-            result = await this.bus.i2cRead(this.addr, count, buf);
-        }
-        finally
-        {
-            try
-            {
-                if(this.bus_enable_gpio)
-                    await this.bus_enable_gpio.set_value(GPIO.LOW);
-            }
-            finally
-            {
-                release();
-            }
-        }
-
-        if(!result)
-            throw new Error("I2C Read failed");
-
-        if(result.bytesRead < count)
-            throw new Error("I2C Read failed, expected " + count + " bytes, got " + result.bytesRead);
-
-        return result.buffer;
-    }
-    async read_register(reg)
-    {
-        let buf = await this.read_burst(reg, 1);
-
-        return buf.readUInt8(0);
     }
 
     async config(os, filter, standby)
@@ -305,49 +231,51 @@ class BME280
             break;
         }
 
-        await this.write_register(0xF2, ctrl_hum);
-        await this.write_register(0xF4, ctrl_meas);
-        await this.write_register(0xF5, config);
+        await this.write(0xF2, ctrl_hum);
+        await this.write(0xF4, ctrl_meas);
+        await this.write(0xF5, config);
     }
     async measure(forced)
     {
-        let config = await this.read_register(0xF4);
+        let config = await this.read(0xF4);
 
         if(!forced)
         {
-            return await this.write_register(0xF4, (config & 0xFC) | 0x03);
+            await this.write(0xF4, (config & 0xFC) | 0x03);
+
+            return;
         }
         else
         {
-            await this.write_register(0xF4, (config & 0xFC) | 0x01);
+            await this.write(0xF4, (config & 0xFC) | 0x01);
 
-            //while(((await this.read_register(0xF4)) & 0x03) != 0x00);
+            //while(((await this.read(0xF4)) & 0x03) != 0x00);
         }
 
-        while((await this.read_register(0xF3)) & 0x08);
+        while((await this.read(0xF3)) & 0x08);
     }
     async sleep()
     {
-        let config = await this.read_register(0xF4);
+        let config = await this.read(0xF4);
 
-        await this.write_register(0xF4, config & 0xFC);
+        await this.write(0xF4, config & 0xFC);
     }
     async get_status()
     {
-        return await this.read_register(0xF3);
+        return this.read(0xF3);
     }
     async get_chip_id()
     {
-        return await this.read_register(0xD0);
+        return this.read(0xD0);
     }
     async reset()
     {
-        await this.write_register(0xE0, 0xB6);
+        await this.write(0xE0, 0xB6);
     }
 
     async get_data()
     {
-        let buf = await this.read_burst(0xF7, 8);
+        let buf = await this.read(0xF7, 8);
 
         // Temperature
         let adc_T = ((buf.readUInt8(3) << 8 | buf.readUInt8(4)) << 8 | buf.readUInt8(5)) >> 4;

@@ -51,12 +51,7 @@ class GPIO
     pin;
     index;
     path;
-    event = {
-        timer: null,
-        callback: null,
-        value: GPIO.LOW,
-        last_value: GPIO.LOW
-    };
+    event;
     exported;
 
     constructor(pin, index)
@@ -64,6 +59,12 @@ class GPIO
         this.pin = pin;
         this.index = index;
         this.path = GPIO.root_path + "gpio" + index + "/";
+        this.event = {
+            timer: null,
+            callback: null,
+            value: GPIO.LOW,
+            last_value: GPIO.LOW
+        };
         this.exported = true;
     }
 

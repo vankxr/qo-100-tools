@@ -1,144 +1,64 @@
-const GPIO = require.main.require("./lib/gpio");
+const { I2C, I2CDevice} = require.main.require("./lib/i2c");
 
-class RelayController
+class RelayController extends I2CDevice
 {
-    bus;
-    bus_enable_gpio;
-    addr;
-
     constructor(bus, bus_enable_gpio)
     {
-        this.bus = bus;
-        this.bus_enable_gpio = bus_enable_gpio;
-
-        this.addr = 0x33;
+        if(bus instanceof I2CDevice)
+            super(bus.bus, bus.addr, bus.bus_enable_gpio);
+        else
+            super(bus, 0x33, bus_enable_gpio);
     }
 
-    async probe()
+    async write(reg, data)
     {
-        const release = await this.bus.mutex.acquire();
+        if(typeof(reg) !== "number" || reg < 0 || reg > 255)
+            throw new Error("Invalid register");
 
-        try
-        {
-            if(this.bus_enable_gpio)
-                await this.bus_enable_gpio.set_value(GPIO.HIGH);
+        if(typeof(data) === "number")
+            data = [data];
 
-            if((await this.bus.scan(this.addr)).indexOf(this.addr) === -1)
-                throw new Error("Could not find RelayController at address 0x" + this.addr.toString(16));
-        }
-        finally
-        {
-            try
-            {
-                if(this.bus_enable_gpio)
-                    await this.bus_enable_gpio.set_value(GPIO.LOW);
-            }
-            finally
-            {
-                release();
-            }
-        }
+        if(Array.isArray(data))
+            data = Buffer.from(data);
 
-        return true;
-    }
+        if(!(data instanceof Buffer))
+            throw new Error("Invalid data");
 
-    async write_burst(reg, data)
-    {
         let buf = Buffer.alloc(data.length + 1, 0);
 
         buf.writeUInt8(reg, 0);
+        data.copy(buf, 1, 0);
 
-        for(let i = 0; i < data.length; i++)
-            buf.writeUInt8(data[i], i + 1);
-
-        const release = await this.bus.mutex.acquire();
-
-        try
-        {
-            if(this.bus_enable_gpio)
-                await this.bus_enable_gpio.set_value(GPIO.HIGH);
-
-            await this.bus.i2cWrite(this.addr, buf.length, buf);
-        }
-        finally
-        {
-            try
-            {
-                if(this.bus_enable_gpio)
-                    await this.bus_enable_gpio.set_value(GPIO.LOW);
-            }
-            finally
-            {
-                release();
-            }
-        }
+        await super.write(buf);
     }
-    async write_register(reg, data)
+    async read(reg, count = 1)
     {
-        await this.write_burst(reg, [data]);
-    }
-    async read_burst(reg, count)
-    {
-        let buf = Buffer.alloc(1, 0);
+        if(typeof(reg) !== "number" || reg < 0 || reg > 255)
+            throw new Error("Invalid register");
 
-        buf.writeUInt8(reg, 0);
+        if(typeof(count) !== "number" || count < 1)
+            throw new Error("Invalid count");
 
-        let result;
-        const release = await this.bus.mutex.acquire();
+        await super.write(reg);
 
-        try
-        {
-            if(this.bus_enable_gpio)
-                await this.bus_enable_gpio.set_value(GPIO.HIGH);
-
-            await this.bus.i2cWrite(this.addr, buf.length, buf);
-
-            buf = Buffer.alloc(count, 0);
-            result = await this.bus.i2cRead(this.addr, count, buf);
-        }
-        finally
-        {
-            try
-            {
-                if(this.bus_enable_gpio)
-                    await this.bus_enable_gpio.set_value(GPIO.LOW);
-            }
-            finally
-            {
-                release();
-            }
-        }
-
-        if(!result)
-            throw new Error("I2C Read failed");
-
-        if(result.bytesRead < count)
-            throw new Error("I2C Read failed, expected " + count + " bytes, got " + result.bytesRead);
-
-        return result.buffer;
-    }
-    async read_register(reg)
-    {
-        let buf = await this.read_burst(reg, 1);
-
-        return buf.readUInt8(0);
+        return super.read(count);
     }
 
     async get_unique_id()
     {
-        let buf = await this.read_burst(0xF8, 8);
+        let buf = await this.read(0xF8, 8);
 
         return buf.readUInt32LE(4) + "-" + buf.readUInt32LE(0);
     }
     async get_software_version()
     {
-        let buf = await this.read_burst(0xF4, 2);
+        let buf = await this.read(0xF4, 2);
 
         return buf.readUInt16LE(0);
     }
     async get_chip_temperatures()
     {
-        let buf = await this.read_burst(0xE0, 8);
+        let buf = await this.read(0xE0, 8);
 
         return {
             emu: buf.readFloatLE(0),
@@ -147,7 +67,7 @@ class RelayController
     }
     async get_chip_voltages()
     {
-        let buf = await this.read_burst(0xD0, 16);
+        let buf = await this.read(0xD0, 16);
 
         return {
             avdd: buf.readFloatLE(0),
@@ -158,7 +78,7 @@ class RelayController
     }
     async get_system_voltages()
     {
-        let buf = await this.read_burst(0xC0, 4);
+        let buf = await this.read(0xC0, 4);
 
         return {
             vin: buf.readFloatLE(0)

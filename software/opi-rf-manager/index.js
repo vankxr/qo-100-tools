@@ -1,15 +1,18 @@
 const FileSystem = require("fs").promises;
 const Mutex = require('async-mutex').Mutex;
 const GPIO = require("./lib/gpio");
-const I2C = require("i2c-bus");
+const { I2C, I2CDevice} = require("./lib/i2c");
+const { OneWire, OneWireDevice } = require("./lib/onewire");
 const IPMA = require("./lib/ipma");
 const HPPSU = require("./lib/hppsu");
+const DS2484 = require("./lib/ds2484");
 const BME280 = require("./lib/bme280");
 const MCP3221 = require("./lib/mcp3221");
 const MCP3421 = require("./lib/mcp3421");
 const MCP23008 = require("./lib/mcp23008");
 const MCP23017 = require("./lib/mcp23017");
 const LTC5597 = require("./lib/ltc5597");
+const DS18B20 = require("./lib/ds18b20");
 const RelayController = require("./lib/relay_controller");
 const Logger = require("./util/logger");
 const delay = require("./util/delay");
@@ -48,12 +51,77 @@ async function main()
 
     // Communication Interfaces
     const I2C_BUS = [
-        await I2C.openPromisified(0),
-        await I2C.openPromisified(1)
+        await I2C.open(0),
+        await I2C.open(1)
     ];
 
-    I2C_BUS[0].mutex = new Mutex();
-    I2C_BUS[1].mutex = new Mutex();
+    // One Wire bus enumeration
+    const OW_CONTROLLERS = [
+        new DS2484(I2C_BUS[0])
+    ];
+    const OW_BUS = [null];
+
+    let DS18B20_SENSORS = [];
+
+    for(let i = 0; i < OW_CONTROLLERS.length; i++)
+    {
+        try
+        {
+            await OW_CONTROLLERS[i].probe();
+        }
+        catch (e)
+        {
+            el.ctprint("red", null, e);
+
+            continue;
+        }
+
+        cl.ctprint("green", null, "DS2484 #%d found!", i);
+
+        OW_CONTROLLERS[i].config();
+
+        OW_BUS[i] = OW_CONTROLLERS[i].get_ow_bus();
+        OW_BUS[i].mutex = new Mutex();
+
+        let devices;
+
+        try
+        {
+            devices = await OW_BUS[i].scan();
+        }
+        catch (e)
+        {
+            el.ctprint("red", null, "Error scanning OneWire bus %d: " + e, i);
+
+            continue;
+        }
+
+        cl.ctprint(devices.length > 0 ? null : "yellow", null, "  Found %d devices on OneWire bus %d:", devices.length, i);
+
+        for(device of devices)
+        {
+            cl.ctprint(null, null, "    %s", device);
+
+            if(device.get_family_name() == "DS18B20")
+            {
+                let i = DS18B20_SENSORS.length;
+
+                cl.ctprint("green", null, "      DS18B20 #%d found!", i);
+
+                let sensor = new DS18B20(device);
+
+                DS18B20_SENSORS.push(sensor);
+
+                await sensor.config(12);
+                await sensor.measure();
+
+                cl.ctprint(null, null, "        DS18B20 #%d Temperature: %d C", i, await sensor.get_temperature());
+                cl.ctprint(null, null, "        DS18B20 #%d High Alarm Temperature: %d C", i, (await sensor.get_alarm()).high);
+                cl.ctprint(null, null, "        DS18B20 #%d Low Alarm Temperature: %d C", i, (await sensor.get_alarm()).low);
+                cl.ctprint(null, null, "        DS18B20 #%d Parasidic powered: %s", i, await sensor.is_parasidic_power());
+            }
+        }
+    }
 
     // IPMA
     let ipma_station = null;
@@ -116,7 +184,7 @@ async function main()
 
         let sea_hpa = (await IPMA0.get_latest_surface_observation()).pressao;
 
-        cl.ctprint(null, null, "IPMA Sea pressure: %d hPa", sea_hpa);
+        cl.ctprint(null, null, "  IPMA Sea pressure: %d hPa", sea_hpa);
 
         BME280.set_sea_pressure(sea_hpa);
     }
@@ -158,12 +226,12 @@ async function main()
         );
         await BME[i].measure(false);
 
-        cl.ctprint(null, null, "BME280 #%d Temperature: %d C", i, await BME[i].get_temperature());
-        cl.ctprint(null, null, "BME280 #%d Humidity: %d %%RH", i, await BME[i].get_humidity());
-        cl.ctprint(null, null, "BME280 #%d Pressure: %d hPa", i, await BME[i].get_pressure());
-        cl.ctprint(null, null, "BME280 #%d Dew point: %d C", i, await BME[i].get_dew_point());
-        cl.ctprint(null, null, "BME280 #%d Heat index: %d C", i, await BME[i].get_heat_index());
-        cl.ctprint(null, null, "BME280 #%d Altitude: %d m", i, await BME[i].get_altitude());
+        cl.ctprint(null, null, "  BME280 #%d Temperature: %d C", i, await BME[i].get_temperature());
+        cl.ctprint(null, null, "  BME280 #%d Humidity: %d %%RH", i, await BME[i].get_humidity());
+        cl.ctprint(null, null, "  BME280 #%d Pressure: %d hPa", i, await BME[i].get_pressure());
+        cl.ctprint(null, null, "  BME280 #%d Dew point: %d C", i, await BME[i].get_dew_point());
+        cl.ctprint(null, null, "  BME280 #%d Heat index: %d C", i, await BME[i].get_heat_index());
+        cl.ctprint(null, null, "  BME280 #%d Altitude: %d m", i, await BME[i].get_altitude());
     }
 
     // MCP3221
@@ -186,7 +254,7 @@ async function main()
 
         cl.ctprint("green", null, "MCP3221 #%d found!", i);
 
-        cl.ctprint(null, null, "MCP3221 #%d Voltage: %d mV", i, (await ADC[i].get_voltage(50)) / (21 / (21 + 147)));
+        cl.ctprint(null, null, "  MCP3221 #%d Voltage: %d mV", i, (await ADC[i].get_voltage(50)) / (21 / (21 + 147)));
     }
 
     // LTC5597 (RFPowerMeter with MCP3421 ADC)
@@ -248,7 +316,7 @@ async function main()
 
         await RFPowerMeter[i].config(14, true);
 
-        cl.ctprint(null, null, "RFPowerMeter #%d Power: %d dBm", i, await RFPowerMeter[i].get_power_level(2, 3));
+        cl.ctprint(null, null, "  RFPowerMeter #%d Power: %d dBm", i, await RFPowerMeter[i].get_power_level(2, 3));
     }
 
     // Relay Controller
@@ -271,15 +339,15 @@ async function main()
 
         cl.ctprint("green", null, "Relay Controller #%d found!", i);
 
-        cl.ctprint(null, null, "Relay Controller #%d Unique ID: %s", i, await RelayCon[i].get_unique_id());
-        cl.ctprint(null, null, "Relay Controller #%d Software Version: v%d", i, await RelayCon[i].get_software_version());
-        cl.ctprint(null, null, "Relay Controller #%d AVDD Voltage: %d mV", i, (await RelayCon[i].get_chip_voltages()).avdd);
-        cl.ctprint(null, null, "Relay Controller #%d DVDD Voltage: %d mV", i, (await RelayCon[i].get_chip_voltages()).dvdd);
-        cl.ctprint(null, null, "Relay Controller #%d IOVDD Voltage: %d mV", i, (await RelayCon[i].get_chip_voltages()).iovdd);
-        cl.ctprint(null, null, "Relay Controller #%d Core Voltage: %d mV", i, (await RelayCon[i].get_chip_voltages()).core);
-        cl.ctprint(null, null, "Relay Controller #%d VIN Voltage: %d mV", i, (await RelayCon[i].get_system_voltages()).vin);
-        cl.ctprint(null, null, "Relay Controller #%d ADC Temperature: %d C", i, (await RelayCon[i].get_chip_temperatures()).adc);
-        cl.ctprint(null, null, "Relay Controller #%d EMU Temperature: %d C", i, (await RelayCon[i].get_chip_temperatures()).emu);
+        cl.ctprint(null, null, "  Relay Controller #%d Unique ID: %s", i, await RelayCon[i].get_unique_id());
+        cl.ctprint(null, null, "  Relay Controller #%d Software Version: v%d", i, await RelayCon[i].get_software_version());
+        cl.ctprint(null, null, "  Relay Controller #%d AVDD Voltage: %d mV", i, (await RelayCon[i].get_chip_voltages()).avdd);
+        cl.ctprint(null, null, "  Relay Controller #%d DVDD Voltage: %d mV", i, (await RelayCon[i].get_chip_voltages()).dvdd);
+        cl.ctprint(null, null, "  Relay Controller #%d IOVDD Voltage: %d mV", i, (await RelayCon[i].get_chip_voltages()).iovdd);
+        cl.ctprint(null, null, "  Relay Controller #%d Core Voltage: %d mV", i, (await RelayCon[i].get_chip_voltages()).core);
+        cl.ctprint(null, null, "  Relay Controller #%d VIN Voltage: %d mV", i, (await RelayCon[i].get_system_voltages()).vin);
+        cl.ctprint(null, null, "  Relay Controller #%d ADC Temperature: %d C", i, (await RelayCon[i].get_chip_temperatures()).adc);
+        cl.ctprint(null, null, "  Relay Controller #%d EMU Temperature: %d C", i, (await RelayCon[i].get_chip_temperatures()).emu);
     }
 
     // PSU GPIO Controlers
@@ -355,32 +423,32 @@ async function main()
 
         //await PSU[i].set_enable(true);
 
-        cl.ctprint(null, null, "PSU #%d ID: 0x%s", i, (await PSU[i].get_id()).toString(16));
-        cl.ctprint(null, null, "PSU #%d SPN: %s", i, await PSU[i].get_spn());
-        cl.ctprint(null, null, "PSU #%d Date: %s", i, await PSU[i].get_date());
-        cl.ctprint(null, null, "PSU #%d Name: %s", i, await PSU[i].get_name());
-        cl.ctprint(null, null, "PSU #%d CT: %s", i, await PSU[i].get_ct());
-        cl.ctprint(null, null, "-------------------------------------");
-        cl.ctprint(null, null, "PSU #%d Input Voltage: %d V", i, await PSU[i].get_input_voltage());
-        cl.ctprint(null, null, "PSU #%d Input Undervoltage threshold: %d V", i, await PSU[i].get_input_undervoltage_threshold());
-        cl.ctprint(null, null, "PSU #%d Input Overvoltage threshold: %d V", i, await PSU[i].get_input_overvoltage_threshold());
-        cl.ctprint(null, null, "PSU #%d Input Current: %d A (max. %d A)", i, await PSU[i].get_input_current(), await PSU[i].get_peak_input_current());
-        cl.ctprint(null, null, "PSU #%d Input Power: %d W (max. %d W)", i, await PSU[i].get_input_power(), await PSU[i].get_peak_input_power());
-        cl.ctprint(null, null, "PSU #%d Input Energy: %d Wh", i, await PSU[i].get_input_energy());
-        cl.ctprint(null, null, "PSU #%d Output Voltage: %d V", i, await PSU[i].get_output_voltage());
-        cl.ctprint(null, null, "PSU #%d Output Undervoltage threshold: %d V", i, await PSU[i].get_output_undervoltage_threshold());
-        cl.ctprint(null, null, "PSU #%d Output Overvoltage threshold: %d V", i, await PSU[i].get_output_overvoltage_threshold());
-        cl.ctprint(null, null, "PSU #%d Output Current: %d A (max. %d A)", i, await PSU[i].get_output_current(), await PSU[i].get_peak_output_current());
-        cl.ctprint(null, null, "PSU #%d Output Power: %d W", i, await PSU[i].get_output_power());
-        cl.ctprint(null, null, "PSU #%d Intake Temperature: %d C", i, await PSU[i].get_intake_temperature());
-        cl.ctprint(null, null, "PSU #%d Internal Temperature: %d C", i, await PSU[i].get_internal_temperature());
-        cl.ctprint(null, null, "PSU #%d Fan speed: %d RPM", i, await PSU[i].get_fan_speed());
-        cl.ctprint(null, null, "PSU #%d Fan target speed: %d RPM", i, await PSU[i].get_fan_target_speed());
-        cl.ctprint(null, null, "PSU #%d On time: %d s", i, await PSU[i].get_on_time());
-        cl.ctprint(null, null, "PSU #%d Total on time: %d days", i, await PSU[i].get_total_on_time() / 60 / 24);
-        cl.ctprint(null, null, "PSU #%d Status flags: 0x%s", i, (await PSU[i].get_status_flags()).toString(16));
-        cl.ctprint(null, null, "PSU #%d ON: %s", i, await PSU[i].is_main_output_enabled());
-        cl.ctprint(null, null, "PSU #%d Input Present: %s", i, await PSU[i].is_input_present());
+        cl.ctprint(null, null, "  PSU #%d ID: 0x%s", i, (await PSU[i].get_id()).toString(16));
+        cl.ctprint(null, null, "  PSU #%d SPN: %s", i, await PSU[i].get_spn());
+        cl.ctprint(null, null, "  PSU #%d Date: %s", i, await PSU[i].get_date());
+        cl.ctprint(null, null, "  PSU #%d Name: %s", i, await PSU[i].get_name());
+        cl.ctprint(null, null, "  PSU #%d CT: %s", i, await PSU[i].get_ct());
+        cl.ctprint(null, null, "  -------------------------------------");
+        cl.ctprint(null, null, "  PSU #%d Input Voltage: %d V", i, await PSU[i].get_input_voltage());
+        cl.ctprint(null, null, "  PSU #%d Input Undervoltage threshold: %d V", i, await PSU[i].get_input_undervoltage_threshold());
+        cl.ctprint(null, null, "  PSU #%d Input Overvoltage threshold: %d V", i, await PSU[i].get_input_overvoltage_threshold());
+        cl.ctprint(null, null, "  PSU #%d Input Current: %d A (max. %d A)", i, await PSU[i].get_input_current(), await PSU[i].get_peak_input_current());
+        cl.ctprint(null, null, "  PSU #%d Input Power: %d W (max. %d W)", i, await PSU[i].get_input_power(), await PSU[i].get_peak_input_power());
+        cl.ctprint(null, null, "  PSU #%d Input Energy: %d Wh", i, await PSU[i].get_input_energy());
+        cl.ctprint(null, null, "  PSU #%d Output Voltage: %d V", i, await PSU[i].get_output_voltage());
+        cl.ctprint(null, null, "  PSU #%d Output Undervoltage threshold: %d V", i, await PSU[i].get_output_undervoltage_threshold());
+        cl.ctprint(null, null, "  PSU #%d Output Overvoltage threshold: %d V", i, await PSU[i].get_output_overvoltage_threshold());
+        cl.ctprint(null, null, "  PSU #%d Output Current: %d A (max. %d A)", i, await PSU[i].get_output_current(), await PSU[i].get_peak_output_current());
+        cl.ctprint(null, null, "  PSU #%d Output Power: %d W", i, await PSU[i].get_output_power());
+        cl.ctprint(null, null, "  PSU #%d Intake Temperature: %d C", i, await PSU[i].get_intake_temperature());
+        cl.ctprint(null, null, "  PSU #%d Internal Temperature: %d C", i, await PSU[i].get_internal_temperature());
+        cl.ctprint(null, null, "  PSU #%d Fan speed: %d RPM", i, await PSU[i].get_fan_speed());
+        cl.ctprint(null, null, "  PSU #%d Fan target speed: %d RPM", i, await PSU[i].get_fan_target_speed());
+        cl.ctprint(null, null, "  PSU #%d On time: %d s", i, await PSU[i].get_on_time());
+        cl.ctprint(null, null, "  PSU #%d Total on time: %d days", i, await PSU[i].get_total_on_time() / 60 / 24);
+        cl.ctprint(null, null, "  PSU #%d Status flags: 0x%s", i, (await PSU[i].get_status_flags()).toString(16));
+        cl.ctprint(null, null, "  PSU #%d ON: %s", i, await PSU[i].is_main_output_enabled());
+        cl.ctprint(null, null, "  PSU #%d Input Present: %s", i, await PSU[i].is_input_present());
 
         await PSU[i].set_fan_target_speed(0);
         await PSU[i].set_enable(false);
