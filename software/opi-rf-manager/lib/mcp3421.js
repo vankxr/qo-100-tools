@@ -3,12 +3,25 @@ const { I2C, I2CDevice} = require.main.require("./lib/i2c");
 
 class MCP3421 extends I2CDevice
 {
+    scale_factor;
+
     constructor(bus, addr, bus_enable_gpio)
     {
         if(bus instanceof I2CDevice)
             super(bus.bus, bus.addr, bus.bus_enable_gpio);
         else
             super(bus, 0x68 | (addr & 0x07), bus_enable_gpio);
+
+        this.scale_factor = 1;
+    }
+
+    set_scale_factor(scale_factor)
+    {
+        this.scale_factor = scale_factor;
+    }
+    get_scale_factor()
+    {
+        return this.scale_factor;
     }
 
     async read_burst()
@@ -114,7 +127,7 @@ class MCP3421 extends I2CDevice
 
         accum /= samples;
 
-        return accum;
+        return accum * this.scale_factor;
     }
 }
 

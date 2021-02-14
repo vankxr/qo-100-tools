@@ -62,6 +62,7 @@ class GPIO
         this.event = {
             timer: null,
             callback: null,
+            args: [],
             value: GPIO.LOW,
             last_value: GPIO.LOW
         };
@@ -148,7 +149,7 @@ class GPIO
         return value;
     }
 
-    async enable_event_polling(value, interval, callback)
+    async enable_event_polling(value, interval, callback, ...args)
     {
         if(this.event.timer)
             throw new Error("Event polling already enabled, disable first");
@@ -162,7 +163,8 @@ class GPIO
         if(interval < 0)
             throw new Error("Invalid interval");
 
-        this.event.callback = callback;
+        this.event.callback = callback.bind(this);
+        this.event.args = args;
         this.event.last_value = await this.get_value();
         this.event.value = value;
         this.event.timer = setInterval(this.poll, interval);
@@ -175,6 +177,8 @@ class GPIO
         clearInterval(this.event.timer);
 
         this.event.timer = null;
+        this.event.callback = null;
+        this.event.args = [];
     }
 
     async poll()
@@ -188,13 +192,13 @@ class GPIO
                 this.event.last_value = value;
 
                 if((this.event.value === GPIO.ANY || value === this.event.value) && typeof(this.event.callback) == "function")
-                    this.event.callback(null, value);
+                    this.event.callback(null, value, ...this.event.args);
             }
         }
         catch (e)
         {
             if(typeof(this.event.callback) == "function")
-                this.event.callback(e);
+                this.event.callback(e, null, ...this.event.args);
         }
     }
 }

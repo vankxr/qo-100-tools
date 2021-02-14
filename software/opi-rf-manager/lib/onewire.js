@@ -1,4 +1,5 @@
 const Util = require("util");
+const Mutex = require('async-mutex').Mutex;
 
 class OneWireDevice
 {
@@ -136,9 +137,11 @@ class OneWireDevice
 }
 class OneWire
 {
+    mutex;
+
     constructor()
     {
-
+        this.mutex = new Mutex();
     }
 
     async reset()

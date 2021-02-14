@@ -8,7 +8,8 @@ class IPMA
             host: "api.ipma.pt",
             port: 443,
             path: "/open-data/observation/meteorology/stations/stations.json",
-            method: "GET"
+            method: "GET",
+            timeout: 5000
         };
 
         let res = await https_request(req_options);
@@ -27,7 +28,8 @@ class IPMA
             host: "api.ipma.pt",
             port: 443,
             path: "/open-data/distrits-islands.json",
-            method: "GET"
+            method: "GET",
+            timeout: 5000
         };
 
         let res = await https_request(req_options);
@@ -67,7 +69,8 @@ class IPMA
             host: "api.ipma.pt",
             port: 443,
             path: "/open-data/forecast/meteorology/cities/daily/hp-daily-forecast-day" + day + ".json",
-            method: "GET"
+            method: "GET",
+            timeout: 5000
         };
 
         let res = await https_request(req_options);
@@ -109,7 +112,8 @@ class IPMA
             host: "api.ipma.pt",
             port: 443,
             path: "/open-data/observation/meteorology/stations/obs-surface.geojson",
-            method: "GET"
+            method: "GET",
+            timeout: 5000
         };
 
         let res = await https_request(req_options);
@@ -179,7 +183,8 @@ class IPMA
             host: "api.ipma.pt",
             port: 443,
             path: "/open-data/observation/meteorology/stations/observations.json",
-            method: "GET"
+            method: "GET",
+            timeout: 5000
         };
 
         let res = await https_request(req_options);

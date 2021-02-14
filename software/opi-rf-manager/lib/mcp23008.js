@@ -3,9 +3,7 @@ const { I2C, I2CDevice} = require.main.require("./lib/i2c");
 
 class MCP23008GPIO extends GPIO
 {
-    event = {
-        callback: null,
-    };
+    event;
     parent;
 
     static async export(pin)
@@ -20,7 +18,8 @@ class MCP23008GPIO extends GPIO
         super(pin, index);
 
         this.event = {
-            callback: null
+            callback: null,
+            args: []
         };
         this.parent = parent;
     }
@@ -95,7 +94,7 @@ class MCP23008GPIO extends GPIO
             return GPIO.LOW;
     }
 
-    async enable_event_polling(value, interval, callback)
+    async enable_event_polling(value, interval, callback, ...args)
     {
         if(!this.parent.irq_gpio)
             throw new Error("Parent MCP23008 does not have a valid IRQ GPIO configured");
@@ -112,7 +111,8 @@ class MCP23008GPIO extends GPIO
         if(interval < 0)
             throw new Error("Invalid interval");
 
-        this.event.callback = callback;
+        this.event.callback = callback.bind(this);
+        this.event.args = args;
 
         let regs = await this.parent.read(0x02, 3);
         let gpinten = regs.readUInt8(0);
@@ -136,7 +136,7 @@ class MCP23008GPIO extends GPIO
         regs.writeUInt8(gpinten | (1 << (this.index % 8)), 0);
 
         if(gpinten === 0x00) // No other GPIO has interrupts enabled
-            this.parent.irq_gpio.enable_event_polling(GPIO.LOW, interval, this.parent.isr);
+            this.parent.irq_gpio.enable_event_polling(GPIO.LOW, interval, MCP23008.isr, this.parent);
 
         await this.parent.write(0x02, regs);
     }
@@ -150,6 +150,9 @@ class MCP23008GPIO extends GPIO
         gpinten &= ~(1 << (this.index % 8));
 
         await this.parent.write(0x02, gpinten);
+
+        this.event.callback = null;
+        this.event.args = [];
 
         if(gpinten === 0x00) // No other GPIO has interrupts enabled
             this.parent.irq_gpio.disable_event_polling();
@@ -170,6 +173,34 @@ class MCP23008 extends I2CDevice
         new MCP23008GPIO(this, "PA6", 6),
         new MCP23008GPIO(this, "PA7", 7)
     ];
+
+    static async isr(self)
+    {
+        if(!(self instanceof MCP23008))
+            return;
+
+        try
+        {
+            let regs = await self.read(0x07, 2);
+            let intf = regs.readUInt8(0);
+            let intcap = regs.readUInt8(1);
+
+            for(let i = 0; i < 8; i++)
+            {
+                if(intf & (1 << i))
+                {
+                    let gpio = self.gpios[i];
+
+                    if(typeof(gpio.event.callback) == "function")
+                        gpio.event.callback(null, !!(intcap & (1 << i)), ...gpio.event.args);
+                }
+            }
+        }
+        catch (e)
+        {
+
+        }
+    }
 
     constructor(bus, addr, bus_enable_gpio, irq_gpio)
     {
@@ -264,31 +295,6 @@ class MCP23008 extends I2CDevice
             throw new Error("Invalid pin name");
 
         return this.gpios[gpio_table_index];
-    }
-
-    async isr()
-    {
-        try
-        {
-            let regs = await this.read(0x07, 2);
-            let intf = regs.readUInt8(0);
-            let intcap = regs.readUInt8(1);
-
-            for(let i = 0; i < 8; i++)
-            {
-                if(intf & (1 << i))
-                {
-                    let gpio = this.gpios[i];
-
-                    if(typeof(gpio.event.callback) == "function")
-                        gpio.event.callback(null, !!(intcap & (1 << i)));
-                }
-            }
-        }
-        catch (e)
-        {
-
-        }
     }
 }
 

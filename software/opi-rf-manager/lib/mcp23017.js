@@ -21,7 +21,8 @@ class MCP23017GPIO extends GPIO
         super(pin, index);
 
         this.event = {
-            callback: null
+            callback: null,
+            args: []
         };
         this.parent = parent;
         this.reg_mask = pin[1] === "B" ? 0x10 : 0x00;
@@ -114,7 +115,8 @@ class MCP23017GPIO extends GPIO
         if(interval < 0)
             throw new Error("Invalid interval");
 
-        this.event.callback = callback;
+        this.event.callback = callback.bind(this);
+        this.event.args = args;
 
         let regs = await this.parent.read(0x02 | this.reg_mask, 3);
         let gpinten_op = await this.parent.read(0x02 | (this.reg_mask ^ 0x10)); // GPINTEN register from the other port
@@ -139,7 +141,7 @@ class MCP23017GPIO extends GPIO
         regs.writeUInt8(gpinten | (1 << (this.index % 8)), 0);
 
         if(gpinten_op === 0x00 && gpinten === 0x00) // No other GPIO has interrupts enabled
-            this.parent.irq_gpio.enable_event_polling(GPIO.LOW, interval, this.parent.isr);
+            this.parent.irq_gpio.enable_event_polling(GPIO.LOW, interval, MCP23017.isr, this.parent);
 
         await this.parent.write(0x02 | this.reg_mask, regs);
     }
@@ -154,6 +156,9 @@ class MCP23017GPIO extends GPIO
         gpinten &= ~(1 << (this.index % 8));
 
         await this.parent.write(0x02 | this.reg_mask, gpinten);
+
+        this.event.callback = null;
+        this.event.args = [];
 
         if(gpinten_op === 0x00 && gpinten === 0x00) // No other GPIO has interrupts enabled
             this.parent.irq_gpio.disable_event_polling();
@@ -183,6 +188,45 @@ class MCP23017 extends I2CDevice
         new MCP23017GPIO(this, "PB6", 38),
         new MCP23017GPIO(this, "PB7", 39)
     ];
+
+    static async isr(self)
+    {
+        if(!(self instanceof MCP23017))
+            return;
+
+        try
+        {
+            let regs_a = await self.read(0x07, 2);
+            let intf_a = regs_a.readUInt8(0);
+            let intcap_a = regs_a.readUInt8(1);
+            let regs_b = await self.read(0x17, 2);
+            let intf_b = regs_b.readUInt8(0);
+            let intcap_b = regs_b.readUInt8(1);
+
+            for(let i = 0; i < 8; i++)
+            {
+                if(intf_a & (1 << i))
+                {
+                    let gpio = self.gpios[i];
+
+                    if(typeof(gpio.event.callback) == "function")
+                        gpio.event.callback(null, !!(intcap_a & (1 << i)), ...gpio.event.args);
+                }
+
+                if(intf_b & (1 << i))
+                {
+                    let gpio = self.gpios[i + 8];
+
+                    if(typeof(gpio.event.callback) == "function")
+                        gpio.event.callback(null, !!(intcap_b & (1 << i)), ...gpio.event.args);
+                }
+            }
+        }
+        catch (e)
+        {
+
+        }
+    }
 
     constructor(bus, addr, bus_enable_gpio, irq_gpio)
     {
@@ -280,42 +324,6 @@ class MCP23017 extends I2CDevice
             throw new Error("Invalid pin name");
 
         return this.gpios[gpio_table_index];
-    }
-
-    async isr()
-    {
-        try
-        {
-            let regs_a = await this.read(0x07, 2);
-            let intf_a = regs_a.readUInt8(0);
-            let intcap_a = regs_a.readUInt8(1);
-            let regs_b = await this.read(0x17, 2);
-            let intf_b = regs_b.readUInt8(0);
-            let intcap_b = regs_b.readUInt8(1);
-
-            for(let i = 0; i < 8; i++)
-            {
-                if(intf_a & (1 << i))
-                {
-                    let gpio = this.gpios[i];
-
-                    if(typeof(gpio.event.callback) == "function")
-                        gpio.event.callback(null, !!(intcap_a & (1 << i)));
-                }
-
-                if(intf_b & (1 << i))
-                {
-                    let gpio = this.gpios[i + 8];
-
-                    if(typeof(gpio.event.callback) == "function")
-                        gpio.event.callback(null, !!(intcap_b & (1 << i)));
-                }
-            }
-        }
-        catch (e)
-        {
-
-        }
     }
 }
 

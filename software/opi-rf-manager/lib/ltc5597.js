@@ -3,17 +3,28 @@ const MCP3421 = require.main.require("./lib/mcp3421");
 class LTC5597
 {
     adc;
+    offset;
     calibration = {};
     current_calibration = [];
 
     constructor(bus, addr, bus_enable_gpio)
     {
         this.adc = new MCP3421(bus, addr, bus_enable_gpio);
+        this.offset = 0;
     }
 
     async probe()
     {
         await this.adc.probe();
+    }
+
+    set_offset(offset)
+    {
+        this.offset = offset;
+    }
+    get_offset()
+    {
+        return this.offset;
     }
 
     async config(resolution, continuous)
@@ -129,7 +140,7 @@ class LTC5597
         let slope = dp / dv;
         let interp = p0 + (voltage - v0) * slope;
 
-        return interp;
+        return interp + this.offset;
     }
 }
 

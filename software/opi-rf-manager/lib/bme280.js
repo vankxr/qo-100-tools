@@ -2,6 +2,8 @@ const { I2C, I2CDevice} = require.main.require("./lib/i2c");
 
 class BME280 extends I2CDevice
 {
+    static sea_hpa = 1013.25;
+
     calibration = {
         read: false,
         T1: undefined,
@@ -23,6 +25,11 @@ class BME280 extends I2CDevice
         H5: undefined,
         H6: undefined
     };
+
+    static set_sea_pressure(sea_hpa)
+    {
+        BME280.sea_hpa = sea_hpa;
+    }
 
     constructor(bus, addr, bus_enable_gpio)
     {
@@ -330,13 +337,6 @@ class BME280 extends I2CDevice
     async get_pressure()
     {
         return (await this.get_data()).pressure;
-    }
-
-    static sea_hpa = 1013.25;
-
-    static set_sea_pressure(sea_hpa)
-    {
-        BME280.sea_hpa = sea_hpa;
     }
 
     async get_altitude()

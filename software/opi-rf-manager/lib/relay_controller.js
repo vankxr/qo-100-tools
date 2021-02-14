@@ -7,7 +7,7 @@ class RelayController extends I2CDevice
         if(bus instanceof I2CDevice)
             super(bus.bus, bus.addr, bus.bus_enable_gpio);
         else
-            super(bus, 0x33, bus_enable_gpio);
+            super(bus, 0x3A, bus_enable_gpio);
     }
 
     async write(reg, data)
