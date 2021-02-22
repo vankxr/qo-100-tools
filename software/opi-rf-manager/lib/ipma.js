@@ -91,7 +91,7 @@ class IPMA
 
         let forecast_date = new Date(res.body.forecastDate);
 
-        for(let forecast of res.body.data)
+        for(const forecast of res.body.data)
         {
             if(forecast.globalIdLocal !== this.location.globalIdLocal)
                 continue;
@@ -131,7 +131,7 @@ class IPMA
 
         let ret = [];
 
-        for(let observation of res.body.features)
+        for(const observation of res.body.features)
         {
             if(!observation.properties)
                 continue;

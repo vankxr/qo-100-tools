@@ -1,15 +1,19 @@
 const Colors = require('colors/safe');
 const Util = require("util");
 const Stream = require("stream");
+const { timeStamp } = require("console");
 const LogFileManager = require.main.require("./util/log_file_manager");
+
+Colors.enable();
 
 class Printer
 {
     stream;
     stream_manager;
     next;
+    colors_enabled;
 
-    constructor(stream)
+    constructor(stream, colors_enabled = true)
     {
         if(stream instanceof Stream.Writable)
             this.stream = stream;
@@ -17,6 +21,17 @@ class Printer
             this.stream_manager = stream;
         else
             throw new Error("Invalid stream");
+
+        this.colors_enabled = colors_enabled;
+    }
+
+    enable_colors()
+    {
+        this.colors_enabled = true;
+    }
+    disable_colors()
+    {
+        this.colors_enabled = false;
     }
 
     get_stream()
@@ -41,8 +56,8 @@ class Printer
     {
         let color_fn = undefined;
 
-        if(typeof(color) === "string")
-            color_fn = Colors[color.toLowerCase()];
+        if(this.colors_enabled && typeof(color) === "string")
+            color_fn = Colors[color];
 
         let out = "";
 

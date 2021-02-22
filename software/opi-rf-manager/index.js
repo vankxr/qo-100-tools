@@ -1,4 +1,5 @@
 const FileSystem = require("fs");
+const Util = require("util");
 const ReadLine = require('readline');
 const Crypto = require("crypto");
 const SSH2 = require("ssh2");
@@ -7,6 +8,7 @@ const GPIO = require("./lib/gpio");
 const { I2C, I2CDevice } = require("./lib/i2c");
 const { OneWire, OneWireDevice } = require("./lib/onewire");
 const IPMA = require("./lib/ipma");
+const WBSpectrumMonitor = require("./lib/wb_spectrum_monitor");
 const HPPSU = require("./lib/hppsu");
 const DS2484 = require("./lib/ds2484");
 const BME280 = require("./lib/bme280");
@@ -23,6 +25,8 @@ const delay = require("./util/delay");
 
 let cl;
 let ipma;
+let wb_spectrum_monitor;
+let wb_signals = {};
 const gpios = {};
 const buses = {};
 const onewire_bus_controllers = [];
@@ -43,8 +47,8 @@ function log_init()
 
     console_file.start();
 
-    const console_file_printer = new Printer(console_file);
-    const console_stdout_printer = new Printer(process.stdout);
+    const console_file_printer = new Printer(console_file, false);
+    const console_stdout_printer = new Printer(process.stdout, true);
 
     console_stdout_printer.chain(console_file_printer);
 
@@ -64,6 +68,7 @@ async function ssh_server_init()
 
     // Users
     ssh_server_add_user("joao", null, (await FileSystem.promises.readFile(__dirname + "/keys/users/joao.pub")).toString().split("\n"));
+    ssh_server_add_user("root", null, (await FileSystem.promises.readFile(__dirname + "/keys/users/joao.pub")).toString().split("\n")); // Alias
 
     // Commands
     ssh_server_add_command(
@@ -71,10 +76,10 @@ async function ssh_server_init()
         "Prints this help information",
         async function (argv)
         {
-            for(cmd of Object.keys(ssh_commands))
+            for(const cmd of Object.keys(ssh_commands))
                 this.println(null, null, cmd + " - " + ssh_commands[cmd].description);
 
-            return 0;
+            return true;
         }
     );
     ssh_server_add_command(
@@ -83,8 +88,10 @@ async function ssh_server_init()
         async function (argv)
         {
             this.println(null, null, "Your IP: " + this.stream.session.client.ip);
+            this.println(null, null, "Your username: " + this.stream.session.client.auth.username);
+            this.println(null, null, "Your auth method: " + this.stream.session.client.auth.method);
 
-            return 0;
+            return true;
         }
     );
     ssh_server_add_command(
@@ -94,7 +101,7 @@ async function ssh_server_init()
         {
             this.println(null, null, (argv.length > 1 ? argv[1] : ""));
 
-            return 0;
+            return true;
         }
     );
     ssh_server_add_command(
@@ -113,7 +120,7 @@ async function ssh_server_init()
                 }
             );
 
-            return 0;
+            return true;
         }
     );
     ssh_server_add_command(
@@ -167,7 +174,7 @@ async function ssh_server_init()
                 throw new Error("Sensor not supported");
             }
 
-            return 0;
+            return true;
         },
         function (line)
         {
@@ -187,17 +194,22 @@ async function ssh_server_init()
         "Read telemetry from the PSU specified in the first argument",
         async function (argv)
         {
-            let psu_name = argv[1];
+            let psu_param_name = argv[1];
 
-            if(typeof(psu_name) != "string")
-                throw new Error("Invalid PSU name");
+            if(typeof(psu_param_name) != "string")
+                throw new Error("Invalid PSU parameter name");
 
-            psu_name = psu_name.toLowerCase();
+            psu_param_name = psu_param_name.toLowerCase();
 
-            if(psu_name.indexOf("psu") != 0)
-                throw new Error("Invalid PSU name");
+            if(psu_param_name.indexOf("psu") != 0)
+                throw new Error("Invalid PSU parameter name");
 
-            let psu_index = parseInt(psu_name.slice(3));
+            let param_name_start = psu_param_name.indexOf("_");
+
+            if(param_name_start == -1)
+                param_name_start = psu_param_name.length;
+
+            let psu_index = parseInt(psu_param_name.slice(3, param_name_start));
 
             if(psu_index < 0 || psu_index >= power_supplies.length)
                 throw new Error("Invalid PSU name");
@@ -207,53 +219,308 @@ async function ssh_server_init()
             if(!psu)
                 throw new Error("PSU not found");
 
+            let param_name = psu_param_name.slice(param_name_start + 1);
+
             if(psu instanceof HPPSU)
             {
-                this.tprintln(null, "HPPSU", "PSU ID: 0x%s", (await psu.get_id()).toString(16));
-                this.tprintln(null, "HPPSU", "PSU SPN: %s", await psu.get_spn());
-                this.tprintln(null, "HPPSU", "PSU Date: %s", await psu.get_date());
-                this.tprintln(null, "HPPSU", "PSU Name: %s", await psu.get_name());
-                this.tprintln(null, "HPPSU", "PSU CT: %s", await psu.get_ct());
-                this.tprintln(null, "HPPSU", "-------------------------------------");
-                this.tprintln(null, "HPPSU", "PSU Input Voltage: %d V", await psu.get_input_voltage());
-                this.tprintln(null, "HPPSU", "PSU Input Undervoltage threshold: %d V", await psu.get_input_undervoltage_threshold());
-                this.tprintln(null, "HPPSU", "PSU Input Overvoltage threshold: %d V", await psu.get_input_overvoltage_threshold());
-                this.tprintln(null, "HPPSU", "PSU Input Current: %d A (max. %d A)", await psu.get_input_current(), await psu.get_peak_input_current());
-                this.tprintln(null, "HPPSU", "PSU Input Power: %d W (max. %d W)", await psu.get_input_power(), await psu.get_peak_input_power());
-                this.tprintln(null, "HPPSU", "PSU Input Energy: %d Wh", await psu.get_input_energy());
-                this.tprintln(null, "HPPSU", "PSU Output Voltage: %d V", await psu.get_output_voltage());
-                this.tprintln(null, "HPPSU", "PSU Output Undervoltage threshold: %d V", await psu.get_output_undervoltage_threshold());
-                this.tprintln(null, "HPPSU", "PSU Output Overvoltage threshold: %d V", await psu.get_output_overvoltage_threshold());
-                this.tprintln(null, "HPPSU", "PSU Output Current: %d A (max. %d A)", await psu.get_output_current(), await psu.get_peak_output_current());
-                this.tprintln(null, "HPPSU", "PSU Output Power: %d W", await psu.get_output_power());
-                this.tprintln(null, "HPPSU", "PSU Intake Temperature: %d C", await psu.get_intake_temperature());
-                this.tprintln(null, "HPPSU", "PSU Internal Temperature: %d C", await psu.get_internal_temperature());
-                this.tprintln(null, "HPPSU", "PSU Fan speed: %d RPM", await psu.get_fan_speed());
-                this.tprintln(null, "HPPSU", "PSU Fan target speed: %d RPM", await psu.get_fan_target_speed());
-                this.tprintln(null, "HPPSU", "PSU On time: %d s", await psu.get_on_time());
-                this.tprintln(null, "HPPSU", "PSU Total on time: %d days", await psu.get_total_on_time() / 60 / 24);
-                this.tprintln(null, "HPPSU", "PSU Status flags: 0x%s", (await psu.get_status_flags()).toString(16));
-                this.tprintln(null, "HPPSU", "PSU ON: %s", await psu.is_main_output_enabled());
-                this.tprintln(null, "HPPSU", "PSU Input Present: %s", await psu.is_input_present());
+                switch(param_name)
+                {
+                    case "":
+                    {
+                        this.tprintln(null, "HPPSU", "ID: 0x%s", (await psu.get_id()).toString(16));
+                        this.tprintln(null, "HPPSU", "SPN: %s", await psu.get_spn());
+                        this.tprintln(null, "HPPSU", "Date: %s", await psu.get_date());
+                        this.tprintln(null, "HPPSU", "Name: %s", await psu.get_name());
+                        this.tprintln(null, "HPPSU", "CT: %s", await psu.get_ct());
+                        this.tprintln(null, "HPPSU", "Input Present: %s", await psu.is_input_present());
+                        this.tprintln(null, "HPPSU", "Input Voltage: %d V", await psu.get_input_voltage());
+                        this.tprintln(null, "HPPSU", "Input Undervoltage threshold: %d V", await psu.get_input_undervoltage_threshold());
+                        this.tprintln(null, "HPPSU", "Input Overvoltage threshold: %d V", await psu.get_input_overvoltage_threshold());
+                        this.tprintln(null, "HPPSU", "Input Current: %d A (max. %d A)", await psu.get_input_current(), await psu.get_peak_input_current());
+                        this.tprintln(null, "HPPSU", "Input Power: %d W (max. %d W)", await psu.get_input_power(), await psu.get_peak_input_power());
+                        this.tprintln(null, "HPPSU", "Input Energy: %d Wh", await psu.get_input_energy());
+                        this.tprintln(null, "HPPSU", "Output Enabled: %s", await psu.is_main_output_enabled());
+                        this.tprintln(null, "HPPSU", "Output Voltage: %d V", await psu.get_output_voltage());
+                        this.tprintln(null, "HPPSU", "Output Undervoltage threshold: %d V", await psu.get_output_undervoltage_threshold());
+                        this.tprintln(null, "HPPSU", "Output Overvoltage threshold: %d V", await psu.get_output_overvoltage_threshold());
+                        this.tprintln(null, "HPPSU", "Output Current: %d A (max. %d A)", await psu.get_output_current(), await psu.get_peak_output_current());
+                        this.tprintln(null, "HPPSU", "Output Power: %d W", await psu.get_output_power());
+                        this.tprintln(null, "HPPSU", "Intake Temperature: %d C", await psu.get_intake_temperature());
+                        this.tprintln(null, "HPPSU", "Internal Temperature: %d C", await psu.get_internal_temperature());
+                        this.tprintln(null, "HPPSU", "Fan speed: %d RPM", await psu.get_fan_speed());
+                        this.tprintln(null, "HPPSU", "Fan target speed: %d RPM", await psu.get_fan_target_speed());
+                        this.tprintln(null, "HPPSU", "On time: %d s", await psu.get_on_time());
+                        this.tprintln(null, "HPPSU", "Total on time: %d days", await psu.get_total_on_time() / 60 / 24);
+                        this.tprintln(null, "HPPSU", "Status flags: 0x%s", (await psu.get_status_flags()).toString(16));
+                    }
+                    break;
+                    case "info":
+                    {
+                        this.tprintln(null, "HPPSU", "ID: 0x%s", (await psu.get_id()).toString(16));
+                        this.tprintln(null, "HPPSU", "SPN: %s", await psu.get_spn());
+                        this.tprintln(null, "HPPSU", "Date: %s", await psu.get_date());
+                        this.tprintln(null, "HPPSU", "Name: %s", await psu.get_name());
+                        this.tprintln(null, "HPPSU", "CT: %s", await psu.get_ct());
+                    }
+                    break;
+                    case "status":
+                    {
+                        this.tprintln(null, "HPPSU", "Status flags: 0x%s", (await psu.get_status_flags()).toString(16));
+                        this.tprintln(null, "HPPSU", "Input Present: %s", await psu.is_input_present());
+                        this.tprintln(null, "HPPSU", "Output Enabled: %s", await psu.is_main_output_enabled());
+                    }
+                    break;
+                    case "input":
+                    {
+                        this.tprintln(null, "HPPSU", "Input Present: %s", await psu.is_input_present());
+                        this.tprintln(null, "HPPSU", "Input Voltage: %d V", await psu.get_input_voltage());
+                        this.tprintln(null, "HPPSU", "Input Undervoltage threshold: %d V", await psu.get_input_undervoltage_threshold());
+                        this.tprintln(null, "HPPSU", "Input Overvoltage threshold: %d V", await psu.get_input_overvoltage_threshold());
+                        this.tprintln(null, "HPPSU", "Input Current: %d A (max. %d A)", await psu.get_input_current(), await psu.get_peak_input_current());
+                        this.tprintln(null, "HPPSU", "Input Power: %d W (max. %d W)", await psu.get_input_power(), await psu.get_peak_input_power());
+                        this.tprintln(null, "HPPSU", "Input Energy: %d Wh", await psu.get_input_energy());
+                    }
+                    break;
+                    case "output":
+                    {
+                        this.tprintln(null, "HPPSU", "Output Enabled: %s", await psu.is_main_output_enabled());
+                        this.tprintln(null, "HPPSU", "Output Voltage: %d V", await psu.get_output_voltage());
+                        this.tprintln(null, "HPPSU", "Output Undervoltage threshold: %d V", await psu.get_output_undervoltage_threshold());
+                        this.tprintln(null, "HPPSU", "Output Overvoltage threshold: %d V", await psu.get_output_overvoltage_threshold());
+                        this.tprintln(null, "HPPSU", "Output Current: %d A (max. %d A)", await psu.get_output_current(), await psu.get_peak_output_current());
+                        this.tprintln(null, "HPPSU", "Output Power: %d W", await psu.get_output_power());
+                    }
+                    break;
+                    case "temperature":
+                    {
+                        this.tprintln(null, "HPPSU", "Intake Temperature: %d C", await psu.get_intake_temperature());
+                        this.tprintln(null, "HPPSU", "Internal Temperature: %d C", await psu.get_internal_temperature());
+                    }
+                    break;
+                    case "fan_speed":
+                    {
+                        this.tprintln(null, "HPPSU", "Fan speed: %d RPM", await psu.get_fan_speed());
+                        this.tprintln(null, "HPPSU", "Fan target speed: %d RPM", await psu.get_fan_target_speed());
+                    }
+                    break;
+                    case "on_time":
+                    {
+                        this.tprintln(null, "HPPSU", "On time: %d s", await psu.get_on_time());
+                        this.tprintln(null, "HPPSU", "Total on time: %d days", await psu.get_total_on_time() / 60 / 24);
+                    }
+                    break;
+                    default:
+                    {
+                        throw new Error("PSU parameter not supported");
+                    }
+                    break;
+                }
             }
             else
             {
                 throw new Error("PSU not supported");
             }
 
-            return 0;
+            return true;
         },
         function (line)
         {
-            const psu_names = ["psu0", "psu1"];
-            const hits = psu_names.filter(
+            const param_names = ["info", "status", "input", "output", "temperature", "fan_speed", "on_time"];
+            const psu_param_names = [];
+
+            for(let i = 0; i < power_supplies.length; i++)
+            {
+                psu_param_names.push("psu" + i);
+
+                for(const param of param_names)
+                    psu_param_names.push("psu" + i + "_" + param);
+            }
+
+            const hits = psu_param_names.filter(
                 function (c)
                 {
                     return c.startsWith(line);
                 }
             );
 
-            return hits.length ? hits : psu_names;
+            return hits.length ? hits : psu_param_names;
+        }
+    );
+    ssh_server_add_command(
+        "wpsu",
+        "Modify parameters of the PSU specified in the first argument",
+        async function (argv)
+        {
+            let psu_param_name = argv[1];
+
+            if(typeof(psu_param_name) != "string")
+                throw new Error("Invalid PSU parameter name");
+
+            psu_param_name = psu_param_name.toLowerCase();
+
+            if(psu_param_name.indexOf("psu") != 0)
+                throw new Error("Invalid PSU parameter name");
+
+            let param_name_start = psu_param_name.indexOf("_");
+
+            if(param_name_start == -1)
+                param_name_start = psu_param_name.length;
+
+            let psu_index = parseInt(psu_param_name.slice(3, param_name_start));
+
+            if(psu_index < 0 || psu_index >= power_supplies.length)
+                throw new Error("Invalid PSU name");
+
+            let psu = power_supplies[psu_index];
+
+            if(!psu)
+                throw new Error("PSU not found");
+
+            let param_name = psu_param_name.slice(param_name_start + 1);
+
+            if(psu instanceof HPPSU)
+            {
+                switch(param_name)
+                {
+                    case "clear_peak_input_current":
+                    {
+                        await psu.clear_peak_input_current();
+
+                        this.tprintln(null, "HPPSU", "Peak Input Current: %d A", await psu.get_peak_input_current());
+                    }
+                    break;
+                    case "clear_peak_input_power":
+                    {
+                        await psu.clear_peak_input_power();
+
+                        this.tprintln(null, "HPPSU", "Peak Input Power: %d W", await psu.get_peak_input_power());
+                    }
+                    break;
+                    case "clear_peak_output_current":
+                    {
+                        await psu.clear_peak_output_current();
+
+                        this.tprintln(null, "HPPSU", "Peak Output Current: %d A", await psu.get_peak_output_current());
+                    }
+                    break;
+                    case "fan_speed":
+                    {
+                        let speed = parseInt(argv[2]);
+
+                        await psu.set_fan_target_speed(speed);
+
+                        this.tprintln(null, "HPPSU", "Fan speed: %d RPM", await psu.get_fan_speed());
+                        this.tprintln(null, "HPPSU", "Fan target speed: %d RPM", await psu.get_fan_target_speed());
+                    }
+                    break;
+                    case "clear_on_time_and_energy":
+                    {
+                        await psu.clear_on_time_and_energy();
+
+                        this.tprintln(null, "HPPSU", "On time: %d s", await psu.get_on_time());
+                    }
+                    break;
+                    case "turn_on":
+                    {
+                        await psu.set_enable(true);
+                        await delay(100);
+
+                        this.tprintln(null, "HPPSU", "Output Enabled: %s", await psu.is_main_output_enabled());
+                    }
+                    break;
+                    case "turn_off":
+                    {
+                        await psu.set_enable(false);
+                        await delay(100);
+
+                        this.tprintln(null, "HPPSU", "Output Enabled: %s", await psu.is_main_output_enabled());
+                    }
+                    break;
+                    default:
+                    {
+                        throw new Error("PSU parameter not supported");
+                    }
+                    break;
+                }
+            }
+            else
+            {
+                throw new Error("PSU not supported");
+            }
+
+            return true;
+        },
+        function (line)
+        {
+            const param_names = ["clear_peak_input_current", "clear_peak_input_power", "clear_peak_output_current", "fan_speed", "clear_on_time_and_energy", "turn_on", "turn_off"];
+            const psu_param_names = [];
+
+            for(let i = 0; i < power_supplies.length; i++)
+                for(const param of param_names)
+                    psu_param_names.push("psu" + i + "_" + param);
+
+            const hits = psu_param_names.filter(
+                function (c)
+                {
+                    return c.startsWith(line);
+                }
+            );
+
+            return hits.length ? hits : psu_param_names;
+        }
+    );
+    ssh_server_add_command(
+        "lswbsig",
+        "Prints the latest signals detected on the Wideband Transponder",
+        async function (argv)
+        {
+            if(wb_signals.noise_power !== undefined)
+                this.tprintln("grey", null, "Noise floor: %d dB", wb_signals.noise_power.toFixed(2));
+
+            if(wb_signals.beacon)
+            {
+                const signal = wb_signals.beacon;
+
+                this.tprintln("magenta", null, "Beacon:");
+                this.tprintln("magenta", null, "  Center frequency: %d MHz", signal.full_center_freq.toFixed(3));
+                this.tprintln("magenta", null, "  Full bandwidth: %d MHz", signal.full_bandwidth.toFixed(3));
+                this.tprintln("magenta", null, "  Full power: %d dB", signal.full_power.toFixed(2));
+                this.tprintln("magenta", null, "  Used bandwidth: %d MHz", signal.used_bandwidth.toFixed(3));
+                this.tprintln("magenta", null, "  Used power: %d dB", signal.used_power.toFixed(2));
+                this.tprintln("magenta", null, "  Symbol rate: %d ksps", signal.symbolrate.toFixed(0));
+                this.tprintln("magenta", null, "  SNR: %d dB", signal.snr.toFixed(2));
+            }
+            else
+            {
+                this.tprintln("red", null, "No beacon found!");
+
+                return false;
+            }
+
+            if(!wb_signals.signals.length)
+                this.tprintln(null, null, "No signals found!");
+
+            for(const signal of wb_signals.signals)
+            {
+                let color = "brightGreen";
+
+                if(signal.out_of_band)
+                    color = "yellow";
+                if(signal.over_powered)
+                    color = "red";
+
+                this.tprintln(color, null, "Signal:");
+                this.tprintln(color, null, "  Center frequency: %d MHz", signal.full_center_freq.toFixed(3));
+                this.tprintln(color, null, "  Full bandwidth: %d MHz", signal.full_bandwidth.toFixed(3));
+                this.tprintln(color, null, "  Full power: %d dB", signal.full_power.toFixed(2));
+                this.tprintln(color, null, "  Used bandwidth: %d MHz", signal.used_bandwidth.toFixed(3));
+                this.tprintln(color, null, "  Used power: %d dB", signal.used_power.toFixed(2));
+                this.tprintln(color, null, "  Symbol rate: %d ksps", signal.symbolrate.toFixed(0));
+                this.tprintln(color, null, "  SNR: %d dB", signal.snr.toFixed(2));
+                this.tprintln(color, null, "  SBR: %d dB", signal.sbr.toFixed(2));
+            }
+
+            return true;
         }
     );
 
@@ -286,7 +553,7 @@ function ssh_server_add_user(username, password, keys)
     {
         user.keys = [];
 
-        for(key of keys)
+        for(const key of keys)
         {
             if(!key.length)
                 continue;
@@ -341,13 +608,34 @@ function ssh_server_complete_command(line)
 
     if(tokens.length > 1)
     {
-        let cmd = ssh_commands[tokens[0]];
+        let cmd_name = tokens[0];
+        let cmd = ssh_commands[cmd_name];
 
         if(cmd && typeof(cmd.completer) == "function")
             hits = cmd.completer(tokens.slice(1).join(" "));
 
-        if(hits.length == 1)
-            hits[0] = tokens[0] + " " + hits[0];
+        let checkpos = line.length - cmd_name.length - 1;
+        let char = "";
+        let equal = true;
+
+        for(let i = 0; i < hits.length; i++)
+        {
+            if(!char)
+                char = hits[i][checkpos];
+
+            if(hits[i][checkpos] !== char)
+            {
+                equal = false;
+
+                break;
+            }
+        }
+
+        if(equal)
+        {
+            for(let i = 0; i < hits.length; i++)
+                hits[i] = cmd_name + " " + hits[i];
+        }
     }
     else
     {
@@ -358,6 +646,9 @@ function ssh_server_complete_command(line)
             }
         );
     }
+
+    if(hits.length == 1 && line == hits[0])
+        hits[0] += " ";
 
     return [hits.length ? hits : command_names, line];
 }
@@ -371,7 +662,7 @@ async function ssh_server_process_command_string(str)
     let argv = ShellQuote.parse(str);
     let current_argv = [];
 
-    for(arg of argv)
+    for(const arg of argv)
     {
         switch(typeof(arg))
         {
@@ -477,11 +768,11 @@ async function ssh_server_process_command(argv)
 
     return success;
 }
-function ssh_server_connection_handler(client)
+function ssh_server_connection_handler(client, info)
 {
-    client.ip = client._sock._peername.address;
+    client.ip = info.ip;
 
-    cl.tprintln("magenta", "SSH", "New client connected! IP: %s!", client.ip);
+    cl.tprintln("magenta", "SSH", "New client connected! IP: %s (%s)!", client.ip, info.header.identRaw);
 
     client.on("authentication", ssh_server_client_auth_handler);
     client.on("ready", ssh_server_client_ready_handler);
@@ -501,7 +792,7 @@ function ssh_server_client_auth_handler(ctx)
     let incoming_username = Buffer.from(ctx.username);
     let found_user;
 
-    for(user of ssh_allowed_users)
+    for(const user of ssh_allowed_users)
     {
         if(incoming_username.length !== user.username.length)
             continue;
@@ -535,7 +826,7 @@ function ssh_server_client_auth_handler(ctx)
         {
             let passed = false;
 
-            for(key of user.keys)
+            for(const key of found_user.keys)
             {
                 let pub_ssh_key = key.getPublicSSH();
 
@@ -638,7 +929,7 @@ function ssh_server_client_session_shell_request_handler(accept, reject)
 
     let channel = accept();
     channel.session = this;
-    channel.printer = new Printer(channel);
+    channel.printer = new Printer(channel, true);
 
     if(this.pty)
     {
@@ -726,132 +1017,39 @@ async function ssh_server_client_session_exec_request_handler(accept, reject, in
     channel.end();
 }
 
-async function bme280_update_sea_hpa()
+async function wb_spectrum_monitor_init()
 {
-    if(!(ipma instanceof IPMA))
-        cl.tprintln("red", "IPMA", "No valid IPMA instance defined");
+    wb_spectrum_monitor = new WBSpectrumMonitor();
 
-    let sea_hpa;
-
-    try
-    {
-        sea_hpa = (await ipma.get_latest_surface_observation()).pressao;
-    }
-    catch(e)
-    {
-        cl.tprintln("red", "IPMA", "Error fetching from IPMA: " + e);
-    }
-
-    cl.tprintln("green", "IPMA", "Got IPMA Sea pressure: %d hPa", sea_hpa);
-
-    BME280.set_sea_pressure(sea_hpa);
+    wb_spectrum_monitor.on("open", wb_spectrum_monitor_open_handler);
+    wb_spectrum_monitor.on("signals", wb_spectrum_monitor_signals_handler);
+    wb_spectrum_monitor.on("error", wb_spectrum_monitor_error_handler);
+    wb_spectrum_monitor.on("close", wb_spectrum_monitor_close_handler);
+    wb_spectrum_monitor.on("timeout", wb_spectrum_monitor_timeout_handler);
+}
+function wb_spectrum_monitor_open_handler(ws)
+{
+    cl.tprintln("green", "WBTPX", "WebSocket listening!");
+}
+function wb_spectrum_monitor_signals_handler(signals)
+{
+    wb_signals = signals;
+}
+function wb_spectrum_monitor_error_handler(e)
+{
+    cl.tprintln("red", "WBTPX", "Error: " + e);
+}
+function wb_spectrum_monitor_close_handler(code, reason)
+{
+    cl.tprintln("yellow", "WBTPX", "WebSocket closed (%d)!", code);
+}
+function wb_spectrum_monitor_timeout_handler(ws)
+{
+    cl.tprintln("yellow", "WBTPX", "WebSocket timed out!");
 }
 
-async function init()
+async function ipma_init()
 {
-    // Console and logging
-    log_init();
-
-    // GPIOs
-    gpios.intrusion = [];
-    gpios.intrusion.push(await GPIO.export("PA0"));
-    gpios.intrusion.push(await GPIO.export("PA1"));
-    gpios.ext_i2c_enable = [];
-    gpios.ext_i2c_enable.push(await GPIO.export("PA6"));
-    gpios.ext_i2c_enable.push(await GPIO.export("PA2"));
-    gpios.psu_i2c_enable = [];
-    gpios.psu_i2c_enable.push(await GPIO.export("PA7"));
-    gpios.psu_i2c_enable.push(await GPIO.export("PA10"));
-
-    await gpios.intrusion[0].set_direction(GPIO.INPUT);
-    await gpios.intrusion[0].set_pull(GPIO.PULLUP);
-    await gpios.intrusion[1].set_direction(GPIO.INPUT);
-    await gpios.intrusion[1].set_pull(GPIO.PULLUP);
-    await gpios.ext_i2c_enable[0].set_direction(GPIO.OUTPUT);
-    await gpios.ext_i2c_enable[0].set_value(GPIO.LOW);
-    await gpios.ext_i2c_enable[1].set_direction(GPIO.OUTPUT);
-    await gpios.ext_i2c_enable[1].set_value(GPIO.LOW);
-    await gpios.psu_i2c_enable[0].set_direction(GPIO.OUTPUT);
-    await gpios.psu_i2c_enable[0].set_value(GPIO.LOW);
-    await gpios.psu_i2c_enable[1].set_direction(GPIO.OUTPUT);
-    await gpios.psu_i2c_enable[1].set_value(GPIO.LOW);
-
-    // Communication Interfaces
-    //// I2C
-    buses.onewire = [];
-    buses.i2c = [];
-    buses.i2c.push(await I2C.open(0));
-    buses.i2c.push(await I2C.open(1));
-
-    //// OneWire bus Controllers
-    onewire_bus_controllers.push(new DS2484(buses.i2c[0]));
-
-    for(let i = 0; i < onewire_bus_controllers.length; i++)
-    {
-        const controller = onewire_bus_controllers[i];
-
-        try
-        {
-            await controller.probe();
-        }
-        catch (e)
-        {
-            cl.tprintln("red", "DS2484", e);
-
-            continue;
-        }
-
-        cl.tprintln("green", "DS2484", "DS2484 #%d found!", i);
-
-        controller.config();
-
-        buses.onewire.push(controller.get_ow_bus());
-    }
-
-    //// OneWire bus enumeration
-    for(let i = 0; i < buses.onewire.length; i++)
-    {
-        let bus = buses.onewire[i];
-        let devices;
-
-        try
-        {
-            devices = await bus.scan();
-        }
-        catch (e)
-        {
-            cl.tprintln("red", "OneWire", "Error scanning OneWire bus %d: " + e, i);
-
-            continue;
-        }
-
-        cl.tprintln(devices.length > 0 ? null : "yellow", "OneWire", "  Found %d devices on OneWire bus %d:", devices.length, i);
-
-        for(device of devices)
-        {
-            cl.tprintln(null, "OneWire", "    %s", device);
-
-            if(device.get_family_name() == "DS18B20")
-            {
-                cl.tprintln("green", "OneWire", "      DS18B20 #%d found!", i);
-
-                let sensor = new DS18B20(device);
-
-                // TODO: Check code and add accordingly to sensors array
-                sensors["ds18b20_" + sensor.get_uid().toString(16)] = sensor;
-
-                await sensor.config(12);
-                await sensor.measure();
-
-                cl.tprintln(null, "DS18B20", "        Temperature: %d C", await sensor.get_temperature());
-                cl.tprintln(null, "DS18B20", "        High Alarm Temperature: %d C", (await sensor.get_alarm()).high);
-                cl.tprintln(null, "DS18B20", "        Low Alarm Temperature: %d C", (await sensor.get_alarm()).low);
-                cl.tprintln(null, "DS18B20", "        Parasidic powered: %s", await sensor.is_parasidic_power());
-            }
-        }
-    }
-
-    // IPMA
     try
     {
         let ipma_station = null;
@@ -915,6 +1113,139 @@ async function init()
         cl.tprintln("red", "IPMA", e);
     }
 
+    // BME280 sea level pressure for altitude calculation
+    ipma_fetch_sea_hpa();
+    setInterval(ipma_fetch_sea_hpa, 1200000); // Update every 20 minutes
+}
+async function ipma_fetch_sea_hpa()
+{
+    if(!(ipma instanceof IPMA))
+        cl.tprintln("red", "IPMA", "No valid IPMA instance defined");
+
+    let sea_hpa;
+
+    try
+    {
+        sea_hpa = (await ipma.get_latest_surface_observation()).pressao;
+
+        cl.tprintln("green", "IPMA", "Got IPMA Sea pressure: %d hPa", sea_hpa);
+
+        BME280.set_sea_pressure(sea_hpa);
+    }
+    catch(e)
+    {
+        cl.tprintln("red", "IPMA", "Error fetching from IPMA: " + e);
+    }
+}
+
+async function main()
+{
+    // Console and logging
+    log_init();
+
+    // IPMA
+    await ipma_init();
+
+    // GPIOs
+    gpios.intrusion = [];
+    gpios.intrusion.push(await GPIO.export("PA0"));
+    gpios.intrusion.push(await GPIO.export("PA1"));
+    gpios.ext_i2c_enable = [];
+    gpios.ext_i2c_enable.push(await GPIO.export("PA6"));
+    gpios.ext_i2c_enable.push(await GPIO.export("PA2"));
+    gpios.psu_i2c_enable = [];
+    gpios.psu_i2c_enable.push(await GPIO.export("PA7"));
+    gpios.psu_i2c_enable.push(await GPIO.export("PA10"));
+
+    await gpios.intrusion[0].set_direction(GPIO.INPUT);
+    await gpios.intrusion[0].set_pull(GPIO.PULLUP);
+    await gpios.intrusion[1].set_direction(GPIO.INPUT);
+    await gpios.intrusion[1].set_pull(GPIO.PULLUP);
+    await gpios.ext_i2c_enable[0].set_direction(GPIO.OUTPUT);
+    await gpios.ext_i2c_enable[0].set_value(GPIO.LOW);
+    await gpios.ext_i2c_enable[1].set_direction(GPIO.OUTPUT);
+    await gpios.ext_i2c_enable[1].set_value(GPIO.LOW);
+    await gpios.psu_i2c_enable[0].set_direction(GPIO.OUTPUT);
+    await gpios.psu_i2c_enable[0].set_value(GPIO.LOW);
+    await gpios.psu_i2c_enable[1].set_direction(GPIO.OUTPUT);
+    await gpios.psu_i2c_enable[1].set_value(GPIO.LOW);
+
+    // Communication Interfaces
+    //// I2C
+    buses.i2c = [];
+    buses.i2c.push(await I2C.open(0));
+    buses.i2c.push(await I2C.open(1));
+
+    //// OneWire bus Controllers
+    buses.onewire = [];
+
+    onewire_bus_controllers.push(new DS2484(buses.i2c[0]));
+
+    for(let i = 0; i < onewire_bus_controllers.length; i++)
+    {
+        const controller = onewire_bus_controllers[i];
+
+        try
+        {
+            await controller.probe();
+        }
+        catch (e)
+        {
+            cl.tprintln("red", "DS2484", e);
+
+            continue;
+        }
+
+        cl.tprintln("green", "DS2484", "DS2484 #%d found!", i);
+
+        controller.config();
+
+        buses.onewire.push(controller.get_ow_bus());
+    }
+
+    //// OneWire bus enumeration
+    for(let i = 0; i < buses.onewire.length; i++)
+    {
+        let bus = buses.onewire[i];
+        let devices;
+
+        try
+        {
+            devices = await bus.scan();
+        }
+        catch (e)
+        {
+            cl.tprintln("red", "OneWire", "Error scanning OneWire bus %d: " + e, i);
+
+            continue;
+        }
+
+        cl.tprintln(devices.length > 0 ? null : "yellow", "OneWire", "  Found %d devices on OneWire bus %d:", devices.length, i);
+
+        for(const device of devices)
+        {
+            cl.tprintln(null, "OneWire", "    %s", device);
+
+            if(device.get_family_name() == "DS18B20")
+            {
+                cl.tprintln("green", "OneWire", "      DS18B20 #%d found!", i);
+
+                let sensor = new DS18B20(device);
+
+                // TODO: Check code and add accordingly to sensors array
+                sensors["ds18b20_" + sensor.get_uid().toString(16)] = sensor;
+
+                await sensor.config(12);
+                await sensor.measure();
+
+                cl.tprintln(null, "DS18B20", "        Temperature: %d C", await sensor.get_temperature());
+                cl.tprintln(null, "DS18B20", "        High Alarm Temperature: %d C", (await sensor.get_alarm()).high);
+                cl.tprintln(null, "DS18B20", "        Low Alarm Temperature: %d C", (await sensor.get_alarm()).low);
+                cl.tprintln(null, "DS18B20", "        Parasidic powered: %s", await sensor.is_parasidic_power());
+            }
+        }
+    }
+
     // Sensors
     //// BME280
     const bme280_sensors = [];
@@ -955,12 +1286,12 @@ async function init()
 
         await delay(125 * 16);
 
-        cl.tprintln(null, "BME280", "  BME280 #%d Temperature: %d C", i, await sensor.get_temperature());
-        cl.tprintln(null, "BME280", "  BME280 #%d Humidity: %d %%RH", i, await sensor.get_humidity());
-        cl.tprintln(null, "BME280", "  BME280 #%d Pressure: %d hPa", i, await sensor.get_pressure());
-        cl.tprintln(null, "BME280", "  BME280 #%d Dew point: %d C", i, await sensor.get_dew_point());
-        cl.tprintln(null, "BME280", "  BME280 #%d Heat index: %d C", i, await sensor.get_heat_index());
-        cl.tprintln(null, "BME280", "  BME280 #%d Altitude: %d m", i, await sensor.get_altitude());
+        cl.tprintln(null, "BME280", "  Temperature: %d C", await sensor.get_temperature());
+        cl.tprintln(null, "BME280", "  Humidity: %d %%RH", await sensor.get_humidity());
+        cl.tprintln(null, "BME280", "  Pressure: %d hPa", await sensor.get_pressure());
+        cl.tprintln(null, "BME280", "  Dew point: %d C", await sensor.get_dew_point());
+        cl.tprintln(null, "BME280", "  Heat index: %d C", await sensor.get_heat_index());
+        cl.tprintln(null, "BME280", "  Altitude: %d m", await sensor.get_altitude());
     }
 
     //// MCP3221 ADC
@@ -995,7 +1326,7 @@ async function init()
             sensors["mcp3421_" + i] = sensor;
         }
 
-        cl.tprintln(null, "MCP3221", "  MCP3221 #%d Voltage: %d mV", i, await sensor.get_voltage(10));
+        cl.tprintln(null, "MCP3221", "  Voltage: %d mV", await sensor.get_voltage(10));
     }
 
     //// LTC5597 (RFPowerMeter with MCP3421 ADC)
@@ -1069,7 +1400,7 @@ async function init()
 
         await sensor.config(14, true);
 
-        cl.tprintln(null, "LTC5597", "  LTC5597 #%d Power: %d dBm", i, await sensor.get_power_level(2, 3) + 18.1 + 20);
+        cl.tprintln(null, "LTC5597", "  Power: %d dBm", await sensor.get_power_level(2, 3) + 18.1 + 20);
     }
 
     //// Controllers
@@ -1093,21 +1424,21 @@ async function init()
 
         cl.tprintln("green", "RelayController", "Relay Controller #%d found!", i);
 
-        cl.tprintln(null, "RelayController", "  Relay Controller #%d Unique ID: %s", i, await controller.get_unique_id());
-        cl.tprintln(null, "RelayController", "  Relay Controller #%d Software Version: v%d", i, await controller.get_software_version());
+        cl.tprintln(null, "RelayController", "  Unique ID: %s", await controller.get_unique_id());
+        cl.tprintln(null, "RelayController", "  Software Version: v%d", await controller.get_software_version());
 
         let chip_voltages = await controller.get_chip_voltages();
-        cl.tprintln(null, "RelayController", "  Relay Controller #%d AVDD Voltage: %d mV", i, chip_voltages.avdd);
-        cl.tprintln(null, "RelayController", "  Relay Controller #%d DVDD Voltage: %d mV", i, chip_voltages.dvdd);
-        cl.tprintln(null, "RelayController", "  Relay Controller #%d IOVDD Voltage: %d mV", i, chip_voltages.iovdd);
-        cl.tprintln(null, "RelayController", "  Relay Controller #%d Core Voltage: %d mV", i, chip_voltages.core);
+        cl.tprintln(null, "RelayController", "  AVDD Voltage: %d mV", chip_voltages.avdd);
+        cl.tprintln(null, "RelayController", "  DVDD Voltage: %d mV", chip_voltages.dvdd);
+        cl.tprintln(null, "RelayController", "  IOVDD Voltage: %d mV", chip_voltages.iovdd);
+        cl.tprintln(null, "RelayController", "  Core Voltage: %d mV", chip_voltages.core);
 
         let system_voltages = await controller.get_system_voltages();
-        cl.tprintln(null, "RelayController", "  Relay Controller #%d VIN Voltage: %d mV", i, system_voltages.vin);
+        cl.tprintln(null, "RelayController", "  VIN Voltage: %d mV", system_voltages.vin);
 
         let chip_temperatures = await controller.get_chip_temperatures();
-        cl.tprintln(null, "RelayController", "  Relay Controller #%d ADC Temperature: %d C", i, chip_temperatures.adc);
-        cl.tprintln(null, "RelayController", "  Relay Controller #%d EMU Temperature: %d C", i, chip_temperatures.emu);
+        cl.tprintln(null, "RelayController", "  ADC Temperature: %d C", chip_temperatures.adc);
+        cl.tprintln(null, "RelayController", "  EMU Temperature: %d C", chip_temperatures.emu);
     }
 
     // TODO: Other controllers
@@ -1181,37 +1512,44 @@ async function init()
 
         cl.tprintln("green", "HPPSU", "PSU #%d and EEPROM #%d found!", i, i);
 
-        //await psu.set_enable(true);
+        cl.tprintln(null, "HPPSU", "  ID: 0x%s", (await psu.get_id()).toString(16));
+        cl.tprintln(null, "HPPSU", "  SPN: %s", await psu.get_spn());
+        cl.tprintln(null, "HPPSU", "  Date: %s", await psu.get_date());
+        cl.tprintln(null, "HPPSU", "  Name: %s", await psu.get_name());
+        cl.tprintln(null, "HPPSU", "  CT: %s", await psu.get_ct());
+        cl.tprintln(null, "HPPSU", "  Input Present: %s", await psu.is_input_present());
+        cl.tprintln(null, "HPPSU", "  Input Voltage: %d V", await psu.get_input_voltage());
+        cl.tprintln(null, "HPPSU", "  Input Undervoltage threshold: %d V", await psu.get_input_undervoltage_threshold());
+        cl.tprintln(null, "HPPSU", "  Input Overvoltage threshold: %d V", await psu.get_input_overvoltage_threshold());
+        cl.tprintln(null, "HPPSU", "  Input Current: %d A (max. %d A)", await psu.get_input_current(), await psu.get_peak_input_current());
+        cl.tprintln(null, "HPPSU", "  Input Power: %d W (max. %d W)", await psu.get_input_power(), await psu.get_peak_input_power());
+        cl.tprintln(null, "HPPSU", "  Input Energy: %d Wh", await psu.get_input_energy());
+        cl.tprintln(null, "HPPSU", "  Output Enabled: %s", await psu.is_main_output_enabled());
+        cl.tprintln(null, "HPPSU", "  Output Voltage: %d V", await psu.get_output_voltage());
+        cl.tprintln(null, "HPPSU", "  Output Undervoltage threshold: %d V", await psu.get_output_undervoltage_threshold());
+        cl.tprintln(null, "HPPSU", "  Output Overvoltage threshold: %d V", await psu.get_output_overvoltage_threshold());
+        cl.tprintln(null, "HPPSU", "  Output Current: %d A (max. %d A)", await psu.get_output_current(), await psu.get_peak_output_current());
+        cl.tprintln(null, "HPPSU", "  Output Power: %d W", await psu.get_output_power());
+        cl.tprintln(null, "HPPSU", "  Intake Temperature: %d C", await psu.get_intake_temperature());
+        cl.tprintln(null, "HPPSU", "  Internal Temperature: %d C", await psu.get_internal_temperature());
+        cl.tprintln(null, "HPPSU", "  Fan speed: %d RPM", await psu.get_fan_speed());
+        cl.tprintln(null, "HPPSU", "  Fan target speed: %d RPM", await psu.get_fan_target_speed());
+        cl.tprintln(null, "HPPSU", "  On time: %d s", await psu.get_on_time());
+        cl.tprintln(null, "HPPSU", "  Total on time: %d days", await psu.get_total_on_time() / 60 / 24);
+        cl.tprintln(null, "HPPSU", "  Status flags: 0x%s", (await psu.get_status_flags()).toString(16));
 
-        cl.tprintln(null, "HPPSU", "  PSU #%d ID: 0x%s", i, (await psu.get_id()).toString(16));
-        cl.tprintln(null, "HPPSU", "  PSU #%d SPN: %s", i, await psu.get_spn());
-        cl.tprintln(null, "HPPSU", "  PSU #%d Date: %s", i, await psu.get_date());
-        cl.tprintln(null, "HPPSU", "  PSU #%d Name: %s", i, await psu.get_name());
-        cl.tprintln(null, "HPPSU", "  PSU #%d CT: %s", i, await psu.get_ct());
-        cl.tprintln(null, "HPPSU", "  -------------------------------------");
-        cl.tprintln(null, "HPPSU", "  PSU #%d Input Voltage: %d V", i, await psu.get_input_voltage());
-        cl.tprintln(null, "HPPSU", "  PSU #%d Input Undervoltage threshold: %d V", i, await psu.get_input_undervoltage_threshold());
-        cl.tprintln(null, "HPPSU", "  PSU #%d Input Overvoltage threshold: %d V", i, await psu.get_input_overvoltage_threshold());
-        cl.tprintln(null, "HPPSU", "  PSU #%d Input Current: %d A (max. %d A)", i, await psu.get_input_current(), await psu.get_peak_input_current());
-        cl.tprintln(null, "HPPSU", "  PSU #%d Input Power: %d W (max. %d W)", i, await psu.get_input_power(), await psu.get_peak_input_power());
-        cl.tprintln(null, "HPPSU", "  PSU #%d Input Energy: %d Wh", i, await psu.get_input_energy());
-        cl.tprintln(null, "HPPSU", "  PSU #%d Output Voltage: %d V", i, await psu.get_output_voltage());
-        cl.tprintln(null, "HPPSU", "  PSU #%d Output Undervoltage threshold: %d V", i, await psu.get_output_undervoltage_threshold());
-        cl.tprintln(null, "HPPSU", "  PSU #%d Output Overvoltage threshold: %d V", i, await psu.get_output_overvoltage_threshold());
-        cl.tprintln(null, "HPPSU", "  PSU #%d Output Current: %d A (max. %d A)", i, await psu.get_output_current(), await psu.get_peak_output_current());
-        cl.tprintln(null, "HPPSU", "  PSU #%d Output Power: %d W", i, await psu.get_output_power());
-        cl.tprintln(null, "HPPSU", "  PSU #%d Intake Temperature: %d C", i, await psu.get_intake_temperature());
-        cl.tprintln(null, "HPPSU", "  PSU #%d Internal Temperature: %d C", i, await psu.get_internal_temperature());
-        cl.tprintln(null, "HPPSU", "  PSU #%d Fan speed: %d RPM", i, await psu.get_fan_speed());
-        cl.tprintln(null, "HPPSU", "  PSU #%d Fan target speed: %d RPM", i, await psu.get_fan_target_speed());
-        cl.tprintln(null, "HPPSU", "  PSU #%d On time: %d s", i, await psu.get_on_time());
-        cl.tprintln(null, "HPPSU", "  PSU #%d Total on time: %d days", i, await psu.get_total_on_time() / 60 / 24);
-        cl.tprintln(null, "HPPSU", "  PSU #%d Status flags: 0x%s", i, (await psu.get_status_flags()).toString(16));
-        cl.tprintln(null, "HPPSU", "  PSU #%d ON: %s", i, await psu.is_main_output_enabled());
-        cl.tprintln(null, "HPPSU", "  PSU #%d Input Present: %s", i, await psu.is_input_present());
-
-        await psu.set_fan_target_speed(0);
         await psu.set_enable(false);
+
+        cl.tprintln("magenta", "HPPSU", "  Testing fan at max RPM...");
+        await psu.set_fan_target_speed(17500);
+        await delay(3000);
+        let fan_speed = await psu.get_fan_speed();
+        await psu.set_fan_target_speed(0);
+
+        if(fan_speed >= 16000)
+            cl.tprintln("green", "HPPSU", "    Fan test passed (%d)!", fan_speed);
+        else
+            cl.tprintln("yellow", "HPPSU", "    Fan test failed (%d)!", fan_speed);
 
         //await psu.clear_on_time_and_energy();
         //await psu.clear_peak_input_current();
@@ -1234,19 +1572,11 @@ async function init()
         }
     }
 
+    // Wideband Spectrum monitor
+    await wb_spectrum_monitor_init();
+
     // SSH Server
     await ssh_server_init();
-}
-async function main()
-{
-    // Initialize
-    await init();
-
-    // BME280 sea level pressure for altitude calculation
-    bme280_update_sea_hpa();
-    setInterval(bme280_update_sea_hpa, 1200000); // Update every 20 minutes
-
-    
 }
 
 try

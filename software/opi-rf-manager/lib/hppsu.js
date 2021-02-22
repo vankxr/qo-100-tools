@@ -339,6 +339,11 @@ class HPPSU
     }
     async set_fan_target_speed(rpm)
     {
+        if(rpm < 0 || rpm > 17500)
+            throw new Error("RPM out of bounds");
+
+        // Only values > 3300 actually work
+
         await this.mcu.write(0x40, rpm);
 
         // write 0xXXXX to 0x40 - set surprise_more_flags bit 5, probably signal that fan speed has changed

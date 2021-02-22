@@ -1,0 +1,19 @@
+ [Unit]
+Description=Orange Pi RF Frontend Manager
+After=syslog.target network.target
+StartLimitInterval=200
+StartLimitBurst=5
+
+[Service]
+ExecStart=/root/.nvm/versions/node/v15.8.0/bin/node index.js
+Restart=always
+RestartSec=5
+KillSignal=SIGINT
+SyslogIdentifier=opi-rf-manager
+StandardOutput=null
+WorkingDirectory=/root/opi-rf-manager
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
