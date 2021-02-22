@@ -77,7 +77,7 @@ void gpio_init()
     GPIO->P[2].CTRL   = GPIO_P_CTRL_DRIVESTRENGTHALT_STRONG | (5 << _GPIO_P_CTRL_SLEWRATEALT_SHIFT)
                       | GPIO_P_CTRL_DRIVESTRENGTH_STRONG | (5 << _GPIO_P_CTRL_SLEWRATE_SHIFT);
     GPIO->P[2].MODEL  = GPIO_P_MODEL_MODE0_DISABLED         // NU
-                      | GPIO_P_MODEL_MODE1_DISABLED         // R2
+                      | GPIO_P_MODEL_MODE1_PUSHPULL         // R2
                       | GPIO_P_MODEL_MODE2_DISABLED         // NC
                       | GPIO_P_MODEL_MODE3_DISABLED         // NC
                       | GPIO_P_MODEL_MODE4_DISABLED         // NC
@@ -89,8 +89,8 @@ void gpio_init()
                       | GPIO_P_MODEH_MODE10_DISABLED        // NC
                       | GPIO_P_MODEH_MODE11_DISABLED        // NC
                       | GPIO_P_MODEH_MODE12_DISABLED        // NC
-                      | GPIO_P_MODEH_MODE13_DISABLED        // R7
-                      | GPIO_P_MODEH_MODE14_DISABLED        // R6
+                      | GPIO_P_MODEH_MODE13_PUSHPULL        // R7
+                      | GPIO_P_MODEH_MODE14_PUSHPULL        // R6
                       | GPIO_P_MODEH_MODE15_DISABLED;       // NU
     GPIO->P[2].DOUT   = 0;
     GPIO->P[2].OVTDIS = 0;

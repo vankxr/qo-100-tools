@@ -21,7 +21,7 @@
 // Structs
 
 // Helper macros
-#define I2C_SLAVE_ADDRESS                   0x33
+#define I2C_SLAVE_ADDRESS                   0x3A
 #define I2C_SLAVE_REGISTER_COUNT            256
 #define I2C_SLAVE_REGISTER(t, a)            (*(t *)&ubI2CRegister[(a)])
 #define I2C_SLAVE_REGISTER_VIN_VOLTAGE      0xC0 // 32-bit
