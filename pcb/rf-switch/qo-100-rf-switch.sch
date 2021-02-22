@@ -3191,6 +3191,25 @@ Logo</text>
 <wire x1="2" y1="-2" x2="1.5" y2="-2" width="0.127" layer="21"/>
 <wire x1="2" y1="-1.5" x2="2" y2="-2" width="0.127" layer="21"/>
 </package>
+<package name="DFN6">
+<smd name="1" x="-0.5" y="-0.65" dx="0.25" dy="0.4" layer="1"/>
+<text x="-0.948" y="1.148" size="0.6096" layer="25">&gt;NAME</text>
+<circle x="-1.114" y="-1.117" radius="0.2" width="0" layer="21"/>
+<wire x1="-0.8" y1="0.8" x2="0.8" y2="0.8" width="0.127" layer="51"/>
+<wire x1="0.8" y1="0.8" x2="0.8" y2="-0.8" width="0.127" layer="51"/>
+<wire x1="0.8" y1="-0.8" x2="-0.8" y2="-0.8" width="0.127" layer="51"/>
+<wire x1="-0.8" y1="-0.8" x2="-0.8" y2="0.8" width="0.127" layer="51"/>
+<smd name="7" x="0" y="0" dx="1.4" dy="0.5" layer="1"/>
+<smd name="2" x="0" y="-0.65" dx="0.25" dy="0.4" layer="1"/>
+<smd name="3" x="0.5" y="-0.65" dx="0.25" dy="0.4" layer="1"/>
+<smd name="4" x="0.5" y="0.65" dx="0.25" dy="0.4" layer="1" rot="R180"/>
+<smd name="5" x="0" y="0.65" dx="0.25" dy="0.4" layer="1" rot="R180"/>
+<smd name="6" x="-0.5" y="0.65" dx="0.25" dy="0.4" layer="1" rot="R180"/>
+<wire x1="0.8" y1="-0.8" x2="0.8" y2="-0.5" width="0.127" layer="21"/>
+<wire x1="0.8" y1="0.8" x2="0.8" y2="0.5" width="0.127" layer="21"/>
+<wire x1="-0.8" y1="0.8" x2="-0.8" y2="0.5" width="0.127" layer="21"/>
+<wire x1="-0.8" y1="-0.5" x2="-0.8" y2="-0.8" width="0.127" layer="21"/>
+</package>
 </packages>
 <symbols>
 <symbol name="MCP23008">
@@ -3218,6 +3237,21 @@ Logo</text>
 <pin name="A1" x="-25.4" y="-27.94" length="middle"/>
 <pin name="A0" x="-25.4" y="-25.4" length="middle"/>
 </symbol>
+<symbol name="MIC94305">
+<wire x1="-20.32" y1="0" x2="0" y2="0" width="0.254" layer="94"/>
+<wire x1="0" y1="0" x2="0" y2="-20.32" width="0.254" layer="94"/>
+<wire x1="0" y1="-20.32" x2="-20.32" y2="-20.32" width="0.254" layer="94"/>
+<wire x1="-20.32" y1="-20.32" x2="-20.32" y2="0" width="0.254" layer="94"/>
+<pin name="GND@0" x="-25.4" y="-15.24" length="middle"/>
+<pin name="GND@1" x="-25.4" y="-17.78" length="middle"/>
+<pin name="VIN@1" x="-25.4" y="-5.08" length="middle"/>
+<pin name="VOUT@1" x="5.08" y="-5.08" length="middle" rot="R180"/>
+<pin name="VOUT@0" x="5.08" y="-2.54" length="middle" rot="R180"/>
+<pin name="VIN@0" x="-25.4" y="-2.54" length="middle"/>
+<pin name="EN" x="-25.4" y="-10.16" length="middle"/>
+<text x="-20.32" y="3.556" size="1.27" layer="95">&gt;NAME</text>
+<text x="-20.32" y="1.27" size="1.27" layer="96">&gt;VALUE</text>
+</symbol>
 </symbols>
 <devicesets>
 <deviceset name="MCP23008" prefix="U">
@@ -3244,6 +3278,27 @@ Logo</text>
 <connect gate="G$1" pin="SDA" pad="20"/>
 <connect gate="G$1" pin="VDD" pad="18"/>
 <connect gate="G$1" pin="VSS" pad="17 PAD"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="MIC94305" prefix="U">
+<gates>
+<gate name="G$1" symbol="MIC94305" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="DFN6">
+<connects>
+<connect gate="G$1" pin="EN" pad="4"/>
+<connect gate="G$1" pin="GND@0" pad="3"/>
+<connect gate="G$1" pin="GND@1" pad="7"/>
+<connect gate="G$1" pin="VIN@0" pad="5"/>
+<connect gate="G$1" pin="VIN@1" pad="6"/>
+<connect gate="G$1" pin="VOUT@0" pad="1"/>
+<connect gate="G$1" pin="VOUT@1" pad="2"/>
 </connects>
 <technologies>
 <technology name=""/>
@@ -3520,7 +3575,7 @@ Logo</text>
 </libraries>
 <attributes>
 <attribute name="CNAME" value="None"/>
-<attribute name="CREVISION" value="1"/>
+<attribute name="CREVISION" value="2"/>
 <attribute name="DESIGNER" value="Joao Silva"/>
 </attributes>
 <variantdefs>
@@ -3595,13 +3650,13 @@ Logo</text>
 <part name="U3" library="Microchip" deviceset="MCP23008" device=""/>
 <part name="CON1" library="JST" deviceset="4P" device="-SH-SIDE"/>
 <part name="JP1" library="Pin Header" deviceset="PINHD-2X3" device="" package3d_urn="urn:adsk.eagle:package:22462/2"/>
-<part name="R5" library="Resistor" deviceset="RESISTOR" device="-0603" value="1K Ohms"/>
+<part name="R5" library="Resistor" deviceset="RESISTOR" device="-0603" value="10K Ohms"/>
 <part name="3V2" library="Supply Symbol" deviceset="3V3" device=""/>
-<part name="R6" library="Resistor" deviceset="RESISTOR" device="-0603" value="1K Ohms"/>
+<part name="R6" library="Resistor" deviceset="RESISTOR" device="-0603" value="10K Ohms"/>
 <part name="3V3" library="Supply Symbol" deviceset="3V3" device=""/>
-<part name="R7" library="Resistor" deviceset="RESISTOR" device="-0603" value="1K Ohms"/>
+<part name="R7" library="Resistor" deviceset="RESISTOR" device="-0603" value="10K Ohms"/>
 <part name="GND25" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="C17" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1uF"/>
+<part name="C17" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="10uF"/>
 <part name="GND26" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND27" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="SJ1" library="Solder Jumper" deviceset="SJ2" device="S"/>
@@ -3610,6 +3665,11 @@ Logo</text>
 <part name="GND29" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="SJ3" library="Solder Jumper" deviceset="SJ2" device="S"/>
 <part name="GND30" library="Supply Symbol" deviceset="GND" device=""/>
+<part name="U4" library="Microchip" deviceset="MIC94305" device=""/>
+<part name="3V7" library="Supply Symbol" deviceset="3V3" device=""/>
+<part name="GND31" library="Supply Symbol" deviceset="GND" device=""/>
+<part name="R8" library="Resistor" deviceset="RESISTOR" device="-0603" value="100K Ohms"/>
+<part name="3V10" library="Supply Symbol" deviceset="3V3" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -3952,6 +4012,24 @@ Do not install R4 for F2915</text>
 <instance part="GND30" gate="G$1" x="83.82" y="215.9" smashed="yes">
 <attribute name="VALUE" x="81.026" y="210.82" size="1.778" layer="96"/>
 </instance>
+<instance part="U4" gate="G$1" x="246.38" y="160.02" smashed="yes">
+<attribute name="NAME" x="226.06" y="163.576" size="1.27" layer="95"/>
+<attribute name="VALUE" x="226.06" y="161.29" size="1.27" layer="96"/>
+</instance>
+<instance part="3V7" gate="G$1" x="256.54" y="167.64" smashed="yes">
+<attribute name="VALUE" x="254" y="165.1" size="1.778" layer="96" rot="R90"/>
+</instance>
+<instance part="GND31" gate="G$1" x="215.9" y="134.62" smashed="yes">
+<attribute name="VALUE" x="215.9" y="129.54" size="1.778" layer="96" align="bottom-center"/>
+</instance>
+<instance part="R8" gate="G$1" x="205.74" y="223.52" smashed="yes" rot="R270">
+<attribute name="VALUE" x="202.9714" y="223.52" size="1.778" layer="96" ratio="10" rot="SR270" align="top-left"/>
+<attribute name="NAME" x="208.5086" y="223.52" size="1.778" layer="95" ratio="10" rot="SR270"/>
+<attribute name="TOLERANCE" x="200.4314" y="223.52" size="1.778" layer="97" ratio="10" rot="SR270" align="top-left"/>
+</instance>
+<instance part="3V10" gate="G$1" x="205.74" y="228.6" smashed="yes">
+<attribute name="VALUE" x="203.2" y="226.06" size="1.778" layer="96" rot="R90"/>
+</instance>
 </instances>
 <busses>
 </busses>
@@ -4116,6 +4194,16 @@ Do not install R4 for F2915</text>
 <wire x1="83.82" y1="215.9" x2="83.82" y2="220.98" width="0.1524" layer="91"/>
 <pinref part="SJ3" gate="G$1" pin="1"/>
 </segment>
+<segment>
+<pinref part="GND31" gate="G$1" pin="GND"/>
+<wire x1="215.9" y1="134.62" x2="215.9" y2="142.24" width="0.1524" layer="91"/>
+<wire x1="215.9" y1="142.24" x2="215.9" y2="144.78" width="0.1524" layer="91"/>
+<wire x1="215.9" y1="144.78" x2="220.98" y2="144.78" width="0.1524" layer="91"/>
+<wire x1="220.98" y1="142.24" x2="215.9" y2="142.24" width="0.1524" layer="91"/>
+<junction x="215.9" y="142.24"/>
+<pinref part="U4" gate="G$1" pin="GND@0"/>
+<pinref part="U4" gate="G$1" pin="GND@1"/>
+</segment>
 </net>
 <net name="SW_V1" class="0">
 <segment>
@@ -4135,9 +4223,9 @@ Do not install R4 for F2915</text>
 <pinref part="U1" gate="G$1" pin="V1"/>
 </segment>
 <segment>
-<wire x1="200.66" y1="205.74" x2="205.74" y2="205.74" width="0.1524" layer="91"/>
-<label x="205.74" y="205.74" size="1.778" layer="95" xref="yes"/>
-<pinref part="U3" gate="G$1" pin="GP0"/>
+<wire x1="200.66" y1="200.66" x2="205.74" y2="200.66" width="0.1524" layer="91"/>
+<label x="205.74" y="200.66" size="1.778" layer="95" xref="yes"/>
+<pinref part="U3" gate="G$1" pin="GP2"/>
 </segment>
 </net>
 <net name="SW_V2" class="0">
@@ -4158,9 +4246,9 @@ Do not install R4 for F2915</text>
 <pinref part="U1" gate="G$1" pin="V2"/>
 </segment>
 <segment>
-<wire x1="200.66" y1="203.2" x2="220.98" y2="203.2" width="0.1524" layer="91"/>
-<label x="220.98" y="203.2" size="1.778" layer="95" xref="yes"/>
-<pinref part="U3" gate="G$1" pin="GP1"/>
+<wire x1="200.66" y1="198.12" x2="220.98" y2="198.12" width="0.1524" layer="91"/>
+<label x="220.98" y="198.12" size="1.778" layer="95" xref="yes"/>
+<pinref part="U3" gate="G$1" pin="GP3"/>
 </segment>
 </net>
 <net name="SW_V3" class="0">
@@ -4181,9 +4269,9 @@ Do not install R4 for F2915</text>
 <pinref part="U1" gate="G$1" pin="V3"/>
 </segment>
 <segment>
-<wire x1="200.66" y1="200.66" x2="205.74" y2="200.66" width="0.1524" layer="91"/>
-<label x="205.74" y="200.66" size="1.778" layer="95" xref="yes"/>
-<pinref part="U3" gate="G$1" pin="GP2"/>
+<wire x1="200.66" y1="195.58" x2="205.74" y2="195.58" width="0.1524" layer="91"/>
+<label x="205.74" y="195.58" size="1.778" layer="95" xref="yes"/>
+<pinref part="U3" gate="G$1" pin="GP4"/>
 </segment>
 </net>
 <net name="N$1" class="0">
@@ -4338,6 +4426,21 @@ Do not install R4 for F2915</text>
 <pinref part="3V3" gate="G$1" pin="3V3"/>
 <wire x1="63.5" y1="185.42" x2="63.5" y2="193.04" width="0.1524" layer="91"/>
 </segment>
+<segment>
+<pinref part="U4" gate="G$1" pin="VOUT@0"/>
+<pinref part="3V7" gate="G$1" pin="3V3"/>
+<wire x1="251.46" y1="157.48" x2="256.54" y2="157.48" width="0.1524" layer="91"/>
+<wire x1="256.54" y1="157.48" x2="256.54" y2="167.64" width="0.1524" layer="91"/>
+<pinref part="U4" gate="G$1" pin="VOUT@1"/>
+<wire x1="251.46" y1="154.94" x2="256.54" y2="154.94" width="0.1524" layer="91"/>
+<wire x1="256.54" y1="154.94" x2="256.54" y2="157.48" width="0.1524" layer="91"/>
+<junction x="256.54" y="157.48"/>
+</segment>
+<segment>
+<pinref part="R8" gate="G$1" pin="2"/>
+<pinref part="3V10" gate="G$1" pin="3V3"/>
+<wire x1="205.74" y1="223.52" x2="205.74" y2="228.6" width="0.1524" layer="91"/>
+</segment>
 </net>
 <net name="N$14" class="0">
 <segment>
@@ -4426,6 +4529,16 @@ Do not install R4 for F2915</text>
 <wire x1="83.82" y1="231.14" x2="83.82" y2="236.22" width="0.1524" layer="91"/>
 <pinref part="SJ3" gate="G$1" pin="3"/>
 </segment>
+<segment>
+<wire x1="220.98" y1="157.48" x2="215.9" y2="157.48" width="0.1524" layer="91"/>
+<label x="210.82" y="157.48" size="1.778" layer="95" rot="R180" xref="yes"/>
+<pinref part="U4" gate="G$1" pin="VIN@0"/>
+<pinref part="U4" gate="G$1" pin="VIN@1"/>
+<wire x1="215.9" y1="157.48" x2="210.82" y2="157.48" width="0.1524" layer="91"/>
+<wire x1="220.98" y1="154.94" x2="215.9" y2="154.94" width="0.1524" layer="91"/>
+<wire x1="215.9" y1="154.94" x2="215.9" y2="157.48" width="0.1524" layer="91"/>
+<junction x="215.9" y="157.48"/>
+</segment>
 </net>
 <net name="IO_A0" class="0">
 <segment>
@@ -4475,6 +4588,29 @@ Do not install R4 for F2915</text>
 <pinref part="JP1" gate="-5" pin="S"/>
 <pinref part="R1" gate="G$1" pin="2"/>
 <wire x1="30.48" y1="43.18" x2="43.18" y2="43.18" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="PWR_FILTER_EN" class="0">
+<segment>
+<pinref part="U4" gate="G$1" pin="EN"/>
+<wire x1="220.98" y1="149.86" x2="215.9" y2="149.86" width="0.1524" layer="91"/>
+<label x="215.9" y="149.86" size="1.778" layer="95" rot="R180" xref="yes"/>
+</segment>
+<segment>
+<wire x1="200.66" y1="187.96" x2="205.74" y2="187.96" width="0.1524" layer="91"/>
+<label x="205.74" y="187.96" size="1.778" layer="95" xref="yes"/>
+<pinref part="U3" gate="G$1" pin="GP7"/>
+</segment>
+</net>
+<net name="PWR_SENSE" class="0">
+<segment>
+<wire x1="200.66" y1="205.74" x2="205.74" y2="205.74" width="0.1524" layer="91"/>
+<label x="210.82" y="205.74" size="1.778" layer="95" xref="yes"/>
+<pinref part="U3" gate="G$1" pin="GP0"/>
+<pinref part="R8" gate="G$1" pin="1"/>
+<wire x1="205.74" y1="205.74" x2="210.82" y2="205.74" width="0.1524" layer="91"/>
+<wire x1="205.74" y1="210.82" x2="205.74" y2="205.74" width="0.1524" layer="91"/>
+<junction x="205.74" y="205.74"/>
 </segment>
 </net>
 </nets>
