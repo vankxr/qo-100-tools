@@ -3240,7 +3240,7 @@ Source: &lt;a href="http://www.littelfuse.com/~/media/electronics/datasheets/tvs
 <part name="GND10" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND11" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND12" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="C6" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="10nF"/>
+<part name="C6" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="68nF"/>
 <part name="C7" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1uF"/>
 <part name="R2" library="Resistor" deviceset="RESISTOR" device="-0603" value="41.2K Ohms"/>
 <part name="GND13" library="Supply Symbol" deviceset="GND" device=""/>
@@ -3287,7 +3287,7 @@ Source: &lt;a href="http://www.littelfuse.com/~/media/electronics/datasheets/tvs
 <part name="GND24" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND25" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND26" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="C15" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="10nF"/>
+<part name="C15" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="68nF"/>
 <part name="C16" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1uF"/>
 <part name="R7" library="Resistor" deviceset="RESISTOR" device="-0603" value="41.2K Ohms"/>
 <part name="GND27" library="Supply Symbol" deviceset="GND" device=""/>
@@ -3334,7 +3334,7 @@ Source: &lt;a href="http://www.littelfuse.com/~/media/electronics/datasheets/tvs
 <part name="GND39" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND40" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND41" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="C25" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="10nF"/>
+<part name="C25" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="68nF"/>
 <part name="C26" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1uF"/>
 <part name="R12" library="Resistor" deviceset="RESISTOR" device="-0603" value="41.2K Ohms"/>
 <part name="GND42" library="Supply Symbol" deviceset="GND" device=""/>
@@ -3427,7 +3427,7 @@ Source: &lt;a href="http://www.littelfuse.com/~/media/electronics/datasheets/tvs
 <part name="GND128" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND131" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND133" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="C31" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="10nF"/>
+<part name="C31" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="68nF"/>
 <part name="C30" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1uF"/>
 <part name="R29" library="Resistor" deviceset="RESISTOR" device="-0603" value="41.2K Ohms"/>
 <part name="GND144" library="Supply Symbol" deviceset="GND" device=""/>
