@@ -3,7 +3,7 @@
 <eagle version="9.6.1">
 <drawing>
 <settings>
-<setting alwaysvectorfont="yes"/>
+<setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
 <grid distance="0.1" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.05" altunitdist="mm" altunit="mm"/>
@@ -1687,7 +1687,7 @@ design rules under a new name.</description>
 </pass>
 </autorouter>
 <elements>
-<element name="C25" library="Capacitor" package="CAP0603" value="100nF" x="81.5" y="45.25" smashed="yes" rot="R180">
+<element name="C25" library="Capacitor" package="CAP0603" value="150pF" x="81.5" y="45.25" smashed="yes" rot="R180">
 <attribute name="NAME" x="81.2536" y="46.666" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="84.4464" y="47.282" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="48.47999375" y="112.55999375" size="1.778" layer="27" rot="R180" display="off"/>
@@ -2236,7 +2236,7 @@ design rules under a new name.</description>
 <attribute name="NAME" x="73.38" y="46.19" size="0.8" layer="25" font="vector" ratio="10" align="center-left"/>
 <attribute name="VALUE" x="72.38" y="45.655" size="0.8" layer="27" font="vector" ratio="10" align="center-left"/>
 </element>
-<element name="C27" library="Capacitor" package="CAP0603" value="100nF" x="69.5" y="44" smashed="yes" rot="R180">
+<element name="C27" library="Capacitor" package="CAP0603" value="150pF + 18 nH" x="69.5" y="44" smashed="yes" rot="R180">
 <attribute name="NAME" x="67.9536" y="45.416" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="72.4464" y="46.032" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="69.5" y="44" size="1.778" layer="27" rot="R180" display="off"/>
@@ -2356,12 +2356,12 @@ design rules under a new name.</description>
 <attribute name="NAME" x="87.305" y="22.29" size="0.8" layer="25" font="vector" ratio="10" rot="R180" align="center-left"/>
 <attribute name="VALUE" x="89.905" y="30.58" size="0.8" layer="27" font="vector" ratio="10" rot="R180" align="center-left"/>
 </element>
-<element name="R4" library="Resistor" package="RES0603" value="0 Ohms" x="81.5" y="24.1" smashed="yes" rot="R180">
+<element name="R4" library="Resistor" package="RES0603" value="100 Ohms" x="81.5" y="24.1" smashed="yes" rot="R180">
 <attribute name="NAME" x="78.4456" y="24.116" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="81.5" y="20.8" size="0.8" layer="27" font="vector" ratio="10" rot="R180" display="off"/>
 <attribute name="VALUE" x="84.9544" y="26.132" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 </element>
-<element name="R5" library="Resistor" package="RES0603" value="0 Ohms" x="81.5" y="25.9" smashed="yes" rot="R180">
+<element name="R5" library="Resistor" package="RES0603" value="100 Ohms" x="81.5" y="25.9" smashed="yes" rot="R180">
 <attribute name="NAME" x="78.4456" y="25.916" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="81.5" y="22.6" size="0.8" layer="27" font="vector" ratio="10" rot="R180" display="off"/>
 <attribute name="VALUE" x="84.9544" y="27.932" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
@@ -5653,6 +5653,8 @@ design rules under a new name.</description>
 <approved hash="19,1,00f81f3c220a3dce"/>
 <approved hash="19,1,d942de342f022874"/>
 <approved hash="19,1,db42d90428322a74"/>
+<approved hash="19,1,c5a9ca43dc75d39f"/>
+<approved hash="19,1,c7e4ca3a3c0c31d2"/>
 </errors>
 </board>
 </drawing>

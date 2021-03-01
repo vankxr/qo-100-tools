@@ -5709,7 +5709,7 @@ Logo</text>
 <part name="FRAME5" library="Frame" deviceset="A2-LANDSCAPE" device=""/>
 <part name="U5" library="Maxim Integrated" deviceset="MAX2671" device=""/>
 <part name="RFCON1" library="RF Connector" deviceset="RFCON" device="-SMA-EDGE"/>
-<part name="C25" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100nF"/>
+<part name="C25" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="150pF"/>
 <part name="GND2" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND3" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="C29" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100nF"/>
@@ -5895,7 +5895,7 @@ Logo</text>
 <part name="C26" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100nF"/>
 <part name="GND73" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="U4" library="Renesas" deviceset="F1951*" device="" technology="NBGI"/>
-<part name="C27" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100nF"/>
+<part name="C27" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="150pF + 18 nH"/>
 <part name="R14" library="Resistor" deviceset="RESISTOR" device="-0603" value="61.9 Ohms"/>
 <part name="R12" library="Resistor" deviceset="RESISTOR" device="-0603" value="105 Ohms"/>
 <part name="R16" library="Resistor" deviceset="RESISTOR" device="-0603" value="105 Ohms"/>
@@ -5943,8 +5943,8 @@ Logo</text>
 <part name="GND31" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="CON1" library="JST" deviceset="3P" device="-SH-SIDE" value="3P-SH-SIDE"/>
 <part name="GND43" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="R4" library="Resistor" deviceset="RESISTOR" device="-0603" value="0 Ohms"/>
-<part name="R5" library="Resistor" deviceset="RESISTOR" device="-0603" value="0 Ohms"/>
+<part name="R4" library="Resistor" deviceset="RESISTOR" device="-0603" value="100 Ohms"/>
+<part name="R5" library="Resistor" deviceset="RESISTOR" device="-0603" value="100 Ohms"/>
 <part name="U13" library="Microchip" deviceset="MCP6C02" device="" technology="-020"/>
 <part name="R36" library="Resistor" deviceset="RESISTOR" device="-1206" value="0.03 Ohms">
 <attribute name="TOLERANCE" value="1%"/>
