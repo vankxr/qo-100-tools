@@ -1,0 +1,34 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug",
+            "cwd": "${workspaceRoot}",
+            "executable": "./bin/v1.icyradio-pa-bias-controller.elf",
+            "request": "launch",
+            "type": "cortex-debug",
+            "preLaunchTask": "Build",
+            "servertype": "jlink",
+            "device": "EFM32TG11BXXXF128",
+            "svdFile": "${env:ARM_LIBROOT}/SiliconLabs.EFM32TG11B_DFP.5.8.10/SVD/EFM32TG11B/EFM32TG11B120F128GM32.svd",
+            "interface": "swd",
+            "swoConfig": {
+                "enabled": true,
+                "swoFrequency": 2000000,
+                "cpuFrequency": 8000000,
+                "source": "probe",
+                "decoders": [
+                    {
+                        "port": 0,
+                        "label": "Console",
+                        "type": "console",
+                        "showOnStartup": true
+                    }
+                ]
+            }
+        }
+    ]
+}
