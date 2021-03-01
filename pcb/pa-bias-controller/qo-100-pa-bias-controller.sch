@@ -5541,9 +5541,9 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 </class>
 </classes>
 <parts>
-<part name="R13" library="Resistor" deviceset="RESISTOR" device="-2512" value="0.012 Ohms"/>
-<part name="R14" library="Resistor" deviceset="RESISTOR" device="-2512" value="0.012 Ohms"/>
-<part name="R15" library="Resistor" deviceset="RESISTOR" device="-2512" value="0.012 Ohms"/>
+<part name="R13" library="Resistor" deviceset="RESISTOR" device="-2512" value="DNP"/>
+<part name="R14" library="Resistor" deviceset="RESISTOR" device="-2512" value="0.1 Ohms"/>
+<part name="R15" library="Resistor" deviceset="RESISTOR" device="-2512" value="DNP"/>
 <part name="CON2" library="Generic Connector" deviceset="2EDG-5P" device="-5MM"/>
 <part name="GND2" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="LOGO1" library="Silkscreen" deviceset="JS" device="-10MM"/>
@@ -5570,8 +5570,8 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 <part name="3V10" library="Supply Symbol" deviceset="3V3" device=""/>
 <part name="CON1" library="JST" deviceset="3P" device="-SH-SIDE" value="3P-SH-SIDE"/>
 <part name="GND24" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="R2" library="Resistor" deviceset="RESISTOR" device="-0603" value="0 Ohms"/>
-<part name="R3" library="Resistor" deviceset="RESISTOR" device="-0603" value="0 Ohms"/>
+<part name="R2" library="Resistor" deviceset="RESISTOR" device="-0603" value="100 Ohms"/>
+<part name="R3" library="Resistor" deviceset="RESISTOR" device="-0603" value="100 Ohms"/>
 <part name="C3" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100nF"/>
 <part name="GND26" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="3V3" library="Supply Symbol" deviceset="3V3" device=""/>
@@ -5662,17 +5662,17 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 <attribute name="COLOR" value="GREEN"/>
 </part>
 <part name="GND1027" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="C15" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="DNP"/>
-<part name="R19" library="Resistor" deviceset="RESISTOR" device="-0603" value="0 Ohms"/>
-<part name="R11" library="Resistor" deviceset="RESISTOR" device="-0603" value="0 Ohms"/>
+<part name="C15" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100nF"/>
+<part name="R19" library="Resistor" deviceset="RESISTOR" device="-0603" value="1K Ohms"/>
+<part name="R11" library="Resistor" deviceset="RESISTOR" device="-0603" value="1K Ohms"/>
 <part name="R23" library="Resistor" deviceset="RESISTOR" device="-0603" value="20 Ohms"/>
 <part name="C19" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="220nF"/>
 <part name="GND1" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND5" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="5V00002" library="Supply Symbol" deviceset="5V0" device=""/>
 <part name="3V2" library="Supply Symbol" deviceset="3V3" device=""/>
-<part name="R7" library="Resistor" deviceset="RESISTOR" device="-0603" value="130K Ohms"/>
-<part name="R8" library="Resistor" deviceset="RESISTOR" device="-0603" value="10K Ohms"/>
+<part name="R7" library="Resistor" deviceset="RESISTOR" device="-0603" value="15K Ohms"/>
+<part name="R8" library="Resistor" deviceset="RESISTOR" device="-0603" value="1K Ohms"/>
 <part name="GND3" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="C13" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100nF"/>
 <part name="GND4" library="Supply Symbol" deviceset="GND" device=""/>
@@ -5680,23 +5680,23 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 <part name="R17" library="Resistor" deviceset="RESISTOR" device="-2512" value="0.012 Ohms"/>
 <part name="R18" library="Resistor" deviceset="RESISTOR" device="-2512" value="0.012 Ohms"/>
 <part name="CON3" library="Generic Connector" deviceset="2EDG-5P" device="-5MM"/>
-<part name="C16" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="DNP"/>
-<part name="R20" library="Resistor" deviceset="RESISTOR" device="-0603" value="0 Ohms"/>
-<part name="R12" library="Resistor" deviceset="RESISTOR" device="-0603" value="0 Ohms"/>
+<part name="C16" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100nF"/>
+<part name="R20" library="Resistor" deviceset="RESISTOR" device="-0603" value="1K Ohms"/>
+<part name="R12" library="Resistor" deviceset="RESISTOR" device="-0603" value="1K Ohms"/>
 <part name="R24" library="Resistor" deviceset="RESISTOR" device="-0603" value="20 Ohms"/>
 <part name="C20" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="220nF"/>
 <part name="GND6" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="R9" library="Resistor" deviceset="RESISTOR" device="-0603" value="130K Ohms"/>
-<part name="R10" library="Resistor" deviceset="RESISTOR" device="-0603" value="10K Ohms"/>
+<part name="R9" library="Resistor" deviceset="RESISTOR" device="-0603" value="15K Ohms"/>
+<part name="R10" library="Resistor" deviceset="RESISTOR" device="-0603" value="1\K Ohms"/>
 <part name="GND7" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="C14" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100nF"/>
 <part name="GND8" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND9" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND10" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="R22" library="Resistor" deviceset="RESISTOR" device="-0603" value="250 Ohms"/>
+<part name="R22" library="Resistor" deviceset="RESISTOR" device="-0603" value="255 Ohms"/>
 <part name="C18" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="20nF"/>
 <part name="GND11" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="R21" library="Resistor" deviceset="RESISTOR" device="-0603" value="250 Ohms"/>
+<part name="R21" library="Resistor" deviceset="RESISTOR" device="-0603" value="255 Ohms"/>
 <part name="C17" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="20nF"/>
 <part name="GND12" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="R6" library="Resistor" deviceset="RESISTOR" device="-0603" value="10K Ohms"/>
@@ -5747,9 +5747,9 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 <part name="R38" library="Resistor" deviceset="RESISTOR" device="-0603" value="10K Ohms"/>
 <part name="L7" library="Inductor" deviceset="INDUCTOR" device="-0603" value="47nH"/>
 <part name="L8" library="Inductor" deviceset="INDUCTOR" device="-0603" value="47nH"/>
-<part name="C45" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="DNP"/>
+<part name="C45" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="10nF"/>
 <part name="GND32" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="C46" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="DNP"/>
+<part name="C46" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="10pF"/>
 <part name="GND33" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND34" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="RFCON2" library="RF Connector" deviceset="RFCON" device="-SSMT"/>
@@ -5767,11 +5767,11 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 <part name="3V13" library="Supply Symbol" deviceset="3V3" device=""/>
 <part name="R40" library="Resistor" deviceset="RESISTOR" device="-0603" value="1K Ohms"/>
 <part name="3V14" library="Supply Symbol" deviceset="3V3" device=""/>
-<part name="C40" library="Capacitor" deviceset="CAPACITOR" device="-2220" value="10uF">
+<part name="C40" library="Capacitor" deviceset="CAPACITOR" device="-2220" value="22uF">
 <attribute name="VOLTAGE" value="50V"/>
 </part>
 <part name="GND35" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="C44" library="Capacitor" deviceset="CAPACITOR" device="-2220" value="10uF">
+<part name="C44" library="Capacitor" deviceset="CAPACITOR" device="-2220" value="22uF">
 <attribute name="VOLTAGE" value="50V"/>
 </part>
 <part name="GND36" library="Supply Symbol" deviceset="GND" device=""/>
