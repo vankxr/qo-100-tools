@@ -70,11 +70,7 @@ void _emu_isr()
 
 void emu_init(uint8_t ubImmediateSwitch)
 {
-    if(ubImmediateSwitch)
-    {
-        EMU->PWRCFG = ((uint32_t)1 << _EMU_PWRCFG_PWRCFG_SHIFT) & _EMU_PWRCFG_PWRCFG_MASK;
-        EMU->PWRCTRL = EMU_PWRCTRL_ANASW_AVDD;
-    }
+    EMU->PWRCTRL = (ubImmediateSwitch ? EMU_PWRCTRL_IMMEDIATEPWRSWITCH : 0) | EMU_PWRCTRL_REGPWRSEL_DVDD | EMU_PWRCTRL_ANASW_AVDD;
 
     EMU->IFC = _EMU_IFC_MASK; // Clear pending IRQs
     IRQ_CLEAR(EMU_IRQn); // Clear pending vector
@@ -107,7 +103,7 @@ void emu_dcdc_init(float fTargetVoltage, float fMaxLNCurrent, float fMaxLPCurren
     else
         ubLPBias = 3;
 
-    EMU->DCDCMISCCTRL = (EMU->DCDCMISCCTRL & ~_EMU_DCDCMISCCTRL_LPCMPBIAS_MASK) | ((uint32_t)ubLPBias << _EMU_DCDCMISCCTRL_LPCMPBIAS_SHIFT);
+    EMU->DCDCMISCCTRL = (EMU->DCDCMISCCTRL & ~_EMU_DCDCMISCCTRL_LPCMPBIASEM234H_MASK) | ((uint32_t)ubLPBias << _EMU_DCDCMISCCTRL_LPCMPBIASEM234H_SHIFT);
     EMU->DCDCMISCCTRL |= EMU_DCDCMISCCTRL_LNFORCECCM; // Force CCM to prevent reverse current
     EMU->DCDCLPCTRL |= EMU_DCDCLPCTRL_LPVREFDUTYEN; // Enable duty cycling of the bias for LP mode
     EMU->DCDCLNFREQCTRL = (EMU->DCDCLNFREQCTRL & ~_EMU_DCDCLNFREQCTRL_RCOBAND_MASK) | 4; // Set RCO Band to 7MHz
@@ -237,7 +233,7 @@ void emu_dcdc_init(float fTargetVoltage, float fMaxLNCurrent, float fMaxLPCurren
         EMU->DCDCLPVCTRL = ubLPVRef << _EMU_DCDCLPVCTRL_LPVREF_SHIFT;
     }
 
-    EMU->DCDCLPCTRL = (EMU->DCDCLPCTRL & ~_EMU_DCDCLPCTRL_LPCMPHYSSEL_MASK) | (((DEVINFO->DCDCLPCMPHYSSEL1 & (((uint32_t)0xFF) << (ubLPBias * 8))) >> (ubLPBias * 8)) << _EMU_DCDCLPCTRL_LPCMPHYSSEL_SHIFT);
+    EMU->DCDCLPCTRL = (EMU->DCDCLPCTRL & ~_EMU_DCDCLPCTRL_LPCMPHYSSELEM234H_MASK) | (((DEVINFO->DCDCLPCMPHYSSEL1 & (((uint32_t)0xFF) << (ubLPBias * 8))) >> (ubLPBias * 8)) << _EMU_DCDCLPCTRL_LPCMPHYSSELEM234H_SHIFT);
 
     while(EMU->DCDCSYNC & EMU_DCDCSYNC_DCDCCTRLBUSY); // Wait for configuration to write
 
@@ -249,8 +245,7 @@ void emu_dcdc_init(float fTargetVoltage, float fMaxLNCurrent, float fMaxLPCurren
     EMU->DCDCCTRL = EMU_DCDCCTRL_DCDCMODEEM4_EM4LOWPOWER | EMU_DCDCCTRL_DCDCMODEEM23_EM23LOWPOWER | EMU_DCDCCTRL_DCDCMODE_LOWNOISE;
 
     // Switch digital domain to DVDD
-    EMU->PWRCFG = EMU_PWRCFG_PWRCFG_DCDCTODVDD;
-    EMU->PWRCTRL = EMU_PWRCTRL_ANASW_AVDD;
+    EMU->PWRCTRL = EMU_PWRCTRL_REGPWRSEL_DVDD | EMU_PWRCTRL_ANASW_AVDD;
 }
 
 float emu_get_temperature()

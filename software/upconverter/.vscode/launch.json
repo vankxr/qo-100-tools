@@ -7,13 +7,13 @@
         {
             "name": "Debug",
             "cwd": "${workspaceRoot}",
-            "executable": "./bin/v1.icyradio-upconverter.elf",
+            "executable": "./bin/v1.icyradio-relay-controller.elf",
             "request": "launch",
             "type": "cortex-debug",
             "preLaunchTask": "Build",
             "servertype": "jlink",
-            "device": "EFM32PG1BXXXF256",
-            "svdFile": "${env:ARM_LIBROOT}/SiliconLabs.GeckoPlatform_EFM32PG1B_DFP.2.7.0/SVD/EFM32PG1B/EFM32PG1B200F256GM32.svd",
+            "device": "EFM32TG11BXXXF128",
+            "svdFile": "${env:ARM_LIBROOT}/SiliconLabs.EFM32TG11B_DFP.5.8.10/SVD/EFM32TG11B/EFM32TG11B120F128GM32.svd",
             "interface": "swd",
             "swoConfig": {
                 "enabled": true,

@@ -1,10 +1,10 @@
 # App Config
 ARM_LIBROOT ?= /mnt/e/Projetos/ARM/ARMdev/lib/
-DEVICEDIR = $(ARM_LIBROOT)/SiliconLabs.GeckoPlatform_EFM32PG1B_DFP.2.7.0/Device/SiliconLabs/EFM32PG1B
+DEVICEDIR = $(ARM_LIBROOT)/SiliconLabs.EFM32TG11B_DFP.5.8.10/Device/SiliconLabs/EFM32TG11B
 COREDIR = $(ARM_LIBROOT)/ARM.CMSIS.5.7.0/CMSIS
-MCU_TYPE = EFM32PG1B200F256GM32
+MCU_TYPE = EFM32TG11B120F128GM32
 APP_ADDRESS = 0x00000000
-APP_NAME = icyradio-upconverter
+APP_NAME = icyradio-relay-controller
 
 # Multiprocessing
 MAX_PARALLEL =
@@ -54,11 +54,11 @@ OBJDUMP = arm-none-eabi-objdump
 GDB = arm-none-eabi-gdb
 
 # Compillers & Linker flags
-ASFLAGS = -mthumb -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16
-CFLAGS = $(addprefix -I,$(INCLUDEDIRSTRUCT)) -mthumb -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -nostdlib -nostartfiles -ffunction-sections -fdata-sections -ffreestanding -O3 -std=gnu99 -Wpointer-arith -Wundef -Werror -D$(MCU_TYPE) -DBUILD_VERSION=$(BUILD_VERSION)
-CXXFLAGS = $(addprefix -I,$(INCLUDEDIRSTRUCT)) -mthumb -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -nostdlib -nostartfiles -ffunction-sections -fdata-sections -ffreestanding -fno-rtti -fno-exceptions -O3 -std=c++17 -Wpointer-arith -Wundef -Werror -D$(MCU_TYPE) -DBUILD_VERSION=$(BUILD_VERSION)
-LDFLAGS = -mthumb -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 --specs=nano.specs --specs=nosys.specs -nostdlib -nostartfiles -ffunction-sections -fdata-sections -ffreestanding -Wl,--gc-sections
-LDLIBS = -lm -lc -lgcc -lnosys -larm_cortexM4lf_math
+ASFLAGS = -mthumb -mcpu=cortex-m0plus -mfloat-abi=soft
+CFLAGS = $(addprefix -I,$(INCLUDEDIRSTRUCT)) -mthumb -mcpu=cortex-m0plus -mfloat-abi=soft -nostdlib -nostartfiles -ffunction-sections -fdata-sections -ffreestanding -O3 -std=gnu99 -Wpointer-arith -Wundef -Werror -D$(MCU_TYPE) -DBUILD_VERSION=$(BUILD_VERSION)
+CXXFLAGS = $(addprefix -I,$(INCLUDEDIRSTRUCT)) -mthumb -mcpu=cortex-m0plus -mfloat-abi=soft -nostdlib -nostartfiles -ffunction-sections -fdata-sections -ffreestanding -fno-rtti -fno-exceptions -O3 -std=c++17 -Wpointer-arith -Wundef -Werror -D$(MCU_TYPE) -DBUILD_VERSION=$(BUILD_VERSION)
+LDFLAGS = -mthumb -mcpu=cortex-m0plus -mfloat-abi=soft --specs=nano.specs --specs=nosys.specs -nostdlib -nostartfiles -ffunction-sections -fdata-sections -ffreestanding -Wl,--gc-sections
+LDLIBS = -lm -lc -lgcc -lnosys -larm_cortexM0l_math
 LDLIBSPATH = -L$(COREDIR)/DSP/Lib/GCC
 
 ifeq ($(BUILD_TYPE), debug)
@@ -67,7 +67,7 @@ CXXFLAGS += -g
 endif
 
 ## Linker scripts
-LDSCRIPT = ld/efm32pg1bxxxf256_app.ld
+LDSCRIPT = ld/efm32tg11bxxxf128_app.ld
 
 # Target
 TARGET = $(TARGETDIR)/v$(BUILD_VERSION).$(APP_NAME)
@@ -100,14 +100,14 @@ $(TARGET).lss: $(TARGET).elf
 
 $(TARGET).bin: $(TARGET).elf
 	@echo Creating BIN file \'$@\'...
-	@$(OBJCOPY) -O binary --only-section=.isr_vector --only-section=.text --only-section=.ARM --only-section=.iram0.text --only-section=.iram1.text --only-section=.data $< $(TARGET).irom0.bin
+	@$(OBJCOPY) -O binary --only-section=.isr_vector --only-section=.text --only-section=.ARM --only-section=.iram0.text --only-section=.data $< $(TARGET).irom0.bin
 	@$(OBJCOPY) -O binary --only-section=.irom1.text $< $(TARGET).irom1.bin
 	@$(OBJCOPY) -O binary --only-section=.drom0.data $< $(TARGET).drom0.bin
 
 $(TARGET).hex: $(TARGET).elf
 	@echo Creating HEX file \'$@\'...
 	@$(OBJCOPY) -O ihex --remove-section=.irom2.text --remove-section=.drom1.data $< $@
-	@$(OBJCOPY) -O ihex --only-section=.isr_vector --only-section=.text --only-section=.ARM --only-section=.iram0.text --only-section=.iram1.text --only-section=.data $< $(TARGET).flash.hex
+	@$(OBJCOPY) -O ihex --only-section=.isr_vector --only-section=.text --only-section=.ARM --only-section=.iram0.text --only-section=.data $< $(TARGET).flash.hex
 	@$(OBJCOPY) -O ihex --only-section=.irom1.text $< $(TARGET).boot.hex
 	@$(OBJCOPY) -O ihex --only-section=.drom0.data $< $(TARGET).userdata.hex
 

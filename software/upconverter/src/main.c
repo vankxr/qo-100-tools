@@ -10,7 +10,6 @@
 #include "emu.h"
 #include "cmu.h"
 #include "gpio.h"
-#include "dbg.h"
 #include "msc.h"
 #include "rtcc.h"
 #include "adc.h"
@@ -18,8 +17,30 @@
 #include "usart.h"
 #include "adf4351.h"
 #include "f1951.h"
+#include "i2c.h"
+#include "mcp3421.h"
+#include "wdog.h"
 
 // Structs
+
+// Helper macros
+#define I2C_SLAVE_ADDRESS                       0x3C
+#define I2C_SLAVE_REGISTER_COUNT                256
+#define I2C_SLAVE_REGISTER(t, a)                (*(t *)&ubI2CRegister[(a)])
+#define I2C_SLAVE_REGISTER_WRITE_MASK(t, a)     (*(t *)&ubI2CRegisterWriteMask[(a)])
+#define I2C_SLAVE_REGISTER_READ_MASK(t, a)      (*(t *)&ubI2CRegisterReadMask[(a)])
+#define I2C_SLAVE_REGISTER_UVTH_VOLTAGE         0x20 // 32-bit
+#define I2C_SLAVE_REGISTER_VIN_VOLTAGE          0xC0 // 32-bit
+#define I2C_SLAVE_REGISTER_5V0_VOLTAGE          0xC4 // 32-bit
+#define I2C_SLAVE_REGISTER_AVDD_VOLTAGE         0xD0 // 32-bit
+#define I2C_SLAVE_REGISTER_DVDD_VOLTAGE         0xD4 // 32-bit
+#define I2C_SLAVE_REGISTER_IOVDD_VOLTAGE        0xD8 // 32-bit
+#define I2C_SLAVE_REGISTER_CORE_VOLTAGE         0xDC // 32-bit
+#define I2C_SLAVE_REGISTER_EMU_TEMP             0xE0 // 32-bit
+#define I2C_SLAVE_REGISTER_ADC_TEMP             0xE4 // 32-bit
+#define I2C_SLAVE_REGISTER_SW_VERSION           0xF4 // 16-bit
+#define I2C_SLAVE_REGISTER_DEV_UIDL             0xF8 // 32-bit
+#define I2C_SLAVE_REGISTER_DEV_UIDH             0xFC // 32-bit
 
 // Forward declarations
 static void reset() __attribute__((noreturn));
@@ -27,10 +48,22 @@ static void sleep();
 
 static uint32_t get_free_ram();
 
-void get_device_name(char *pszDeviceName, uint32_t ulDeviceNameSize);
+static void get_device_name(char *pszDeviceName, uint32_t ulDeviceNameSize);
 static uint16_t get_device_revision();
 
+static void wdog_warning_isr();
+
+static void i2c_slave_register_init();
+static uint8_t i2c_slave_addr_isr(uint8_t ubRnW);
+static uint8_t i2c_slave_tx_data_isr();
+static uint8_t i2c_slave_rx_data_isr(uint8_t ubData);
+
 // Variables
+volatile uint8_t ubI2CRegister[I2C_SLAVE_REGISTER_COUNT];
+volatile uint8_t ubI2CRegisterWriteMask[I2C_SLAVE_REGISTER_COUNT];
+volatile uint8_t ubI2CRegisterReadMask[I2C_SLAVE_REGISTER_COUNT];
+volatile uint8_t ubI2CRegisterPointer = 0x00;
+volatile uint8_t ubI2CFirstWrite = 1;
 
 // ISRs
 
@@ -190,21 +223,113 @@ uint16_t get_device_revision()
     return usRevision;
 }
 
+void wdog_warning_isr()
+{
+    DBGPRINTLN_CTX("Watchdog warning!");
+}
+
+void i2c_slave_register_init()
+{
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+    {
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_VIN_VOLTAGE)      = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_VIN_VOLTAGE)      = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_VIN_VOLTAGE)      = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_5V0_VOLTAGE)      = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_5V0_VOLTAGE)      = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_5V0_VOLTAGE)      = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_AVDD_VOLTAGE)     = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_AVDD_VOLTAGE)     = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_AVDD_VOLTAGE)     = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_DVDD_VOLTAGE)     = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_DVDD_VOLTAGE)     = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_DVDD_VOLTAGE)     = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_IOVDD_VOLTAGE)    = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_IOVDD_VOLTAGE)    = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_IOVDD_VOLTAGE)    = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_CORE_VOLTAGE)     = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_CORE_VOLTAGE)     = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_CORE_VOLTAGE)     = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_EMU_TEMP)         = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_EMU_TEMP)         = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_EMU_TEMP)         = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_ADC_TEMP)         = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_ADC_TEMP)         = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_ADC_TEMP)         = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (uint16_t, I2C_SLAVE_REGISTER_SW_VERSION)       = BUILD_VERSION;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint16_t, I2C_SLAVE_REGISTER_SW_VERSION)       = 0x0000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint16_t, I2C_SLAVE_REGISTER_SW_VERSION)       = 0xFFFF;
+        I2C_SLAVE_REGISTER              (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDL)         = DEVINFO->UNIQUEL;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDL)         = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDL)         = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDH)         = DEVINFO->UNIQUEH;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDH)         = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDH)         = 0xFFFFFFFF;
+    }
+}
+uint8_t i2c_slave_addr_isr(uint8_t ubAddress)
+{
+    ubI2CFirstWrite = 1;
+
+    // Hardware address comparator already verifies if the address matches
+    // This is only called if address is valid
+    // All we need to do is ACK
+
+    return 1; // ACK
+}
+uint8_t i2c_slave_tx_data_isr()
+{
+    uint8_t ubData = ubI2CRegister[ubI2CRegisterPointer] & ubI2CRegisterReadMask[ubI2CRegisterPointer];
+    ubI2CRegisterPointer++;
+
+    return ubData;
+}
+uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
+{
+    if(ubI2CFirstWrite)
+    {
+        ubI2CRegisterPointer = ubData;
+        ubI2CFirstWrite = 0;
+
+        return 1; // ACK
+    }
+
+    ubI2CRegister[ubI2CRegisterPointer] = (ubI2CRegister[ubI2CRegisterPointer] & ~ubI2CRegisterWriteMask[ubI2CRegisterPointer]) | (ubData & ubI2CRegisterWriteMask[ubI2CRegisterPointer]);
+    ubI2CRegisterPointer++;
+
+    return 1; // ACK
+}
+
+float get_5v0_current(uint32_t ulSamples)
+{
+    float fShuntVoltage = 0.f;
+
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+    {
+        for(uint32_t i = 0; i < ulSamples; i++)
+            fShuntVoltage += mcp3421_read_adc(MCP3421_PGA_X1);
+    }
+
+    fShuntVoltage /= ulSamples; // Average
+    fShuntVoltage /= 20; // Differential amplifier gain
+
+    return fShuntVoltage / 0.03f; // 0.03 Ohm current shunt resistor
+}
+
 int init()
 {
     rmu_init(RMU_CTRL_PINRMODE_FULL, RMU_CTRL_SYSRMODE_EXTENDED, RMU_CTRL_LOCKUPRMODE_EXTENDED, RMU_CTRL_WDOGRMODE_EXTENDED); // Init RMU and set reset modes
 
-    emu_init(0); // Init EMU
-    emu_dcdc_init(1800.f, 50.f, 100.f, 0.f); // Init DC-DC converter (1.8 V, 50 mA active, 100 uA sleep, 0 mA reverse limit)
+    emu_init(1); // Init EMU, ignore DCDC and switch digital power immediatly to DVDD
 
     cmu_init(); // Init Clocks
-
-    dbg_init(); // Init Debug module
-    dbg_swo_config(BIT(0) | BIT(1), 2000000); // Init SWO channels 0 and 1 at 2 MHz
 
     msc_init(); // Init Flash, RAM and caches
 
     systick_init(); // Init system tick
+
+    wdog_init((8 <<_WDOG_CTRL_PERSEL_SHIFT) | (3 << _WDOG_CTRL_WARNSEL_SHIFT)); // Init the watchdog timer, 2049 ms timeout, 75% warning
+    wdog_set_warning_isr(wdog_warning_isr);
 
     gpio_init(); // Init GPIOs
     ldma_init(); // Init LDMA
@@ -217,13 +342,20 @@ int init()
     float fIOVDDHighThresh, fIOVDDLowThresh;
 
     emu_vmon_avdd_config(1, 3.1f, &fAVDDLowThresh, 3.22f, &fAVDDHighThresh); // Enable AVDD monitor
-    emu_vmon_dvdd_config(1, 1.7f, &fDVDDLowThresh); // Enable DVDD monitor
+    emu_vmon_dvdd_config(1, 3.1f, &fDVDDLowThresh); // Enable DVDD monitor
     emu_vmon_iovdd_config(1, 3.15f, &fIOVDDLowThresh); // Enable IOVDD monitor
 
     fDVDDHighThresh = fDVDDLowThresh + 0.026f; // Hysteresis from datasheet
     fIOVDDHighThresh = fIOVDDLowThresh + 0.026f; // Hysteresis from datasheet
 
-    usart0_init(16000000, 0, USART_SPI_MSB_FIRST, -1, 19, 18);
+    usart0_init(12000000, 0, USART_SPI_MSB_FIRST, -1, 0, 0);
+    usart1_init(1000000, USART_FRAME_STOPBITS_ONE | USART_FRAME_PARITY_NONE | USART_FRAME_DATABITS_EIGHT, -1, 5, -1, -1);
+
+    i2c0_init(I2C_SLAVE_ADDRESS, 1, 1);
+    i2c0_set_slave_addr_isr(i2c_slave_addr_isr);
+    i2c0_set_slave_tx_data_isr(i2c_slave_tx_data_isr);
+    i2c0_set_slave_rx_data_isr(i2c_slave_rx_data_isr);
+    i2c1_init(I2C_FAST, 3, 3);
 
     char szDeviceName[32];
 
@@ -256,9 +388,8 @@ int init()
     DBGPRINTLN_CTX("EMU - IOVDD Voltage: %.2f mV", adc_get_iovdd());
     DBGPRINTLN_CTX("EMU - IOVDD Status: %s", g_ubIOVDDLow ? "LOW" : "OK");
     DBGPRINTLN_CTX("EMU - Core Voltage: %.2f mV", adc_get_corevdd());
-    DBGPRINTLN_CTX("EMU - 5V0 Voltage: %.2f mV", adc_get_5v0());
-    DBGPRINTLN_CTX("EMU - 12V0 Voltage: %.2f mV", adc_get_12v0());
     DBGPRINTLN_CTX("EMU - VIN Voltage: %.2f mV", adc_get_vin());
+    DBGPRINTLN_CTX("EMU - 5V0 Voltage: %.2f mV", adc_get_5v0());
 
     DBGPRINTLN_CTX("CMU - HFXO Oscillator: %.3f MHz", (float)HFXO_OSC_FREQ / 1000000);
     DBGPRINTLN_CTX("CMU - HFRCO Oscillator: %.3f MHz", (float)HFRCO_OSC_FREQ / 1000000);
@@ -268,41 +399,70 @@ int init()
     DBGPRINTLN_CTX("CMU - ULFRCO Oscillator: %.3f kHz", (float)ULFRCO_OSC_FREQ / 1000);
     DBGPRINTLN_CTX("CMU - HFSRC Clock: %.3f MHz", (float)HFSRC_CLOCK_FREQ / 1000000);
     DBGPRINTLN_CTX("CMU - HF Clock: %.3f MHz", (float)HF_CLOCK_FREQ / 1000000);
+    DBGPRINTLN_CTX("CMU - HFBUS Clock: %.3f MHz", (float)HFBUS_CLOCK_FREQ / 1000000);
     DBGPRINTLN_CTX("CMU - HFCORE Clock: %.3f MHz", (float)HFCORE_CLOCK_FREQ / 1000000);
     DBGPRINTLN_CTX("CMU - HFEXP Clock: %.3f MHz", (float)HFEXP_CLOCK_FREQ / 1000000);
     DBGPRINTLN_CTX("CMU - HFPER Clock: %.3f MHz", (float)HFPER_CLOCK_FREQ / 1000000);
+    DBGPRINTLN_CTX("CMU - HFPERB Clock: %.3f MHz", (float)HFPERB_CLOCK_FREQ / 1000000);
+    DBGPRINTLN_CTX("CMU - HFPERC Clock: %.3f MHz", (float)HFPERC_CLOCK_FREQ / 1000000);
     DBGPRINTLN_CTX("CMU - HFLE Clock: %.3f MHz", (float)HFLE_CLOCK_FREQ / 1000000);
     DBGPRINTLN_CTX("CMU - ADC0 Clock: %.3f MHz", (float)ADC0_CLOCK_FREQ / 1000000);
     DBGPRINTLN_CTX("CMU - DBG Clock: %.3f MHz", (float)DBG_CLOCK_FREQ / 1000000);
     DBGPRINTLN_CTX("CMU - AUX Clock: %.3f MHz", (float)AUX_CLOCK_FREQ / 1000000);
     DBGPRINTLN_CTX("CMU - LFA Clock: %.3f kHz", (float)LFA_CLOCK_FREQ / 1000);
+    DBGPRINTLN_CTX("CMU - LESENSE Clock: %.3f kHz", (float)LESENSE_CLOCK_FREQ / 1000);
     DBGPRINTLN_CTX("CMU - LETIMER0 Clock: %.3f kHz", (float)LETIMER0_CLOCK_FREQ / 1000);
     DBGPRINTLN_CTX("CMU - LFB Clock: %.3f kHz", (float)LFB_CLOCK_FREQ / 1000);
     DBGPRINTLN_CTX("CMU - LEUART0 Clock: %.3f kHz", (float)LEUART0_CLOCK_FREQ / 1000);
+    DBGPRINTLN_CTX("CMU - SYSTICK Clock: %.3f kHz", (float)SYSTICK_CLOCK_FREQ / 1000);
+    DBGPRINTLN_CTX("CMU - CSEN Clock: %.3f kHz", (float)CSEN_CLOCK_FREQ / 1000);
     DBGPRINTLN_CTX("CMU - LFE Clock: %.3f kHz", (float)LFE_CLOCK_FREQ / 1000);
     DBGPRINTLN_CTX("CMU - RTCC Clock: %.3f kHz", (float)RTCC_CLOCK_FREQ / 1000);
 
-    DBGPRINTLN_CTX("Waiting 1000 ms...");
+    DBGPRINTLN_CTX("WDOG - Timeout period: %.3f ms", wdog_get_timeout_period());
+    DBGPRINTLN_CTX("WDOG - Warning period: %.3f ms", wdog_get_warning_period());
 
-    delay_ms(1000);
+    DBGPRINTLN_CTX("Scanning I2C bus 1...");
+
+    for(uint8_t a = 0x08; a < 0x78; a++)
+        if(i2c1_write(a, NULL, 0, I2C_STOP))
+            DBGPRINTLN_CTX("  Address 0x%02X ACKed!", a);
+
+    if(mcp3421_init())
+        DBGPRINTLN_CTX("MCP3421 init OK!");
+    else
+        DBGPRINTLN_CTX("MCP3421 init NOK!");
 
     if(adf4351_init())
         DBGPRINTLN_CTX("ADF4351 init OK!");
     else
         DBGPRINTLN_CTX("ADF4351 init NOK!");
 
-    if(f1951_init())
-        DBGPRINTLN_CTX("F1951 init OK!");
+    if(f1951_init(F1951_IF_ATT_ID))
+        DBGPRINTLN_CTX("IF F1951 init OK!");
     else
-        DBGPRINTLN_CTX("F1951 init NOK!");
+        DBGPRINTLN_CTX("IF F1951 init NOK!");
+
+    if(f1951_init(F1951_RF_ATT_ID))
+        DBGPRINTLN_CTX("RF F1951 init OK!");
+    else
+        DBGPRINTLN_CTX("RF F1951 init NOK!");
 
     return 0;
 }
 int main()
 {
-    // Attenuator
-    f1951_set_attenuation(26.5f);
-    DBGPRINTLN_CTX("Attenuator value: -%.3f dB", (float)F1951_ATTENUATION);
+    // I2C Slave Register block
+    i2c_slave_register_init();
+
+    // 5V0 Current ADC
+    mcp3421_write_config(MCP3421_RESOLUTION_16BIT | MCP3421_ONE_SHOT);
+
+    // Attenuators
+    f1951_set_attenuation(F1951_IF_ATT_ID, 25.0f);
+    DBGPRINTLN_CTX("IF Attenuator value: -%.3f dB", (float)F1951_ATTENUATION[F1951_IF_ATT_ID]);
+    f1951_set_attenuation(F1951_RF_ATT_ID, 32.5f);
+    DBGPRINTLN_CTX("RF Attenuator value: -%.3f dB", (float)F1951_ATTENUATION[F1951_RF_ATT_ID]);
 
     // PLL
     adf4351_pfd_config(26000000, 1, 0, 50, 0);
@@ -315,7 +475,7 @@ int main()
     adf4351_main_out_config(1, -4); // -4 dBm
     DBGPRINTLN_CTX("PLL output power: %i dBm", adf4351_main_out_get_power());
 
-    adf4351_set_frequency(1875000000U);
+    adf4351_set_frequency(1900000000U);
     DBGPRINTLN_CTX("PLL output frequency: %.3f MHz", (float)ADF4351_FREQ / 1000000);
 
     PLL_UNMUTE();
@@ -324,35 +484,63 @@ int main()
 
     delay_ms(200);
 
-    PA_5V0_ENABLE();
-    PA_12V0_ENABLE();
+    PA_STG1_ENABLE();
+    PA_STG2_ENABLE();
 
     while(1)
     {
+        wdog_feed();
+
         static uint64_t ullLastLEDTick = 0;
         static uint64_t ullLastDebugPrint = 0;
 
-        if(g_ullSystemTick - ullLastLEDTick > 500)
+        if(g_ullSystemTick - ullLastLEDTick > 2000)
         {
             ullLastLEDTick = g_ullSystemTick;
 
-            LED_TOGGLE();
+            LED_HIGH();
+            delay_ms(50);
+            LED_LOW();
         }
 
-        if(g_ullSystemTick - ullLastDebugPrint > 2000)
+        if(g_ullSystemTick - ullLastDebugPrint > 5000)
         {
             ullLastDebugPrint = g_ullSystemTick;
 
+            float fADCTemp = adc_get_temperature();
+            float fEMUTemp = emu_get_temperature();
+
+            float fVIN = adc_get_vin();
+            float f5V0 = adc_get_5v0();
+            float f5V0I = get_5v0_current(10);
+            float fAVDD = adc_get_avdd();
+            float fDVDD = adc_get_dvdd();
+            float fIOVDD = adc_get_iovdd();
+            float fCoreVDD = adc_get_corevdd();
+
+            ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+            {
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_ADC_TEMP) = fADCTemp;
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_EMU_TEMP) = fEMUTemp;
+
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_VIN_VOLTAGE) = fVIN;
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_5V0_VOLTAGE) = f5V0;
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_AVDD_VOLTAGE) = fAVDD;
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_DVDD_VOLTAGE) = fDVDD;
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_IOVDD_VOLTAGE) = fIOVDD;
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_CORE_VOLTAGE) = fCoreVDD;
+            }
+
             DBGPRINTLN_CTX("----------------------------------");
-            DBGPRINTLN_CTX("ADC temperature: %.2f C", adc_get_temperature());
-            DBGPRINTLN_CTX("EMU temperature: %.2f C", emu_get_temperature());
-            DBGPRINTLN_CTX("AVDD Voltage: %.2f mV", adc_get_avdd());
-            DBGPRINTLN_CTX("DVDD Voltage: %.2f mV", adc_get_dvdd());
-            DBGPRINTLN_CTX("IOVDD Voltage: %.2f mV", adc_get_iovdd());
-            DBGPRINTLN_CTX("Core Voltage: %.2f mV", adc_get_corevdd());
-            DBGPRINTLN_CTX("5V0 Voltage: %.2f mV", adc_get_5v0());
-            DBGPRINTLN_CTX("12V0 Voltage: %.2f mV", adc_get_12v0());
-            DBGPRINTLN_CTX("VIN Voltage: %.2f mV", adc_get_vin());
+            DBGPRINTLN_CTX("ADC temperature: %.2f C", fADCTemp);
+            DBGPRINTLN_CTX("EMU temperature: %.2f C", fEMUTemp);
+            DBGPRINTLN_CTX("AVDD Voltage: %.2f mV", fAVDD);
+            DBGPRINTLN_CTX("DVDD Voltage: %.2f mV", fDVDD);
+            DBGPRINTLN_CTX("IOVDD Voltage: %.2f mV", fIOVDD);
+            DBGPRINTLN_CTX("Core Voltage: %.2f mV", fCoreVDD);
+            DBGPRINTLN_CTX("VIN Voltage: %.2f mV", fVIN);
+            DBGPRINTLN_CTX("5V0 Voltage: %.2f mV", f5V0);
+            DBGPRINTLN_CTX("5V0 Current: %.2f mA", f5V0I);
         }
     }
 

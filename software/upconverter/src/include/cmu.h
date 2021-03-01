@@ -3,6 +3,7 @@
 
 #include <em_device.h>
 #include "msc.h"
+#include "utils.h"
 
 extern uint32_t HFXO_OSC_FREQ;
 extern uint32_t HFRCO_OSC_FREQ;
@@ -13,17 +14,23 @@ extern uint32_t ULFRCO_OSC_FREQ;
 
 extern uint32_t HFSRC_CLOCK_FREQ;
 extern uint32_t HF_CLOCK_FREQ;
+extern uint32_t HFBUS_CLOCK_FREQ;
 extern uint32_t HFCORE_CLOCK_FREQ;
 extern uint32_t HFEXP_CLOCK_FREQ;
 extern uint32_t HFPER_CLOCK_FREQ;
+extern uint32_t HFPERB_CLOCK_FREQ;
+extern uint32_t HFPERC_CLOCK_FREQ;
 extern uint32_t HFLE_CLOCK_FREQ;
 extern uint32_t ADC0_CLOCK_FREQ;
 extern uint32_t DBG_CLOCK_FREQ;
 extern uint32_t AUX_CLOCK_FREQ;
 extern uint32_t LFA_CLOCK_FREQ;
+extern uint32_t LESENSE_CLOCK_FREQ;
 extern uint32_t LETIMER0_CLOCK_FREQ;
 extern uint32_t LFB_CLOCK_FREQ;
 extern uint32_t LEUART0_CLOCK_FREQ;
+extern uint32_t SYSTICK_CLOCK_FREQ;
+extern uint32_t CSEN_CLOCK_FREQ;
 extern uint32_t LFE_CLOCK_FREQ;
 extern uint32_t RTCC_CLOCK_FREQ;
 
@@ -64,6 +71,7 @@ extern uint32_t RTCC_CLOCK_FREQ;
 #define HFRCO_CALIB_32M     (DEVINFO->HFRCOCAL11)
 #define HFRCO_CALIB_36M     (DEVINFO->HFRCOCAL16 | CMU_HFRCOCTRL_CLKDIV_DIV2)
 #define HFRCO_CALIB_38M     (DEVINFO->HFRCOCAL12)
+#define HFRCO_CALIB_48M     (DEVINFO->HFRCOCAL13)
 
 #define AUXHFRCO_CALIB_1M   (DEVINFO->AUXHFRCOCAL0 | CMU_AUXHFRCOCTRL_CLKDIV_DIV4)
 #define AUXHFRCO_CALIB_2M   (DEVINFO->AUXHFRCOCAL0 | CMU_AUXHFRCOCTRL_CLKDIV_DIV2)
@@ -79,6 +87,7 @@ extern uint32_t RTCC_CLOCK_FREQ;
 #define AUXHFRCO_CALIB_26M  (DEVINFO->AUXHFRCOCAL10)
 #define AUXHFRCO_CALIB_32M  (DEVINFO->AUXHFRCOCAL11)
 #define AUXHFRCO_CALIB_38M  (DEVINFO->AUXHFRCOCAL12)
+#define AUXHFRCO_CALIB_48M  (DEVINFO->AUXHFRCOCAL13)
 
 // Utility macros to convert capacitance and current
 // NOTE: All capacitances passed to and returned from CMU functions are the value of a single cap (i.e. the load capacitance that the crystal sees is half of that)
@@ -91,18 +100,19 @@ extern uint32_t RTCC_CLOCK_FREQ;
 #define LFXO_PF_TO_CTUNE(x)  ((uint32_t)(((x) - LFXO_MIN_PF) / LFXO_SS_PF))
 #define HFXO_MIN_CTUNE       ((uint32_t)0)
 #define HFXO_MAX_CTUNE       ((uint32_t)511)
-#define HFXO_MIN_PF          0.f
+#define HFXO_MIN_PF          8.7f
 #define HFXO_MAX_PF          51.624f
-#define HFXO_SS_PF           0.04f
+#define HFXO_SS_PF           0.084f
 #define HFXO_CTUNE_TO_PF(x)  (HFXO_MIN_PF + (x) * HFXO_SS_PF)
 #define HFXO_PF_TO_CTUNE(x)  ((uint32_t)(((x) - HFXO_MIN_PF) / HFXO_SS_PF))
 #define HFXO_MIN_IBTRIM      ((uint32_t)1)
-#define HFXO_MAX_IBTRIM      ((uint32_t)127)
-#define HFXO_MIN_UA          0.f
-#define HFXO_MAX_UA          1240.f
-#define HFXO_SS_UA           40.f
-#define HFXO_UA_TO_IBTRIM(x) (HFXO_MIN_UA + (x) * HFXO_SS_UA)
-#define HFXO_IBTRIM_TO_UA(x) ((uint32_t)(((x) - HFXO_MIN_UA) / HFXO_SS_UA))
+#define HFXO_MAX_IBTRIM      ((uint32_t)2047)
+#define HFXO_MIN_UA          2.f
+#define HFXO_MAX_UA          4862.f
+#define HFXO_FINE_SS_UA      2.f
+#define HFXO_COARSE_SS_UA    1280.f
+#define HFXO_UA_TO_IBTRIM(x) ((((uint32_t)((x) / HFXO_COARSE_SS_UA)) << 9) | ((uint32_t)(((uint32_t)(x) % (uint32_t)HFXO_COARSE_SS_UA) / HFXO_FINE_SS_UA)))
+#define HFXO_IBTRIM_TO_UA(x) (HFXO_COARSE_SS_UA * (((x) & 0x600) >> 9) + HFXO_FINE_SS_UA * (((x) & 0x0FF) >> 0))
 
 void cmu_init();
 void cmu_update_clocks();
@@ -110,10 +120,13 @@ void cmu_config_waitstates(uint32_t ulFrequency);
 
 void cmu_clkout0_config(uint32_t ulSource, int8_t bLocation);
 void cmu_clkout1_config(uint32_t ulSource, int8_t bLocation);
+void cmu_clkout2_config(uint32_t ulSource, int8_t bLocation);
 
 void cmu_hfrco_config(uint8_t ubEnable, uint32_t ulCalibration, uint32_t ulFrequency);
 
 void cmu_auxhfrco_config(uint8_t ubEnable, uint32_t ulCalibration, uint32_t ulFrequency);
+
+void cmu_dpll_config(uint8_t ubEnable, uint32_t ulConfig, uint16_t usM, uint16_t usN);
 
 void cmu_hfxo_config(uint8_t ubEnable, uint32_t ulConfig, uint32_t ulFrequency);
 void cmu_hfxo_timeout_config(uint32_t ulPeakDetTimeout, uint32_t ulSteadyTimeout, uint32_t ulStartupTimeout);
@@ -124,17 +137,20 @@ void cmu_hfxo_steady_config(float fCurrent, float fCapacitance);
 float cmu_hfxo_get_steady_current();
 float cmu_hfxo_get_steady_cap();
 float cmu_hfxo_get_pda_current(uint8_t ubTrigger);
+float cmu_hfxo_get_pma_current();
 
 void cmu_hf_clock_config(uint32_t ulSource, uint8_t ubPrescaler);
 void cmu_hfle_clock_config(uint32_t ulPrescaler);
+void cmu_hfbus_clock_config(uint8_t ubPrescaler);
 void cmu_hfcore_clock_config(uint8_t ubPrescaler);
-void cmu_hfper_clock_config(uint8_t ubEnable, uint8_t ubPrescaler);
+void cmu_hfper_clock_config(uint8_t ubEnable, uint8_t ubPERPrescaler, uint8_t ubPERBPrescaler, uint8_t ubPERCPrescaler);
 void cmu_hfexp_clock_config(uint8_t ubPrescaler);
 void cmu_dbg_clock_config(uint32_t ulSource);
-void cmu_adc0_clock_config(uint32_t ulSource, uint8_t ubInvert);
+void cmu_adc0_clock_config(uint32_t ulSource, uint8_t ubPrescaler, uint8_t ubInvert);
 
 void cmu_hfbus_clock_gate(uint32_t ulPeripheral, uint8_t ubEnable);
 void cmu_hfper0_clock_gate(uint32_t ulPeripheral, uint8_t ubEnable);
+void cmu_hfper1_clock_gate(uint32_t ulPeripheral, uint8_t ubEnable);
 
 void cmu_lfrco_config(uint8_t ubEnable, uint32_t ulConfig);
 
@@ -142,10 +158,14 @@ void cmu_lfxo_config(uint8_t ubEnable, uint32_t ulConfig, float fCapacitance, ui
 float cmu_lfxo_get_cap();
 
 void cmu_lfa_clock_config(uint32_t ulSource);
+void cmu_lfa_lesense_clock_config(uint8_t ubEnable, uint32_t ulPrescaler);
 void cmu_lfa_letimer0_clock_config(uint8_t ubEnable, uint32_t ulPrescaler);
 void cmu_lfb_clock_config(uint32_t ulSource);
+void cmu_lfb_csen_clock_config(uint8_t ubEnable, uint32_t ulPrescaler);
+void cmu_lfb_systick_clock_config(uint8_t ubEnable, uint32_t ulPrescaler);
 void cmu_lfb_leuart0_clock_config(uint8_t ubEnable, uint32_t ulPrescaler);
 void cmu_lfe_clock_config(uint32_t ulSource);
 void cmu_lfe_rtcc_clock_config(uint8_t ubEnable, uint32_t ulPrescaler);
+void cmu_pcnt0_clock_config(uint8_t ubEnable, uint32_t ulSource);
 
 #endif  // __CMU_H__

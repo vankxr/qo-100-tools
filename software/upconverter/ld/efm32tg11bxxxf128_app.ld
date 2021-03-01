@@ -5,11 +5,10 @@ _min_stack_size = 0x400;
 
 MEMORY
 {
-    irom0  (rx)     : ORIGIN = 0x00000000, LENGTH = 0x040000
-    irom1  (rx)     : ORIGIN = 0x0FE10000, LENGTH = 0x002800
+    irom0  (rx)     : ORIGIN = 0x00000000, LENGTH = 0x020000
+    irom1  (rx)     : ORIGIN = 0x0FE10000, LENGTH = 0x004800
     drom0  (r)      : ORIGIN = 0x0FE00000, LENGTH = 0x000800
-    iram0  (rwx)    : ORIGIN = 0x10000000, LENGTH = 0x007C00
-    iram1  (rwx)    : ORIGIN = 0x1003FC00, LENGTH = 0x000400
+    iram0  (rwx)    : ORIGIN = 0x10000000, LENGTH = 0x008000
     dram0  (rw)     : ORIGIN = 0x20000000, LENGTH = 0x008000
 }
 
@@ -104,21 +103,6 @@ SECTIONS
         . = ALIGN(4);
         _eiram0 = .;
     } > iram0 AT > irom0
-
-    /* RAMH Code */
-    _siiram1 = LOADADDR(.iram0.text);
-
-    .iram1.text :
-    {
-        . = ALIGN(4);
-        _siram1 = .;
-
-        *(.iram0.text)           /* .text sections (code) */
-        *(.iram0.text*)          /* .text* sections (code) */
-
-        . = ALIGN(4);
-        _eiram1 = .;
-    } > iram1 AT > irom0
 
     /* Bootloader Code */
     .irom1.text :

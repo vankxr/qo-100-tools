@@ -30,7 +30,7 @@ void ldma_init()
 
     LDMA->IFC = _LDMA_IFC_MASK; // Clear all flags
     IRQ_CLEAR(LDMA_IRQn); // Clear pending vector
-    IRQ_SET_PRIO(LDMA_IRQn, 2, 0); // Set priority 2,0
+    IRQ_SET_PRIO(LDMA_IRQn, 1, 0); // Set priority 1,0
     IRQ_ENABLE(LDMA_IRQn); // Enable vector
     LDMA->IEN = _LDMA_IEN_MASK; // Enable all channel flags
 }
@@ -123,7 +123,7 @@ uint8_t ldma_ch_get_busy(uint8_t ubChannel)
     if(ubChannel >= DMA_CHAN_COUNT)
         return 0;
 
-    return PERI_REG_BIT(&(LDMA->CHBUSY), ubChannel);
+    return !!(LDMA->CHBUSY & BIT(ubChannel));
 }
 uint16_t ldma_ch_get_remaining_xfers(uint8_t ubChannel)
 {
@@ -134,7 +134,7 @@ uint16_t ldma_ch_get_remaining_xfers(uint8_t ubChannel)
     {
         uint16_t usRemaining = (LDMA->CH[ubChannel].CTRL & _LDMA_CH_CTRL_XFERCNT_MASK) >> _LDMA_CH_CTRL_XFERCNT_SHIFT;
 
-        if(PERI_REG_BIT(&(LDMA->CHDONE), ubChannel) || (!usRemaining && (LDMA->IF & BIT(ubChannel))))
+        if(!!(LDMA->CHDONE & BIT(ubChannel)) || (!usRemaining && (LDMA->IF & BIT(ubChannel))))
             return 0;
 
         return usRemaining + 1;
