@@ -142,6 +142,8 @@ async function ssh_server_init()
 
             if(sensor instanceof DS18B20)
             {
+                await sensor.measure();
+
                 this.tprintln(null, "DS18B20", "Temperature: %d C", await sensor.get_temperature());
                 this.tprintln(null, "DS18B20", "High Alarm Temperature: %d C", (await sensor.get_alarm()).high);
                 this.tprintln(null, "DS18B20", "Low Alarm Temperature: %d C", (await sensor.get_alarm()).low);
@@ -1317,7 +1319,8 @@ async function main()
 
         if(i == 0)
         {
-            sensor.set_scale_factor((21e3 + 147e3) / 21e3); // Voltage divider
+            sensor.set_reference(3000); // 3V reference voltage regulator
+            sensor.set_scale_factor((21e3 + 147e3) / 21e3 * 1.04675); // Voltage divider and correction factor
 
             sensors["vin_voltage_adc"] = sensor;
         }

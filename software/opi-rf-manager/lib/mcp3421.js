@@ -66,6 +66,9 @@ class MCP3421 extends I2CDevice
     }
     async get_voltage(gain, samples = 1)
     {
+        if(samples < 1)
+            throw new Error("Invalid sample count");
+
         let config = await this.read_config();
         let resolution = ((config & 0x0C) >> 1) + 12;
 

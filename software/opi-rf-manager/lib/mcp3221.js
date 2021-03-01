@@ -4,6 +4,7 @@ const { I2C, I2CDevice} = require.main.require("./lib/i2c");
 class MCP3221 extends I2CDevice
 {
     scale_factor;
+    reference;
 
     constructor(bus, addr, bus_enable_gpio)
     {
@@ -24,14 +25,27 @@ class MCP3221 extends I2CDevice
         return this.scale_factor;
     }
 
+    set_reference(reference)
+    {
+        this.reference = reference;
+    }
+    get_reference()
+    {
+        return this.reference;
+    }
+
     async get_voltage(samples = 1)
     {
+        if(samples < 1)
+            throw new Error("Invalid sample count");
+
+        let result = await super.read(2 * samples);
         let accum = 0;
 
         for(let i = 0; i < samples; i++)
         {
-            let result = await super.read(2);
-            let voltage = 2500 * result.readUInt16BE(0) / 4096; // mV
+            let code = result.readUInt16BE(i * 2) & 0x0FFF;
+            let voltage = this.reference * code / 4096; // mV
 
             accum += voltage;
         }
