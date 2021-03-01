@@ -21,19 +21,37 @@
 // Structs
 
 // Helper macros
-#define I2C_SLAVE_ADDRESS                   0x3A
-#define I2C_SLAVE_REGISTER_COUNT            256
-#define I2C_SLAVE_REGISTER(t, a)            (*(t *)&ubI2CRegister[(a)])
-#define I2C_SLAVE_REGISTER_VIN_VOLTAGE      0xC0 // 32-bit
-#define I2C_SLAVE_REGISTER_AVDD_VOLTAGE     0xD0 // 32-bit
-#define I2C_SLAVE_REGISTER_DVDD_VOLTAGE     0xD4 // 32-bit
-#define I2C_SLAVE_REGISTER_IOVDD_VOLTAGE    0xD8 // 32-bit
-#define I2C_SLAVE_REGISTER_CORE_VOLTAGE     0xDC // 32-bit
-#define I2C_SLAVE_REGISTER_EMU_TEMP         0xE0 // 32-bit
-#define I2C_SLAVE_REGISTER_ADC_TEMP         0xE4 // 32-bit
-#define I2C_SLAVE_REGISTER_SW_VERSION       0xF4 // 16-bit
-#define I2C_SLAVE_REGISTER_DEV_UIDL         0xF8 // 32-bit
-#define I2C_SLAVE_REGISTER_DEV_UIDH         0xFC // 32-bit
+#define I2C_SLAVE_ADDRESS                       0x3A
+#define I2C_SLAVE_REGISTER_COUNT                256
+#define I2C_SLAVE_REGISTER(t, a)                (*(t *)&ubI2CRegister[(a)])
+#define I2C_SLAVE_REGISTER_WRITE_MASK(t, a)     (*(t *)&ubI2CRegisterWriteMask[(a)])
+#define I2C_SLAVE_REGISTER_READ_MASK(t, a)      (*(t *)&ubI2CRegisterReadMask[(a)])
+#define I2C_SLAVE_REGISTER_RELAY_STATUS         0x00 // 16-bit
+#define I2C_SLAVE_REGISTER_RELAY_SET_ON         0x02 // 16-bit
+#define I2C_SLAVE_REGISTER_RELAY_SET_OFF        0x04 // 16-bit
+#define I2C_SLAVE_REGISTER_RELAY0_DUTY_CYCLE    0x10 // 8-bit
+#define I2C_SLAVE_REGISTER_RELAY1_DUTY_CYCLE    0x11 // 8-bit
+#define I2C_SLAVE_REGISTER_RELAY2_DUTY_CYCLE    0x12 // 8-bit
+#define I2C_SLAVE_REGISTER_RELAY3_DUTY_CYCLE    0x13 // 8-bit
+#define I2C_SLAVE_REGISTER_RELAY4_DUTY_CYCLE    0x14 // 8-bit
+#define I2C_SLAVE_REGISTER_RELAY5_DUTY_CYCLE    0x15 // 8-bit
+#define I2C_SLAVE_REGISTER_RELAY6_DUTY_CYCLE    0x16 // 8-bit
+#define I2C_SLAVE_REGISTER_RELAY7_DUTY_CYCLE    0x17 // 8-bit
+#define I2C_SLAVE_REGISTER_RELAY8_DUTY_CYCLE    0x18 // 8-bit
+#define I2C_SLAVE_REGISTER_RELAY9_DUTY_CYCLE    0x19 // 8-bit
+#define I2C_SLAVE_REGISTER_RELAY10_DUTY_CYCLE   0x1A // 8-bit
+#define I2C_SLAVE_REGISTER_RELAY11_DUTY_CYCLE   0x1B // 8-bit
+#define I2C_SLAVE_REGISTER_UVTH_VOLTAGE         0x20 // 32-bit
+#define I2C_SLAVE_REGISTER_VIN_VOLTAGE          0xC0 // 32-bit
+#define I2C_SLAVE_REGISTER_AVDD_VOLTAGE         0xD0 // 32-bit
+#define I2C_SLAVE_REGISTER_DVDD_VOLTAGE         0xD4 // 32-bit
+#define I2C_SLAVE_REGISTER_IOVDD_VOLTAGE        0xD8 // 32-bit
+#define I2C_SLAVE_REGISTER_CORE_VOLTAGE         0xDC // 32-bit
+#define I2C_SLAVE_REGISTER_EMU_TEMP             0xE0 // 32-bit
+#define I2C_SLAVE_REGISTER_ADC_TEMP             0xE4 // 32-bit
+#define I2C_SLAVE_REGISTER_SW_VERSION           0xF4 // 16-bit
+#define I2C_SLAVE_REGISTER_DEV_UIDL             0xF8 // 32-bit
+#define I2C_SLAVE_REGISTER_DEV_UIDH             0xFC // 32-bit
 
 // Forward declarations
 static void reset() __attribute__((noreturn));
@@ -51,10 +69,28 @@ static uint8_t i2c_slave_addr_isr(uint8_t ubRnW);
 static uint8_t i2c_slave_tx_data_isr();
 static uint8_t i2c_slave_rx_data_isr(uint8_t ubData);
 
+static void timers_init();
+
 // Variables
 volatile uint8_t ubI2CRegister[I2C_SLAVE_REGISTER_COUNT];
+volatile uint8_t ubI2CRegisterWriteMask[I2C_SLAVE_REGISTER_COUNT];
+volatile uint8_t ubI2CRegisterReadMask[I2C_SLAVE_REGISTER_COUNT];
 volatile uint8_t ubI2CRegisterPointer = 0x00;
 volatile uint8_t ubI2CFirstWrite = 1;
+volatile uint32_t * const pulDutyCycleRegister[12] = {
+    &(TIMER1->CC[1].CCV),
+    &(TIMER1->CC[0].CCV),
+    &(WTIMER0->CC[0].CCV),
+    &(TIMER0->CC[2].CCV),
+    &(TIMER0->CC[1].CCV),
+    &(TIMER0->CC[0].CCV),
+    &(TIMER1->CC[3].CCV),
+    &(TIMER1->CC[2].CCV),
+    &(WTIMER1->CC[1].CCV),
+    &(WTIMER1->CC[0].CCV),
+    &(WTIMER1->CC[3].CCV),
+    &(WTIMER1->CC[2].CCV)
+};
 
 // ISRs
 
@@ -223,16 +259,36 @@ void i2c_slave_register_init()
 {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-        I2C_SLAVE_REGISTER(float,    I2C_SLAVE_REGISTER_VIN_VOLTAGE)    = -1.f;
-        I2C_SLAVE_REGISTER(float,    I2C_SLAVE_REGISTER_AVDD_VOLTAGE)   = -1.f;
-        I2C_SLAVE_REGISTER(float,    I2C_SLAVE_REGISTER_DVDD_VOLTAGE)   = -1.f;
-        I2C_SLAVE_REGISTER(float,    I2C_SLAVE_REGISTER_IOVDD_VOLTAGE)  = -1.f;
-        I2C_SLAVE_REGISTER(float,    I2C_SLAVE_REGISTER_CORE_VOLTAGE)   = -1.f;
-        I2C_SLAVE_REGISTER(float,    I2C_SLAVE_REGISTER_EMU_TEMP)       = -1.f;
-        I2C_SLAVE_REGISTER(float,    I2C_SLAVE_REGISTER_ADC_TEMP)       = -1.f;
-        I2C_SLAVE_REGISTER(uint16_t, I2C_SLAVE_REGISTER_SW_VERSION)     = BUILD_VERSION;
-        I2C_SLAVE_REGISTER(uint32_t, I2C_SLAVE_REGISTER_DEV_UIDL)       = DEVINFO->UNIQUEL;
-        I2C_SLAVE_REGISTER(uint32_t, I2C_SLAVE_REGISTER_DEV_UIDH)       = DEVINFO->UNIQUEH;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_VIN_VOLTAGE)      = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_VIN_VOLTAGE)      = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_VIN_VOLTAGE)      = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_AVDD_VOLTAGE)     = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_AVDD_VOLTAGE)     = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_AVDD_VOLTAGE)     = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_DVDD_VOLTAGE)     = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_DVDD_VOLTAGE)     = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_DVDD_VOLTAGE)     = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_IOVDD_VOLTAGE)    = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_IOVDD_VOLTAGE)    = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_IOVDD_VOLTAGE)    = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_CORE_VOLTAGE)     = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_CORE_VOLTAGE)     = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_CORE_VOLTAGE)     = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_EMU_TEMP)         = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_EMU_TEMP)         = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_EMU_TEMP)         = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_ADC_TEMP)         = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_ADC_TEMP)         = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_ADC_TEMP)         = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (uint16_t, I2C_SLAVE_REGISTER_SW_VERSION)       = BUILD_VERSION;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint16_t, I2C_SLAVE_REGISTER_SW_VERSION)       = 0x0000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint16_t, I2C_SLAVE_REGISTER_SW_VERSION)       = 0xFFFF;
+        I2C_SLAVE_REGISTER              (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDL)         = DEVINFO->UNIQUEL;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDL)         = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDL)         = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDH)         = DEVINFO->UNIQUEH;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDH)         = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDH)         = 0xFFFFFFFF;
     }
 }
 uint8_t i2c_slave_addr_isr(uint8_t ubAddress)
@@ -247,7 +303,8 @@ uint8_t i2c_slave_addr_isr(uint8_t ubAddress)
 }
 uint8_t i2c_slave_tx_data_isr()
 {
-    uint8_t ubData = ubI2CRegister[ubI2CRegisterPointer++];
+    uint8_t ubData = ubI2CRegister[ubI2CRegisterPointer] & ubI2CRegisterReadMask[ubI2CRegisterPointer];
+    ubI2CRegisterPointer++;
 
     return ubData;
 }
@@ -261,10 +318,101 @@ uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
         return 1; // ACK
     }
 
-    if(ubI2CRegisterPointer < 0xE0)
-        ubI2CRegister[ubI2CRegisterPointer++] = ubData;
+    ubI2CRegister[ubI2CRegisterPointer] = (ubI2CRegister[ubI2CRegisterPointer] & ~ubI2CRegisterWriteMask[ubI2CRegisterPointer]) | (ubData & ubI2CRegisterWriteMask[ubI2CRegisterPointer]);
+    ubI2CRegisterPointer++;
 
     return 1; // ACK
+}
+
+void timers_init()
+{
+    // Timer 0
+    cmu_hfper0_clock_gate(CMU_HFPERCLKEN0_TIMER0, 1);
+
+    TIMER0->CTRL = TIMER_CTRL_RSSCOIST | TIMER_CTRL_PRESC_DIV4 | TIMER_CTRL_CLKSEL_PRESCHFPERCLK | TIMER_CTRL_FALLA_NONE | TIMER_CTRL_RISEA_NONE | TIMER_CTRL_MODE_UP;
+    TIMER0->TOP = 0x00FF;
+    TIMER0->CNT = 0x0000;
+
+    //// R5
+    TIMER0->CC[0].CTRL = TIMER_CC_CTRL_PRSCONF_LEVEL | TIMER_CC_CTRL_CUFOA_NONE | TIMER_CC_CTRL_COFOA_SET | TIMER_CC_CTRL_CMOA_CLEAR | TIMER_CC_CTRL_MODE_PWM;
+    TIMER0->CC[0].CCV = 0x0000;
+    //// R4
+    TIMER0->CC[1].CTRL = TIMER_CC_CTRL_PRSCONF_LEVEL | TIMER_CC_CTRL_CUFOA_NONE | TIMER_CC_CTRL_COFOA_SET | TIMER_CC_CTRL_CMOA_CLEAR | TIMER_CC_CTRL_MODE_PWM;
+    TIMER0->CC[1].CCV = 0x0000;
+    //// R3
+    TIMER0->CC[2].CTRL = TIMER_CC_CTRL_PRSCONF_LEVEL | TIMER_CC_CTRL_CUFOA_NONE | TIMER_CC_CTRL_COFOA_SET | TIMER_CC_CTRL_CMOA_CLEAR | TIMER_CC_CTRL_MODE_PWM;
+    TIMER0->CC[2].CCV = 0x0000;
+
+    TIMER0->ROUTELOC0 = TIMER_ROUTELOC0_CC2LOC_LOC0 | TIMER_ROUTELOC0_CC1LOC_LOC0 | TIMER_ROUTELOC0_CC0LOC_LOC0;
+    TIMER0->ROUTEPEN |= TIMER_ROUTEPEN_CC2PEN | TIMER_ROUTEPEN_CC1PEN | TIMER_ROUTEPEN_CC0PEN;
+
+    TIMER0->CMD = TIMER_CMD_START;
+
+    // Timer 1
+    cmu_hfper0_clock_gate(CMU_HFPERCLKEN0_TIMER1, 1);
+
+    TIMER1->CTRL = TIMER_CTRL_RSSCOIST | TIMER_CTRL_PRESC_DIV2 | TIMER_CTRL_CLKSEL_PRESCHFPERCLK | TIMER_CTRL_FALLA_NONE | TIMER_CTRL_RISEA_NONE | TIMER_CTRL_MODE_UP;
+    TIMER1->TOP = 0x00FF;
+    TIMER1->CNT = 0x0000;
+
+    //// R1
+    TIMER1->CC[0].CTRL = TIMER_CC_CTRL_PRSCONF_LEVEL | TIMER_CC_CTRL_CUFOA_NONE | TIMER_CC_CTRL_COFOA_SET | TIMER_CC_CTRL_CMOA_CLEAR | TIMER_CC_CTRL_MODE_PWM;
+    TIMER1->CC[0].CCV = 0x0000;
+    //// R0
+    TIMER1->CC[1].CTRL = TIMER_CC_CTRL_PRSCONF_LEVEL | TIMER_CC_CTRL_CUFOA_NONE | TIMER_CC_CTRL_COFOA_SET | TIMER_CC_CTRL_CMOA_CLEAR | TIMER_CC_CTRL_MODE_PWM;
+    TIMER1->CC[1].CCV = 0x0000;
+    //// R7
+    TIMER1->CC[2].CTRL = TIMER_CC_CTRL_PRSCONF_LEVEL | TIMER_CC_CTRL_CUFOA_NONE | TIMER_CC_CTRL_COFOA_SET | TIMER_CC_CTRL_CMOA_CLEAR | TIMER_CC_CTRL_MODE_PWM;
+    TIMER1->CC[2].CCV = 0x0000;
+    //// R6
+    TIMER1->CC[3].CTRL = TIMER_CC_CTRL_PRSCONF_LEVEL | TIMER_CC_CTRL_CUFOA_NONE | TIMER_CC_CTRL_COFOA_SET | TIMER_CC_CTRL_CMOA_CLEAR | TIMER_CC_CTRL_MODE_PWM;
+    TIMER1->CC[3].CCV = 0x0000;
+
+    TIMER1->ROUTELOC0 = TIMER_ROUTELOC0_CC3LOC_LOC4 | TIMER_ROUTELOC0_CC2LOC_LOC4 | TIMER_ROUTELOC0_CC1LOC_LOC3 | TIMER_ROUTELOC0_CC0LOC_LOC3;
+    TIMER1->ROUTEPEN |= TIMER_ROUTEPEN_CC3PEN | TIMER_ROUTEPEN_CC2PEN | TIMER_ROUTEPEN_CC1PEN | TIMER_ROUTEPEN_CC0PEN;
+
+    TIMER1->CMD = TIMER_CMD_START;
+
+    // Wide Timer 0
+    cmu_hfper1_clock_gate(CMU_HFPERCLKEN1_WTIMER0, 1);
+
+    WTIMER0->CTRL = WTIMER_CTRL_RSSCOIST | WTIMER_CTRL_PRESC_DIV2 | WTIMER_CTRL_CLKSEL_PRESCHFPERCLK | WTIMER_CTRL_FALLA_NONE | WTIMER_CTRL_RISEA_NONE | WTIMER_CTRL_MODE_UP;
+    WTIMER0->TOP = 0x00FF;
+    WTIMER0->CNT = 0x0000;
+
+    //// R2
+    WTIMER0->CC[0].CTRL = WTIMER_CC_CTRL_PRSCONF_LEVEL | WTIMER_CC_CTRL_CUFOA_NONE | WTIMER_CC_CTRL_COFOA_SET | WTIMER_CC_CTRL_CMOA_CLEAR | WTIMER_CC_CTRL_MODE_PWM;
+    WTIMER0->CC[0].CCV = 0x0000;
+
+    WTIMER0->ROUTELOC0 = WTIMER_ROUTELOC0_CC0LOC_LOC7;
+    WTIMER0->ROUTEPEN |= WTIMER_ROUTEPEN_CC0PEN;
+
+    WTIMER0->CMD = WTIMER_CMD_START;
+
+    // Wide Timer 1
+    cmu_hfper1_clock_gate(CMU_HFPERCLKEN1_WTIMER1, 1);
+
+    WTIMER1->CTRL = WTIMER_CTRL_RSSCOIST | WTIMER_CTRL_PRESC_DIV2 | WTIMER_CTRL_CLKSEL_PRESCHFPERCLK | WTIMER_CTRL_FALLA_NONE | WTIMER_CTRL_RISEA_NONE | WTIMER_CTRL_MODE_UP;
+    WTIMER1->TOP = 0x00FF;
+    WTIMER1->CNT = 0x0000;
+
+    //// R9
+    WTIMER1->CC[0].CTRL = WTIMER_CC_CTRL_PRSCONF_LEVEL | WTIMER_CC_CTRL_CUFOA_NONE | WTIMER_CC_CTRL_COFOA_SET | WTIMER_CC_CTRL_CMOA_CLEAR | WTIMER_CC_CTRL_MODE_PWM;
+    WTIMER1->CC[0].CCV = 0x0000;
+    //// R8
+    WTIMER1->CC[1].CTRL = WTIMER_CC_CTRL_PRSCONF_LEVEL | WTIMER_CC_CTRL_CUFOA_NONE | WTIMER_CC_CTRL_COFOA_SET | WTIMER_CC_CTRL_CMOA_CLEAR | WTIMER_CC_CTRL_MODE_PWM;
+    WTIMER1->CC[1].CCV = 0x0000;
+    //// R11
+    WTIMER1->CC[2].CTRL = WTIMER_CC_CTRL_PRSCONF_LEVEL | WTIMER_CC_CTRL_CUFOA_NONE | WTIMER_CC_CTRL_COFOA_SET | WTIMER_CC_CTRL_CMOA_CLEAR | WTIMER_CC_CTRL_MODE_PWM;
+    WTIMER1->CC[2].CCV = 0x0000;
+    //// R10
+    WTIMER1->CC[3].CTRL = WTIMER_CC_CTRL_PRSCONF_LEVEL | WTIMER_CC_CTRL_CUFOA_NONE | WTIMER_CC_CTRL_COFOA_SET | WTIMER_CC_CTRL_CMOA_CLEAR | WTIMER_CC_CTRL_MODE_PWM;
+    WTIMER1->CC[3].CCV = 0x0000;
+
+    WTIMER1->ROUTELOC0 = WTIMER_ROUTELOC0_CC3LOC_LOC1 | WTIMER_ROUTELOC0_CC2LOC_LOC1 | WTIMER_ROUTELOC0_CC1LOC_LOC2 | WTIMER_ROUTELOC0_CC0LOC_LOC2;
+    WTIMER1->ROUTEPEN |= WTIMER_ROUTEPEN_CC3PEN | WTIMER_ROUTEPEN_CC2PEN | WTIMER_ROUTEPEN_CC1PEN | WTIMER_ROUTEPEN_CC0PEN;
+
+    WTIMER1->CMD = WTIMER_CMD_START;
 }
 
 int init()
@@ -374,6 +522,9 @@ int init()
 }
 int main()
 {
+    // Timers
+    timers_init();
+
     // I2C Slave Register block
     i2c_slave_register_init();
 
@@ -427,32 +578,33 @@ int main()
             DBGPRINTLN_CTX("Core Voltage: %.2f mV", fCoreVDD);
             DBGPRINTLN_CTX("VIN Voltage: %.2f mV", fVIN);
 
-            /*
-            RELAY0_TOGGLE();
-            delay_ms(100);
-            RELAY1_TOGGLE();
-            delay_ms(100);
-            RELAY2_TOGGLE();
-            delay_ms(100);
-            RELAY3_TOGGLE();
-            delay_ms(100);
-            RELAY4_TOGGLE();
-            delay_ms(100);
-            RELAY5_TOGGLE();
-            delay_ms(100);
-            RELAY6_TOGGLE();
-            delay_ms(100);
-            RELAY7_TOGGLE();
-            delay_ms(100);
-            RELAY8_TOGGLE();
-            delay_ms(100);
-            RELAY9_TOGGLE();
-            delay_ms(100);
-            RELAY10_TOGGLE();
-            delay_ms(100);
-            RELAY11_TOGGLE();
-            delay_ms(100);
-            */
+            for(int i = 0; i < 12; i++)
+            {
+                wdog_feed();
+
+                if(*pulDutyCycleRegister[i])
+                {
+                    for(int j = *pulDutyCycleRegister[i]; j > 0; j -= 10)
+                    {
+                        *pulDutyCycleRegister[i] = j > 0 ? j : 0;
+
+                        delay_ms(20);
+                    }
+
+                    *pulDutyCycleRegister[i] = 0;
+
+                    continue;
+                }
+
+                for(int j = 0; j < 256; j += 10)
+                {
+                    *pulDutyCycleRegister[i] = j <= 255 ? j : 255;
+
+                    delay_ms(20);
+                }
+
+                *pulDutyCycleRegister[i] = 255;
+            }
         }
     }
 
