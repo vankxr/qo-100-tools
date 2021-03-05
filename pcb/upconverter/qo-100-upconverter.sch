@@ -5671,11 +5671,11 @@ Logo</text>
 <part name="GND605" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="C10" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100nF"/>
 <part name="GND607" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="C23" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="2.7nF"/>
-<part name="C22" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="68nF"/>
-<part name="R13" library="Resistor" deviceset="RESISTOR" device="-0603" value="866 Ohms"/>
-<part name="C24" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="910pF"/>
-<part name="R15" library="Resistor" deviceset="RESISTOR" device="-0603" value="6.65K Ohms"/>
+<part name="C23" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="220nF"/>
+<part name="C22" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1uF"/>
+<part name="R13" library="Resistor" deviceset="RESISTOR" device="-0603" value="150 Ohms"/>
+<part name="C24" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="2.7nF"/>
+<part name="R15" library="Resistor" deviceset="RESISTOR" device="-0603" value="1K Ohms"/>
 <part name="GND618" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND620" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND621" library="Supply Symbol" deviceset="GND" device=""/>
@@ -6552,6 +6552,7 @@ Logo</text>
 <description>LO Synthesizer</description>
 <plain>
 <text x="441.96" y="248.92" size="1.778" layer="98" align="center">-9 dB Pi Attenuator</text>
+<text x="444.5" y="170.18" size="1.778" layer="98" align="center">2kHz Loop Bandwidth at 2 mA</text>
 </plain>
 <instances>
 <instance part="U3" gate="G$1" x="317.5" y="231.14" smashed="yes">
