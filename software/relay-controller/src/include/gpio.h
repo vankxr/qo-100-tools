@@ -11,6 +11,7 @@
 #define LED_HIGH()          PERI_REG_BIT_SET(&(GPIO->P[4].DOUT)) = BIT(11)
 #define LED_LOW()           PERI_REG_BIT_CLEAR(&(GPIO->P[4].DOUT)) = BIT(11)
 #define LED_TOGGLE()        GPIO->P[4].DOUTTGL = BIT(11);
+#define LED_STATUS()        !!(GPIO->P[4].DOUT & BIT(11))
 
 // RELAY MACROS
 #define RELAY0_ON()         PERI_REG_BIT_SET(&(GPIO->P[1].DOUT)) = BIT(8)
