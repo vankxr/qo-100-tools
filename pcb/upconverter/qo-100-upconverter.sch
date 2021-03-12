@@ -6246,8 +6246,8 @@ Logo</text>
 <part name="GND31" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="CON1" library="JST" deviceset="3P" device="-SH-SIDE" value="3P-SH-SIDE"/>
 <part name="GND43" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="R6" library="Resistor" deviceset="RESISTOR" device="-0603" value="100 Ohms"/>
-<part name="R7" library="Resistor" deviceset="RESISTOR" device="-0603" value="100 Ohms"/>
+<part name="R6" library="Resistor" deviceset="RESISTOR" device="-0603" value="1K Ohms"/>
+<part name="R7" library="Resistor" deviceset="RESISTOR" device="-0603" value="1K Ohms"/>
 <part name="U19" library="Microchip" deviceset="MCP6C02" device="" technology="-020"/>
 <part name="R50" library="Resistor" deviceset="RESISTOR" device="-1206" value="0.03 Ohms">
 <attribute name="TOLERANCE" value="1%"/>
@@ -6297,9 +6297,9 @@ Logo</text>
 <part name="GND75" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="R12" library="Resistor" deviceset="RESISTOR" device="-0603" value="0 Ohms"/>
 <part name="U1" library="EFM32" deviceset="EFM32TG11B1*M32" device="" technology="20F128G"/>
-<part name="R4" library="Resistor" deviceset="RESISTOR" device="-0603" value="1K Ohms"/>
+<part name="R4" library="Resistor" deviceset="RESISTOR" device="-0603" value="47K Ohms"/>
 <part name="3V13" library="Supply Symbol" deviceset="3V3" device=""/>
-<part name="R5" library="Resistor" deviceset="RESISTOR" device="-0603" value="1K Ohms"/>
+<part name="R5" library="Resistor" deviceset="RESISTOR" device="-0603" value="47K Ohms"/>
 <part name="3V14" library="Supply Symbol" deviceset="3V3" device=""/>
 <part name="L9" library="Inductor" deviceset="INDUCTOR" device="-0603" value="18nH"/>
 <part name="R24" library="Resistor" deviceset="RESISTOR" device="-0603" value="0 Ohms"/>

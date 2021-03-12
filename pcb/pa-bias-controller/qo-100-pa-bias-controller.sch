@@ -5570,8 +5570,8 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 <part name="3V10" library="Supply Symbol" deviceset="3V3" device=""/>
 <part name="CON1" library="JST" deviceset="3P" device="-SH-SIDE" value="3P-SH-SIDE"/>
 <part name="GND24" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="R2" library="Resistor" deviceset="RESISTOR" device="-0603" value="100 Ohms"/>
-<part name="R3" library="Resistor" deviceset="RESISTOR" device="-0603" value="100 Ohms"/>
+<part name="R2" library="Resistor" deviceset="RESISTOR" device="-0603" value="1K Ohms"/>
+<part name="R3" library="Resistor" deviceset="RESISTOR" device="-0603" value="1K Ohms"/>
 <part name="C3" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100nF"/>
 <part name="GND26" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="3V3" library="Supply Symbol" deviceset="3V3" device=""/>
@@ -5763,9 +5763,9 @@ This is a footprint for an edge mount RF antenna. Works pretty well with SMA typ
 <attribute name="OCLCSC" value="C443497"/>
 </part>
 <part name="U1" library="EFM32" deviceset="EFM32TG11B1*M32" device="" technology="20F128G"/>
-<part name="R39" library="Resistor" deviceset="RESISTOR" device="-0603" value="1K Ohms"/>
+<part name="R39" library="Resistor" deviceset="RESISTOR" device="-0603" value="47K Ohms"/>
 <part name="3V13" library="Supply Symbol" deviceset="3V3" device=""/>
-<part name="R40" library="Resistor" deviceset="RESISTOR" device="-0603" value="1K Ohms"/>
+<part name="R40" library="Resistor" deviceset="RESISTOR" device="-0603" value="47K Ohms"/>
 <part name="3V14" library="Supply Symbol" deviceset="3V3" device=""/>
 <part name="C40" library="Capacitor" deviceset="CAPACITOR" device="-2220" value="22uF">
 <attribute name="VOLTAGE" value="50V"/>

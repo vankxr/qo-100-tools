@@ -5499,8 +5499,8 @@ Logo</text>
 <part name="5V00003" library="Supply Symbol" deviceset="5V0" device=""/>
 <part name="CON1" library="JST" deviceset="3P" device="-SH-SIDE" value="3P-SH-SIDE"/>
 <part name="GND24" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="R4" library="Resistor" deviceset="RESISTOR" device="-0603" value="0 Ohms"/>
-<part name="R5" library="Resistor" deviceset="RESISTOR" device="-0603" value="0 Ohms"/>
+<part name="R4" library="Resistor" deviceset="RESISTOR" device="-0603" value="1K Ohms"/>
+<part name="R5" library="Resistor" deviceset="RESISTOR" device="-0603" value="1K Ohms"/>
 <part name="C3" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100nF"/>
 <part name="GND26" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="3V3" library="Supply Symbol" deviceset="3V3" device=""/>
@@ -5530,9 +5530,9 @@ Logo</text>
 <part name="GND60" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="C4" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1uF"/>
 <part name="U1" library="EFM32" deviceset="EFM32TG11B1*M32" device="" technology="20F128G"/>
-<part name="R45" library="Resistor" deviceset="RESISTOR" device="-0603" value="1K Ohms"/>
+<part name="R45" library="Resistor" deviceset="RESISTOR" device="-0603" value="47K Ohms"/>
 <part name="3V14" library="Supply Symbol" deviceset="3V3" device=""/>
-<part name="R46" library="Resistor" deviceset="RESISTOR" device="-0603" value="1K Ohms"/>
+<part name="R46" library="Resistor" deviceset="RESISTOR" device="-0603" value="47K Ohms"/>
 <part name="3V15" library="Supply Symbol" deviceset="3V3" device=""/>
 </parts>
 <sheets>

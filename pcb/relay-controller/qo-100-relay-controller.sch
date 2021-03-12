@@ -4671,9 +4671,9 @@ Source: &lt;a href="http://www.littelfuse.com/~/media/electronics/datasheets/tvs
 <part name="GND4" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="3V8" library="Supply Symbol" deviceset="3V3" device=""/>
 <part name="U2" library="EFM32" deviceset="EFM32TG11B1*M32" device="" technology="20F128G"/>
-<part name="R15" library="Resistor" deviceset="RESISTOR" device="-0603" value="1K Ohms"/>
+<part name="R15" library="Resistor" deviceset="RESISTOR" device="-0603" value="10K Ohms"/>
 <part name="3V21" library="Supply Symbol" deviceset="3V3" device=""/>
-<part name="R16" library="Resistor" deviceset="RESISTOR" device="-0603" value="1K Ohms"/>
+<part name="R16" library="Resistor" deviceset="RESISTOR" device="-0603" value="10K Ohms"/>
 <part name="3V22" library="Supply Symbol" deviceset="3V3" device=""/>
 <part name="R53" library="Resistor" deviceset="RESISTOR" device="-0603" value="10K Ohms"/>
 <part name="R54" library="Resistor" deviceset="RESISTOR" device="-0603" value="100K Ohms"/>
