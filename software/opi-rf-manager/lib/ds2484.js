@@ -1,5 +1,5 @@
 const GPIO = require.main.require("./lib/gpio");
-const { I2C, I2CDevice} = require.main.require("./lib/i2c");
+const { I2C, I2CDevice } = require.main.require("./lib/i2c");
 const { OneWire, OneWireDevice } = require.main.require("./lib/onewire");
 
 class DS2484OneWire extends OneWire

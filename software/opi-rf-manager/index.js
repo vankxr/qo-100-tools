@@ -9,13 +9,17 @@ const { I2C, I2CDevice } = require("./lib/i2c");
 const { OneWire, OneWireDevice } = require("./lib/onewire");
 const IPMA = require("./lib/ipma");
 const WBSpectrumMonitor = require("./lib/wb_spectrum_monitor");
+const OAQ = require("./lib/oaq");
 const HPPSU = require("./lib/hppsu");
 const DS2484 = require("./lib/ds2484");
 const BME280 = require("./lib/bme280");
+const ZMOD4510 = require("./lib/zmod4510");
+const SI1133 = require("./lib/si1133");
 const MCP3221 = require("./lib/mcp3221");
 const MCP3421 = require("./lib/mcp3421");
 const MCP23008 = require("./lib/mcp23008");
 const MCP23017 = require("./lib/mcp23017");
+const F2915 = require("./lib/f2915");
 const LTC5597 = require("./lib/ltc5597");
 const DS18B20 = require("./lib/ds18b20");
 const RelayController = require("./lib/relay_controller");
@@ -29,14 +33,7 @@ let wb_spectrum_monitor;
 let wb_signals = {};
 const gpios = {};
 const buses = {};
-const onewire_bus_controllers = [];
-const relay_controllers = [];
-const upconverters = [];
-const lnb_controllers = [];
-const pa_bias_controllers = [];
-const power_supply_gpio_controllers = [];
-const power_supplies = [];
-const sensors = {};
+const devices = {};
 const ssh_allowed_users = [];
 const ssh_commands = {};
 let ssh_server;
@@ -124,191 +121,119 @@ async function ssh_server_init()
         }
     );
     ssh_server_add_command(
-        "rsens",
-        "Read sensor specified in the first argument",
+        "rdev",
+        "Read data from device specified in the first argument",
         async function (argv)
         {
-            let sensor_name = argv[1];
+            let device_param_name = argv[1];
 
-            if(typeof(sensor_name) != "string")
-                throw new Error("Invalid sensor name");
+            if(typeof(device_param_name) != "string")
+                throw new Error("Invalid device parameter name");
 
-            sensor_name = sensor_name.toLowerCase();
+            device_param_name = device_param_name.toLowerCase();
 
-            let sensor = sensors[sensor_name];
+            let param_name_start = device_param_name.indexOf(".");
 
-            if(!sensor)
-                throw new Error("Sensor not found");
-
-            if(sensor instanceof DS18B20)
-            {
-                await sensor.measure();
-
-                this.tprintln(null, "DS18B20", "Temperature: %d C", await sensor.get_temperature());
-                this.tprintln(null, "DS18B20", "High Alarm Temperature: %d C", (await sensor.get_alarm()).high);
-                this.tprintln(null, "DS18B20", "Low Alarm Temperature: %d C", (await sensor.get_alarm()).low);
-                this.tprintln(null, "DS18B20", "Parasidic powered: %s", await sensor.is_parasidic_power());
-            }
-            else if(sensor instanceof BME280)
-            {
-                this.tprintln(null, "BME280", "Temperature: %d C", await sensor.get_temperature());
-                this.tprintln(null, "BME280", "Humidity: %d %%RH", await sensor.get_humidity());
-                this.tprintln(null, "BME280", "Pressure: %d hPa", await sensor.get_pressure());
-                this.tprintln(null, "BME280", "Dew point: %d C", await sensor.get_dew_point());
-                this.tprintln(null, "BME280", "Heat index: %d C", await sensor.get_heat_index());
-                this.tprintln(null, "BME280", "Altitude: %d m", await sensor.get_altitude());
-            }
-            else if(sensor instanceof MCP3221)
-            {
-                let samples = argv[2] || 1;
-
-                this.tprintln(null, "MCP3221", "Voltage: %d mV", await sensor.get_voltage(samples));
-            }
-            else if(sensor instanceof LTC5597)
-            {
-                let samples = argv[2] || 3;
-                let gain = argv[3] || 2;
-
-                this.tprintln(null, "LTC5597", "Power: %d dBm", await sensor.get_power_level(gain, samples));
-            }
-            else
-            {
-                throw new Error("Sensor not supported");
-            }
-
-            return true;
-        },
-        function (line)
-        {
-            const sensor_names = Object.keys(sensors);
-            const hits = sensor_names.filter(
-                function (c)
-                {
-                    return c.startsWith(line);
-                }
-            );
-
-            return hits.length ? hits : sensor_names;
-        }
-    );
-    ssh_server_add_command(
-        "rpsu",
-        "Read telemetry from the PSU specified in the first argument",
-        async function (argv)
-        {
-            let psu_param_name = argv[1];
-
-            if(typeof(psu_param_name) != "string")
-                throw new Error("Invalid PSU parameter name");
-
-            psu_param_name = psu_param_name.toLowerCase();
-
-            if(psu_param_name.indexOf("psu") != 0)
-                throw new Error("Invalid PSU parameter name");
-
-            let param_name_start = psu_param_name.indexOf("_");
+            if(param_name_start === 0)
+                throw new Error("Invalid device parameter name");
 
             if(param_name_start == -1)
-                param_name_start = psu_param_name.length;
+                param_name_start = device_param_name.length;
 
-            let psu_index = parseInt(psu_param_name.slice(3, param_name_start));
+            let device_name = device_param_name.slice(0, param_name_start);
+            let device = devices[device_name];
 
-            if(psu_index < 0 || psu_index >= power_supplies.length)
-                throw new Error("Invalid PSU name");
+            if(!device)
+                throw new Error("Device not found");
 
-            let psu = power_supplies[psu_index];
+            let param_name = device_param_name.slice(param_name_start + 1);
 
-            if(!psu)
-                throw new Error("PSU not found");
-
-            let param_name = psu_param_name.slice(param_name_start + 1);
-
-            if(psu instanceof HPPSU)
+            if(device instanceof HPPSU)
             {
                 switch(param_name)
                 {
                     case "":
                     {
-                        this.tprintln(null, "HPPSU", "ID: 0x%s", (await psu.get_id()).toString(16));
-                        this.tprintln(null, "HPPSU", "SPN: %s", await psu.get_spn());
-                        this.tprintln(null, "HPPSU", "Date: %s", await psu.get_date());
-                        this.tprintln(null, "HPPSU", "Name: %s", await psu.get_name());
-                        this.tprintln(null, "HPPSU", "CT: %s", await psu.get_ct());
-                        this.tprintln(null, "HPPSU", "Input Present: %s", await psu.is_input_present());
-                        this.tprintln(null, "HPPSU", "Input Voltage: %d V", await psu.get_input_voltage());
-                        this.tprintln(null, "HPPSU", "Input Undervoltage threshold: %d V", await psu.get_input_undervoltage_threshold());
-                        this.tprintln(null, "HPPSU", "Input Overvoltage threshold: %d V", await psu.get_input_overvoltage_threshold());
-                        this.tprintln(null, "HPPSU", "Input Current: %d A (max. %d A)", await psu.get_input_current(), await psu.get_peak_input_current());
-                        this.tprintln(null, "HPPSU", "Input Power: %d W (max. %d W)", await psu.get_input_power(), await psu.get_peak_input_power());
-                        this.tprintln(null, "HPPSU", "Input Energy: %d Wh", await psu.get_input_energy());
-                        this.tprintln(null, "HPPSU", "Output Enabled: %s", await psu.is_main_output_enabled());
-                        this.tprintln(null, "HPPSU", "Output Voltage: %d V", await psu.get_output_voltage());
-                        this.tprintln(null, "HPPSU", "Output Undervoltage threshold: %d V", await psu.get_output_undervoltage_threshold());
-                        this.tprintln(null, "HPPSU", "Output Overvoltage threshold: %d V", await psu.get_output_overvoltage_threshold());
-                        this.tprintln(null, "HPPSU", "Output Current: %d A (max. %d A)", await psu.get_output_current(), await psu.get_peak_output_current());
-                        this.tprintln(null, "HPPSU", "Output Power: %d W", await psu.get_output_power());
-                        this.tprintln(null, "HPPSU", "Intake Temperature: %d C", await psu.get_intake_temperature());
-                        this.tprintln(null, "HPPSU", "Internal Temperature: %d C", await psu.get_internal_temperature());
-                        this.tprintln(null, "HPPSU", "Fan speed: %d RPM", await psu.get_fan_speed());
-                        this.tprintln(null, "HPPSU", "Fan target speed: %d RPM", await psu.get_fan_target_speed());
-                        this.tprintln(null, "HPPSU", "On time: %d s", await psu.get_on_time());
-                        this.tprintln(null, "HPPSU", "Total on time: %d days", await psu.get_total_on_time() / 60 / 24);
-                        this.tprintln(null, "HPPSU", "Status flags: 0x%s", (await psu.get_status_flags()).toString(16));
+                        this.tprintln(null, "HPPSU", "ID: 0x%s", (await device.get_id()).toString(16));
+                        this.tprintln(null, "HPPSU", "SPN: %s", await device.get_spn());
+                        this.tprintln(null, "HPPSU", "Date: %s", await device.get_date());
+                        this.tprintln(null, "HPPSU", "Name: %s", await device.get_name());
+                        this.tprintln(null, "HPPSU", "CT: %s", await device.get_ct());
+                        this.tprintln(null, "HPPSU", "Input Present: %s", await device.is_input_present());
+                        this.tprintln(null, "HPPSU", "Input Voltage: %d V", await device.get_input_voltage());
+                        this.tprintln(null, "HPPSU", "Input Undervoltage threshold: %d V", await device.get_input_undervoltage_threshold());
+                        this.tprintln(null, "HPPSU", "Input Overvoltage threshold: %d V", await device.get_input_overvoltage_threshold());
+                        this.tprintln(null, "HPPSU", "Input Current: %d A (max. %d A)", await device.get_input_current(), await device.get_peak_input_current());
+                        this.tprintln(null, "HPPSU", "Input Power: %d W (max. %d W)", await device.get_input_power(), await device.get_peak_input_power());
+                        this.tprintln(null, "HPPSU", "Input Energy: %d Wh", await device.get_input_energy());
+                        this.tprintln(null, "HPPSU", "Output Enabled: %s", await device.is_main_output_enabled());
+                        this.tprintln(null, "HPPSU", "Output Voltage: %d V", await device.get_output_voltage());
+                        this.tprintln(null, "HPPSU", "Output Undervoltage threshold: %d V", await device.get_output_undervoltage_threshold());
+                        this.tprintln(null, "HPPSU", "Output Overvoltage threshold: %d V", await device.get_output_overvoltage_threshold());
+                        this.tprintln(null, "HPPSU", "Output Current: %d A (max. %d A)", await device.get_output_current(), await device.get_peak_output_current());
+                        this.tprintln(null, "HPPSU", "Output Power: %d W", await device.get_output_power());
+                        this.tprintln(null, "HPPSU", "Intake Temperature: %d C", await device.get_intake_temperature());
+                        this.tprintln(null, "HPPSU", "Internal Temperature: %d C", await device.get_internal_temperature());
+                        this.tprintln(null, "HPPSU", "Fan speed: %d RPM", await device.get_fan_speed());
+                        this.tprintln(null, "HPPSU", "Fan target speed: %d RPM", await device.get_fan_target_speed());
+                        this.tprintln(null, "HPPSU", "On time: %d s", await device.get_on_time());
+                        this.tprintln(null, "HPPSU", "Total on time: %d days", await device.get_total_on_time() / 60 / 24);
+                        this.tprintln(null, "HPPSU", "Status flags: 0x%s", (await device.get_status_flags()).toString(16));
                     }
                     break;
                     case "info":
                     {
-                        this.tprintln(null, "HPPSU", "ID: 0x%s", (await psu.get_id()).toString(16));
-                        this.tprintln(null, "HPPSU", "SPN: %s", await psu.get_spn());
-                        this.tprintln(null, "HPPSU", "Date: %s", await psu.get_date());
-                        this.tprintln(null, "HPPSU", "Name: %s", await psu.get_name());
-                        this.tprintln(null, "HPPSU", "CT: %s", await psu.get_ct());
+                        this.tprintln(null, "HPPSU", "ID: 0x%s", (await device.get_id()).toString(16));
+                        this.tprintln(null, "HPPSU", "SPN: %s", await device.get_spn());
+                        this.tprintln(null, "HPPSU", "Date: %s", await device.get_date());
+                        this.tprintln(null, "HPPSU", "Name: %s", await device.get_name());
+                        this.tprintln(null, "HPPSU", "CT: %s", await device.get_ct());
                     }
                     break;
                     case "status":
                     {
-                        this.tprintln(null, "HPPSU", "Status flags: 0x%s", (await psu.get_status_flags()).toString(16));
-                        this.tprintln(null, "HPPSU", "Input Present: %s", await psu.is_input_present());
-                        this.tprintln(null, "HPPSU", "Output Enabled: %s", await psu.is_main_output_enabled());
+                        this.tprintln(null, "HPPSU", "Status flags: 0x%s", (await device.get_status_flags()).toString(16));
+                        this.tprintln(null, "HPPSU", "Input Present: %s", await device.is_input_present());
+                        this.tprintln(null, "HPPSU", "Output Enabled: %s", await device.is_main_output_enabled());
                     }
                     break;
                     case "input":
                     {
-                        this.tprintln(null, "HPPSU", "Input Present: %s", await psu.is_input_present());
-                        this.tprintln(null, "HPPSU", "Input Voltage: %d V", await psu.get_input_voltage());
-                        this.tprintln(null, "HPPSU", "Input Undervoltage threshold: %d V", await psu.get_input_undervoltage_threshold());
-                        this.tprintln(null, "HPPSU", "Input Overvoltage threshold: %d V", await psu.get_input_overvoltage_threshold());
-                        this.tprintln(null, "HPPSU", "Input Current: %d A (max. %d A)", await psu.get_input_current(), await psu.get_peak_input_current());
-                        this.tprintln(null, "HPPSU", "Input Power: %d W (max. %d W)", await psu.get_input_power(), await psu.get_peak_input_power());
-                        this.tprintln(null, "HPPSU", "Input Energy: %d Wh", await psu.get_input_energy());
+                        this.tprintln(null, "HPPSU", "Input Present: %s", await device.is_input_present());
+                        this.tprintln(null, "HPPSU", "Input Voltage: %d V", await device.get_input_voltage());
+                        this.tprintln(null, "HPPSU", "Input Undervoltage threshold: %d V", await device.get_input_undervoltage_threshold());
+                        this.tprintln(null, "HPPSU", "Input Overvoltage threshold: %d V", await device.get_input_overvoltage_threshold());
+                        this.tprintln(null, "HPPSU", "Input Current: %d A (max. %d A)", await device.get_input_current(), await device.get_peak_input_current());
+                        this.tprintln(null, "HPPSU", "Input Power: %d W (max. %d W)", await device.get_input_power(), await device.get_peak_input_power());
+                        this.tprintln(null, "HPPSU", "Input Energy: %d Wh", await device.get_input_energy());
                     }
                     break;
                     case "output":
                     {
-                        this.tprintln(null, "HPPSU", "Output Enabled: %s", await psu.is_main_output_enabled());
-                        this.tprintln(null, "HPPSU", "Output Voltage: %d V", await psu.get_output_voltage());
-                        this.tprintln(null, "HPPSU", "Output Undervoltage threshold: %d V", await psu.get_output_undervoltage_threshold());
-                        this.tprintln(null, "HPPSU", "Output Overvoltage threshold: %d V", await psu.get_output_overvoltage_threshold());
-                        this.tprintln(null, "HPPSU", "Output Current: %d A (max. %d A)", await psu.get_output_current(), await psu.get_peak_output_current());
-                        this.tprintln(null, "HPPSU", "Output Power: %d W", await psu.get_output_power());
+                        this.tprintln(null, "HPPSU", "Output Enabled: %s", await device.is_main_output_enabled());
+                        this.tprintln(null, "HPPSU", "Output Voltage: %d V", await device.get_output_voltage());
+                        this.tprintln(null, "HPPSU", "Output Undervoltage threshold: %d V", await device.get_output_undervoltage_threshold());
+                        this.tprintln(null, "HPPSU", "Output Overvoltage threshold: %d V", await device.get_output_overvoltage_threshold());
+                        this.tprintln(null, "HPPSU", "Output Current: %d A (max. %d A)", await device.get_output_current(), await device.get_peak_output_current());
+                        this.tprintln(null, "HPPSU", "Output Power: %d W", await device.get_output_power());
                     }
                     break;
                     case "temperature":
                     {
-                        this.tprintln(null, "HPPSU", "Intake Temperature: %d C", await psu.get_intake_temperature());
-                        this.tprintln(null, "HPPSU", "Internal Temperature: %d C", await psu.get_internal_temperature());
+                        this.tprintln(null, "HPPSU", "Intake Temperature: %d C", await device.get_intake_temperature());
+                        this.tprintln(null, "HPPSU", "Internal Temperature: %d C", await device.get_internal_temperature());
                     }
                     break;
                     case "fan_speed":
                     {
-                        this.tprintln(null, "HPPSU", "Fan speed: %d RPM", await psu.get_fan_speed());
-                        this.tprintln(null, "HPPSU", "Fan target speed: %d RPM", await psu.get_fan_target_speed());
+                        this.tprintln(null, "HPPSU", "Fan speed: %d RPM", await device.get_fan_speed());
+                        this.tprintln(null, "HPPSU", "Fan target speed: %d RPM", await device.get_fan_target_speed());
                     }
                     break;
                     case "on_time":
                     {
-                        this.tprintln(null, "HPPSU", "On time: %d s", await psu.get_on_time());
-                        this.tprintln(null, "HPPSU", "Total on time: %d days", await psu.get_total_on_time() / 60 / 24);
+                        this.tprintln(null, "HPPSU", "On time: %d s", await device.get_on_time());
+                        this.tprintln(null, "HPPSU", "Total on time: %d days", await device.get_total_on_time() / 60 / 24);
                     }
                     break;
                     default:
@@ -318,124 +243,314 @@ async function ssh_server_init()
                     break;
                 }
             }
+            else if(device instanceof DS18B20)
+            {
+                await device.measure();
+
+                switch(param_name)
+                {
+                    case "":
+                    {
+                        this.tprintln(null, "DS18B20", "Temperature: %d C", await device.get_temperature());
+                        this.tprintln(null, "DS18B20", "High Alarm Temperature: %d C", (await device.get_alarm()).high);
+                        this.tprintln(null, "DS18B20", "Low Alarm Temperature: %d C", (await device.get_alarm()).low);
+                        this.tprintln(null, "DS18B20", "Parasidic powered: %s", await device.is_parasidic_power());
+                    }
+                    break;
+                    default:
+                    {
+                        throw new Error("DS18B20 parameter not supported");
+                    }
+                    break;
+                }
+            }
+            else if(device instanceof BME280)
+            {
+                switch(param_name)
+                {
+                    case "":
+                    {
+                        this.tprintln(null, "BME280", "Temperature: %d C", await device.get_temperature());
+                        this.tprintln(null, "BME280", "Humidity: %d %%RH", await device.get_humidity());
+                        this.tprintln(null, "BME280", "Pressure: %d hPa", await device.get_pressure());
+                        this.tprintln(null, "BME280", "Dew point: %d C", await device.get_dew_point());
+                        this.tprintln(null, "BME280", "Heat index: %d C", await device.get_heat_index());
+                        this.tprintln(null, "BME280", "Altitude: %d m", await device.get_altitude());
+                    }
+                    break;
+                    default:
+                    {
+                        throw new Error("BME280 parameter not supported");
+                    }
+                    break;
+                }
+            }
+            else if(device instanceof OAQ)
+            {
+                switch(param_name)
+                {
+                    case "":
+                    {
+                        let stable = await device.is_stable();
+
+                        if(!stable)
+                        {
+                            this.tprintln("yellow", "OAQ (ZMOD4510)", "Sensor not yet stable!");
+                        }
+                        else
+                        {
+                            this.tprintln(null, "OAQ (ZMOD4510)", "NO2 concentration: %d", await device.get_no2_concentration());
+                            this.tprintln(null, "OAQ (ZMOD4510)", "O3 concentration: %d", await device.get_o3_concentration());
+                            this.tprintln(null, "OAQ (ZMOD4510)", "Air Quality Index: %d (%s)", await device.get_aqi(), await device.get_loc());
+                        }
+                    }
+                    break;
+                    default:
+                    {
+                        throw new Error("OAQ parameter not supported");
+                    }
+                    break;
+                }
+            }
+            else if(device instanceof SI1133)
+            {
+                switch(param_name)
+                {
+                    case "":
+                    {
+                        await device.measure();
+
+                        this.tprintln(null, "SI1133", "Visible light: %d Lux", await device.get_lux());
+                        this.tprintln(null, "SI1133", "UV Index: %d", await device.get_uv());
+                    }
+                    break;
+                    default:
+                    {
+                        throw new Error("SI1133 parameter not supported");
+                    }
+                    break;
+                }
+            }
+            else if(device instanceof MCP3221)
+            {
+                switch(param_name)
+                {
+                    case "":
+                    {
+                        let samples = argv[2] || 1;
+
+                        this.tprintln(null, "MCP3221", "Voltage: %d mV", await device.get_voltage(samples));
+                    }
+                    break;
+                    default:
+                    {
+                        throw new Error("MCP3221 parameter not supported");
+                    }
+                    break;
+                }
+            }
+            else if(device instanceof LTC5597)
+            {
+                switch(param_name)
+                {
+                    case "":
+                    {
+                        let samples = argv[2] || 3;
+                        let gain = argv[3] || 2;
+
+                        this.tprintln(null, "LTC5597", "Power: %d dBm", await device.get_power_level(gain, samples));
+                    }
+                    break;
+                    default:
+                    {
+                        throw new Error("LTC5597 parameter not supported");
+                    }
+                    break;
+                }
+            }
+            else if(device instanceof F2915)
+            {
+                switch(param_name)
+                {
+                    case "":
+                    {
+                        this.tprintln(null, "F2915", "Powered: %s", await device.is_powered());
+                        this.tprintln(null, "F2915", "Selected RF path: %d", await device.get_rf_path());
+                    }
+                    break;
+                    default:
+                    {
+                        throw new Error("F2915 parameter not supported");
+                    }
+                    break;
+                }
+            }
+            else if(device instanceof RelayController)
+            {
+                switch(param_name)
+                {
+                    case "":
+                    {
+                        this.tprintln(null, "RelayController", "Unique ID: %s", await device.get_unique_id());
+                        cl.tprintln(null, "RelayController", "Software Version: v%d", await device.get_software_version());
+
+                        let chip_voltages = await device.get_chip_voltages();
+                        this.tprintln(null, "RelayController", "AVDD Voltage: %d mV", chip_voltages.avdd);
+                        this.tprintln(null, "RelayController", "DVDD Voltage: %d mV", chip_voltages.dvdd);
+                        this.tprintln(null, "RelayController", "IOVDD Voltage: %d mV", chip_voltages.iovdd);
+                        this.tprintln(null, "RelayController", "Core Voltage: %d mV", chip_voltages.core);
+
+                        let system_voltages = await device.get_system_voltages();
+                        this.tprintln(null, "RelayController", "VIN Voltage: %d mV", system_voltages.vin);
+
+                        let chip_temperatures = await device.get_chip_temperatures();
+                        this.tprintln(null, "RelayController", "ADC Temperature: %d C", chip_temperatures.adc);
+                        this.tprintln(null, "RelayController", "EMU Temperature: %d C", chip_temperatures.emu);
+                    }
+                    break;
+                    default:
+                    {
+                        throw new Error("RelayController parameter not supported");
+                    }
+                    break;
+                }
+            }
             else
             {
-                throw new Error("PSU not supported");
+                throw new Error("Device not supported");
             }
 
             return true;
         },
         function (line)
         {
-            const param_names = ["info", "status", "input", "output", "temperature", "fan_speed", "on_time"];
-            const psu_param_names = [];
+            const param_names = [];
 
-            for(let i = 0; i < power_supplies.length; i++)
+            for(const device_name in devices)
             {
-                psu_param_names.push("psu" + i);
+                const device = devices[device_name];
 
-                for(const param of param_names)
-                    psu_param_names.push("psu" + i + "_" + param);
+                param_names.push(device_name);
+
+                let device_param_names = [];
+
+                if(device instanceof HPPSU)
+                    device_param_names = ["info", "status", "input", "output", "temperature", "fan_speed", "on_time"];
+                else if(device instanceof DS18B20)
+                    device_param_names = [];
+                else if(device instanceof BME280)
+                    device_param_names = [];
+                else if(device instanceof OAQ)
+                    device_param_names = [];
+                else if(device instanceof SI1133)
+                    device_param_names = [];
+                else if(device instanceof MCP3221)
+                    device_param_names = [];
+                else if(device instanceof LTC5597)
+                    device_param_names = [];
+                else if(device instanceof F2915)
+                    device_param_names = [];
+                else if(device instanceof RelayController)
+                    device_param_names = [];
+
+                for(const param of device_param_names)
+                    param_names.push(device_name + "." + param);
             }
 
-            const hits = psu_param_names.filter(
+            const hits = param_names.filter(
                 function (c)
                 {
                     return c.startsWith(line);
                 }
             );
 
-            return hits.length ? hits : psu_param_names;
+            return hits.length ? hits : param_names;
         }
     );
     ssh_server_add_command(
-        "wpsu",
-        "Modify parameters of the PSU specified in the first argument",
+        "wdev",
+        "Modify parameters of the device specified in the first argument",
         async function (argv)
         {
-            let psu_param_name = argv[1];
+            let device_param_name = argv[1];
 
-            if(typeof(psu_param_name) != "string")
-                throw new Error("Invalid PSU parameter name");
+            if(typeof(device_param_name) != "string")
+                throw new Error("Invalid device parameter name");
 
-            psu_param_name = psu_param_name.toLowerCase();
+            device_param_name = device_param_name.toLowerCase();
 
-            if(psu_param_name.indexOf("psu") != 0)
-                throw new Error("Invalid PSU parameter name");
+            let param_name_start = device_param_name.indexOf(".");
 
-            let param_name_start = psu_param_name.indexOf("_");
+            if(param_name_start === 0)
+                throw new Error("Invalid device parameter name");
 
             if(param_name_start == -1)
-                param_name_start = psu_param_name.length;
+                param_name_start = device_param_name.length;
 
-            let psu_index = parseInt(psu_param_name.slice(3, param_name_start));
+            let device_name = device_param_name.slice(0, param_name_start);
+            let device = devices[device_name];
 
-            if(psu_index < 0 || psu_index >= power_supplies.length)
-                throw new Error("Invalid PSU name");
+            if(!device)
+                throw new Error("Device not found");
 
-            let psu = power_supplies[psu_index];
+            let param_name = device_param_name.slice(param_name_start + 1);
 
-            if(!psu)
-                throw new Error("PSU not found");
-
-            let param_name = psu_param_name.slice(param_name_start + 1);
-
-            if(psu instanceof HPPSU)
+            if(device instanceof HPPSU)
             {
                 switch(param_name)
                 {
                     case "clear_peak_input_current":
                     {
-                        await psu.clear_peak_input_current();
+                        await device.clear_peak_input_current();
 
-                        this.tprintln(null, "HPPSU", "Peak Input Current: %d A", await psu.get_peak_input_current());
+                        this.tprintln(null, "HPPSU", "Peak Input Current: %d A", await device.get_peak_input_current());
                     }
                     break;
                     case "clear_peak_input_power":
                     {
-                        await psu.clear_peak_input_power();
+                        await device.clear_peak_input_power();
 
-                        this.tprintln(null, "HPPSU", "Peak Input Power: %d W", await psu.get_peak_input_power());
+                        this.tprintln(null, "HPPSU", "Peak Input Power: %d W", await device.get_peak_input_power());
                     }
                     break;
                     case "clear_peak_output_current":
                     {
-                        await psu.clear_peak_output_current();
+                        await device.clear_peak_output_current();
 
-                        this.tprintln(null, "HPPSU", "Peak Output Current: %d A", await psu.get_peak_output_current());
+                        this.tprintln(null, "HPPSU", "Peak Output Current: %d A", await device.get_peak_output_current());
                     }
                     break;
                     case "fan_speed":
                     {
                         let speed = parseInt(argv[2]);
 
-                        await psu.set_fan_target_speed(speed);
+                        await device.set_fan_target_speed(speed);
 
-                        this.tprintln(null, "HPPSU", "Fan speed: %d RPM", await psu.get_fan_speed());
-                        this.tprintln(null, "HPPSU", "Fan target speed: %d RPM", await psu.get_fan_target_speed());
+                        this.tprintln(null, "HPPSU", "Fan speed: %d RPM", await device.get_fan_speed());
+                        this.tprintln(null, "HPPSU", "Fan target speed: %d RPM", await device.get_fan_target_speed());
                     }
                     break;
                     case "clear_on_time_and_energy":
                     {
-                        await psu.clear_on_time_and_energy();
+                        await device.clear_on_time_and_energy();
 
-                        this.tprintln(null, "HPPSU", "On time: %d s", await psu.get_on_time());
+                        this.tprintln(null, "HPPSU", "On time: %d s", await device.get_on_time());
                     }
                     break;
                     case "turn_on":
                     {
-                        await psu.set_enable(true);
+                        await device.set_enable(true);
                         await delay(100);
 
-                        this.tprintln(null, "HPPSU", "Output Enabled: %s", await psu.is_main_output_enabled());
+                        this.tprintln(null, "HPPSU", "Output Enabled: %s", await device.is_main_output_enabled());
                     }
                     break;
                     case "turn_off":
                     {
-                        await psu.set_enable(false);
+                        await device.set_enable(false);
                         await delay(100);
 
-                        this.tprintln(null, "HPPSU", "Output Enabled: %s", await psu.is_main_output_enabled());
+                        this.tprintln(null, "HPPSU", "Output Enabled: %s", await device.is_main_output_enabled());
                     }
                     break;
                     default:
@@ -445,30 +560,127 @@ async function ssh_server_init()
                     break;
                 }
             }
+            else if(device instanceof DS18B20)
+            {
+                await device.measure();
+
+                switch(param_name)
+                {
+                    default:
+                    {
+                        throw new Error("DS18B20 parameter not supported");
+                    }
+                    break;
+                }
+            }
+            else if(device instanceof BME280)
+            {
+                switch(param_name)
+                {
+                    default:
+                    {
+                        throw new Error("BME280 parameter not supported");
+                    }
+                    break;
+                }
+            }
+            else if(device instanceof MCP3221)
+            {
+                switch(param_name)
+                {
+                    default:
+                    {
+                        throw new Error("MCP3221 parameter not supported");
+                    }
+                    break;
+                }
+            }
+            else if(device instanceof LTC5597)
+            {
+                switch(param_name)
+                {
+                    default:
+                    {
+                        throw new Error("LTC5597 parameter not supported");
+                    }
+                    break;
+                }
+            }
+            else if(device instanceof F2915)
+            {
+                switch(param_name)
+                {
+                    case "rf_path":
+                    {
+                        let path = parseInt(argv[2]);
+
+                        await device.set_rf_path(path);
+
+                        this.tprintln(null, "F2915", "Selected RF path: %d", await device.get_rf_path());
+                    }
+                    break;
+                    default:
+                    {
+                        throw new Error("F2915 parameter not supported");
+                    }
+                    break;
+                }
+            }
+            else if(device instanceof RelayController)
+            {
+                switch(param_name)
+                {
+                    default:
+                    {
+                        throw new Error("RelayController parameter not supported");
+                    }
+                    break;
+                }
+            }
             else
             {
-                throw new Error("PSU not supported");
+                throw new Error("Device not supported");
             }
 
             return true;
         },
         function (line)
         {
-            const param_names = ["clear_peak_input_current", "clear_peak_input_power", "clear_peak_output_current", "fan_speed", "clear_on_time_and_energy", "turn_on", "turn_off"];
-            const psu_param_names = [];
+            const param_names = [];
 
-            for(let i = 0; i < power_supplies.length; i++)
-                for(const param of param_names)
-                    psu_param_names.push("psu" + i + "_" + param);
+            for(const device_name in devices)
+            {
+                const device = devices[device_name];
 
-            const hits = psu_param_names.filter(
+                let device_param_names = [];
+
+                if(device instanceof HPPSU)
+                    device_param_names = ["clear_peak_input_current", "clear_peak_input_power", "clear_peak_output_current", "fan_speed", "clear_on_time_and_energy", "turn_on", "turn_off"];
+                else if(device instanceof DS18B20)
+                    device_param_names = [];
+                else if(device instanceof BME280)
+                    device_param_names = [];
+                else if(device instanceof MCP3221)
+                    device_param_names = [];
+                else if(device instanceof LTC5597)
+                    device_param_names = [];
+                else if(device instanceof F2915)
+                    device_param_names = ["rf_path"];
+                else if(device instanceof RelayController)
+                    device_param_names = [];
+
+                for(const param of device_param_names)
+                    param_names.push(device_name + "." + param);
+            }
+
+            const hits = param_names.filter(
                 function (c)
                 {
                     return c.startsWith(line);
                 }
             );
 
-            return hits.length ? hits : psu_param_names;
+            return hits.length ? hits : param_names;
         }
     );
     ssh_server_add_command(
@@ -1181,6 +1393,7 @@ async function main()
     //// OneWire bus Controllers
     buses.onewire = [];
 
+    const onewire_bus_controllers = [];
     onewire_bus_controllers.push(new DS2484(buses.i2c[0]));
 
     for(let i = 0; i < onewire_bus_controllers.length; i++)
@@ -1235,7 +1448,7 @@ async function main()
                 let sensor = new DS18B20(device);
 
                 // TODO: Check code and add accordingly to sensors array
-                sensors["ds18b20_" + sensor.get_uid().toString(16)] = sensor;
+                devices["ds18b20_" + sensor.get_uid().toString(16)] = sensor;
 
                 await sensor.config(12);
                 await sensor.measure();
@@ -1271,9 +1484,6 @@ async function main()
 
         cl.tprintln("green", "BME280", "BME280 #%d found!", i);
 
-        // TODO: Check code and add accordingly to sensors array
-        sensors["bme280_" + i] = sensor;
-
         await sensor.read_calibration();
         await sensor.config(
             {
@@ -1284,8 +1494,21 @@ async function main()
             16,
             125
         );
-        await sensor.measure(false);
 
+        if(i == 0)
+        {
+            devices["thp_inside_sensor"] = sensor;
+        }
+        else if(i == 1)
+        {
+            devices["thp_outside_sensor"] = sensor;
+        }
+        else
+        {
+            devices["bme280_" + i] = sensor;
+        }
+
+        await sensor.measure(false);
         await delay(125 * 16);
 
         cl.tprintln(null, "BME280", "  Temperature: %d C", await sensor.get_temperature());
@@ -1294,6 +1517,89 @@ async function main()
         cl.tprintln(null, "BME280", "  Dew point: %d C", await sensor.get_dew_point());
         cl.tprintln(null, "BME280", "  Heat index: %d C", await sensor.get_heat_index());
         cl.tprintln(null, "BME280", "  Altitude: %d m", await sensor.get_altitude());
+    }
+
+    //// ZMOD4510
+    const zmod4510_sensors = [];
+    zmod4510_sensors.push(new ZMOD4510(buses.i2c[0], gpios.ext_i2c_enable[0]));
+
+    for(let i = 0; i < zmod4510_sensors.length; i++)
+    {
+        let sensor = zmod4510_sensors[i];
+
+        try
+        {
+            await sensor.probe();
+        }
+        catch (e)
+        {
+            cl.tprintln("red", "ZMOD4510", e);
+
+            continue;
+        }
+
+        cl.tprintln("green", "ZMOD4510", "ZMOD4510 #%d found!", i);
+
+        await sensor.config();
+
+        let oaq = new OAQ(sensor);
+
+        await oaq.config();
+        await oaq.start_measuring();
+
+        if(i == 0)
+        {
+            devices["oaq_out_sensor"] = oaq;
+        }
+        else
+        {
+            devices["zmod4510_oaq_" + i] = oaq;
+        }
+    }
+
+    //// TODO: ZMOD4410 - not really needed...
+
+    //// SI1133
+    const si1133_sensors = [];
+    si1133_sensors.push(new SI1133(buses.i2c[0], 0, gpios.ext_i2c_enable[0]));
+    si1133_sensors.push(new SI1133(buses.i2c[0], 1, gpios.ext_i2c_enable[0]));
+
+    for(let i = 0; i < si1133_sensors.length; i++)
+    {
+        let sensor = si1133_sensors[i];
+
+        try
+        {
+            await sensor.probe();
+        }
+        catch (e)
+        {
+            cl.tprintln("red", "SI1133", e);
+
+            continue;
+        }
+
+        cl.tprintln("green", "SI1133", "SI1133 #%d found!", i);
+
+        await sensor.config();
+
+        if(i == 0)
+        {
+            devices["light_inside_sensor"] = sensor;
+        }
+        else if(i == 1)
+        {
+            devices["light_outside_sensor"] = sensor;
+        }
+        else
+        {
+            devices["si1133_" + i] = sensor;
+        }
+
+        await sensor.measure();
+
+        cl.tprintln(null, "SI1133", "  Visible light: %d Lux", await sensor.get_lux());
+        cl.tprintln(null, "SI1133", "  UV Index: %d", await sensor.get_uv());
     }
 
     //// MCP3221 ADC
@@ -1322,23 +1628,23 @@ async function main()
             sensor.set_reference(3000); // 3V reference voltage regulator
             sensor.set_scale_factor((21e3 + 147e3) / 21e3 * 1.04675); // Voltage divider and correction factor
 
-            sensors["vin_voltage_adc"] = sensor;
+            devices["vin_voltage_adc"] = sensor;
         }
         else
         {
-            sensors["mcp3421_" + i] = sensor;
+            devices["mcp3421_" + i] = sensor;
         }
 
         cl.tprintln(null, "MCP3221", "  Voltage: %d mV", await sensor.get_voltage(10));
     }
 
     //// LTC5597 (RFPowerMeter with MCP3421 ADC)
-    const ltc5597_sensor = [];
-    ltc5597_sensor.push(new LTC5597(buses.i2c[0], 0, gpios.ext_i2c_enable[0]));
+    const ltc5597_sensors = [];
+    ltc5597_sensors.push(new LTC5597(buses.i2c[0], 0, gpios.ext_i2c_enable[0]));
 
-    for(let i = 0; i < ltc5597_sensor.length; i++)
+    for(let i = 0; i < ltc5597_sensors.length; i++)
     {
-        let sensor = ltc5597_sensor[i];
+        let sensor = ltc5597_sensors[i];
 
         try
         {
@@ -1357,11 +1663,11 @@ async function main()
         {
             sensor.set_offset(18.1 + 20);
 
-            sensors["tx_fwd_rf_power_sensor"] = sensor;
+            devices["tx_fwd_rf_power_sensor"] = sensor;
         }
         else
         {
-            sensors["ltc5597_" + i] = sensor;
+            devices["ltc5597_" + i] = sensor;
         }
 
         sensor.load_calibration(
@@ -1406,8 +1712,49 @@ async function main()
         cl.tprintln(null, "LTC5597", "  Power: %d dBm", await sensor.get_power_level(2, 3) + 18.1 + 20);
     }
 
+    //// F2915 (RFSwitch with MCP23008 IO Controller)
+    const f2915_rf_switches = [];
+    f2915_rf_switches.push(new F2915(buses.i2c[0], 0, gpios.ext_i2c_enable[1]));
+    f2915_rf_switches.push(new F2915(buses.i2c[0], 1, gpios.ext_i2c_enable[1]));
+    f2915_rf_switches.push(new F2915(buses.i2c[0], 2, gpios.ext_i2c_enable[1]));
+
+    for(let i = 0; i < f2915_rf_switches.length; i++)
+    {
+        let rf_switch = f2915_rf_switches[i];
+
+        try
+        {
+            await rf_switch.probe();
+        }
+        catch (e)
+        {
+            cl.tprintln("red", "F2915", e);
+
+            continue;
+        }
+
+        cl.tprintln("green", "F2915", "RF Switch #%d found!", i);
+
+        await rf_switch.config();
+        await rf_switch.set_power_enable(true);
+        await rf_switch.set_rf_path(5);
+
+        if(i == 0)
+        {
+            devices["tx_if_switch"] = rf_switch;
+        }
+        else
+        {
+            devices["f2915_rf_switch_" + i] = rf_switch;
+        }
+
+        cl.tprintln(null, "F2915", "  Powered: %s", await rf_switch.is_powered());
+        cl.tprintln(null, "F2915", "  Selected RF path: %d", await rf_switch.get_rf_path());
+    }
+
     //// Controllers
     // Relay Controller
+    const relay_controllers = [];
     relay_controllers.push(new RelayController(buses.i2c[0], gpios.ext_i2c_enable[1]));
 
     for(let i = 0; i < relay_controllers.length; i++)
@@ -1426,6 +1773,15 @@ async function main()
         }
 
         cl.tprintln("green", "RelayController", "Relay Controller #%d found!", i);
+
+        if(i == 0)
+        {
+            devices["relay_controller"] = controller;
+        }
+        else
+        {
+            devices["relay_controller_" + i] = controller;
+        }
 
         cl.tprintln(null, "RelayController", "  Unique ID: %s", await controller.get_unique_id());
         cl.tprintln(null, "RelayController", "  Software Version: v%d", await controller.get_software_version());
@@ -1448,12 +1804,13 @@ async function main()
 
     //// PSU
     // PSU GPIO Controlers
-    power_supply_gpio_controllers.push(new MCP23008(buses.i2c[1], 0, gpios.psu_i2c_enable[0]));
-    power_supply_gpio_controllers.push(new MCP23008(buses.i2c[1], 0, gpios.psu_i2c_enable[1]));
+    const psu_gpio_controllers = [];
+    psu_gpio_controllers.push(new MCP23008(buses.i2c[1], 0, gpios.psu_i2c_enable[0]));
+    psu_gpio_controllers.push(new MCP23008(buses.i2c[1], 0, gpios.psu_i2c_enable[1]));
 
-    for(let i = 0; i < power_supply_gpio_controllers.length; i++)
+    for(let i = 0; i < psu_gpio_controllers.length; i++)
     {
-        let gpio_controller = power_supply_gpio_controllers[i];
+        let gpio_controller = psu_gpio_controllers[i];
 
         try
         {
@@ -1480,12 +1837,13 @@ async function main()
     }
 
     // PSU
-    power_supplies.push(new HPPSU(buses.i2c[1], 7, gpios.psu_i2c_enable[0], power_supply_gpio_controllers[0].get_gpio("PA0"), power_supply_gpio_controllers[0].get_gpio("PA4")));
-    power_supplies.push(new HPPSU(buses.i2c[1], 7, gpios.psu_i2c_enable[1], power_supply_gpio_controllers[1].get_gpio("PA0"), power_supply_gpio_controllers[1].get_gpio("PA4")));
+    const psus = [];
+    psus.push(new HPPSU(buses.i2c[1], 7, gpios.psu_i2c_enable[0], psu_gpio_controllers[0].get_gpio("PA0"), psu_gpio_controllers[0].get_gpio("PA4")));
+    psus.push(new HPPSU(buses.i2c[1], 7, gpios.psu_i2c_enable[1], psu_gpio_controllers[1].get_gpio("PA0"), psu_gpio_controllers[1].get_gpio("PA4")));
 
-    for(let i = 0; i < power_supplies.length; i++)
+    for(let i = 0; i < psus.length; i++)
     {
-        let psu = power_supplies[i];
+        let psu = psus[i];
         let psu_present = true;
 
         try
@@ -1514,6 +1872,8 @@ async function main()
         }
 
         cl.tprintln("green", "HPPSU", "PSU #%d and EEPROM #%d found!", i, i);
+
+        devices["psu" + i] = psu;
 
         cl.tprintln(null, "HPPSU", "  ID: 0x%s", (await psu.get_id()).toString(16));
         cl.tprintln(null, "HPPSU", "  SPN: %s", await psu.get_spn());

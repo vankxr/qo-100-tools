@@ -1,5 +1,5 @@
 const GPIO = require.main.require("./lib/gpio");
-const { I2C, I2CDevice} = require.main.require("./lib/i2c");
+const { I2C, I2CDevice } = require.main.require("./lib/i2c");
 
 class MCP3221 extends I2CDevice
 {

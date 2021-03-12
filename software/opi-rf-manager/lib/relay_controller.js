@@ -1,4 +1,4 @@
-const { I2C, I2CDevice} = require.main.require("./lib/i2c");
+const { I2C, I2CDevice } = require.main.require("./lib/i2c");
 
 class RelayController extends I2CDevice
 {

@@ -1,4 +1,4 @@
-const { I2C, I2CDevice} = require.main.require("./lib/i2c");
+const { I2C, I2CDevice } = require.main.require("./lib/i2c");
 
 class BME280 extends I2CDevice
 {
@@ -285,7 +285,7 @@ class BME280 extends I2CDevice
         let buf = await this.read(0xF7, 8);
 
         // Temperature
-        let adc_T = ((buf.readUInt8(3) << 8 | buf.readUInt8(4)) << 8 | buf.readUInt8(5)) >> 4;
+        let adc_T = ((buf.readUInt16BE(3) << 8) | buf.readUInt8(5)) >> 4;
         let v1_T = (adc_T / 16384 - this.calibration.T1 / 1024) * this.calibration.T2;
         let v2_T = Math.pow(adc_T / 131072 - this.calibration.T1 / 8192, 2) * this.calibration.T3;
         let T_fine = v1_T + v2_T;
@@ -306,7 +306,7 @@ class BME280 extends I2CDevice
             H = 0;
 
         // Pressure
-        let adc_P = ((buf.readUInt8(0) << 8 | buf.readUInt8(1)) << 8 | buf.readUInt8(2)) >> 4;
+        let adc_P = ((buf.readUInt16BE(0) << 8) | buf.readUInt8(2)) >> 4;
         let v1_P = T_fine / 2 - 64000;
         let v2_P = Math.pow(v1_P, 2) * this.calibration.P6 / 32768;
         v2_P += v1_P * this.calibration.P5 * 2;
