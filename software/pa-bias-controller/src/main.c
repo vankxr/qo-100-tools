@@ -17,6 +17,7 @@
 #include "usart.h"
 #include "i2c.h"
 #include "max11300.h"
+#include "mcp4728.h"
 #include "wdog.h"
 
 // Structs
@@ -27,7 +28,20 @@
 #define I2C_SLAVE_REGISTER(t, a)                (*(t *)&ubI2CRegister[(a)])
 #define I2C_SLAVE_REGISTER_WRITE_MASK(t, a)     (*(t *)&ubI2CRegisterWriteMask[(a)])
 #define I2C_SLAVE_REGISTER_READ_MASK(t, a)      (*(t *)&ubI2CRegisterReadMask[(a)])
-#define I2C_SLAVE_REGISTER_UVTH_VOLTAGE         0x20 // 32-bit
+#define I2C_SLAVE_REGISTER_PA1_VGG_RAW_VOLTAGE  0x10 // 32-bit
+#define I2C_SLAVE_REGISTER_PA1_VGG_VOLTAGE      0x14 // 32-bit
+#define I2C_SLAVE_REGISTER_PA1_VDD_VOLTAGE      0x18 // 32-bit
+#define I2C_SLAVE_REGISTER_PA1_IDD_CURRENT      0x1C // 32-bit
+#define I2C_SLAVE_REGISTER_PA1_TEMP             0x20 // 32-bit
+#define I2C_SLAVE_REGISTER_PA2_VGG_RAW_VOLTAGE  0x30 // 32-bit
+#define I2C_SLAVE_REGISTER_PA2_VGG_VOLTAGE      0x34 // 32-bit
+#define I2C_SLAVE_REGISTER_PA2_VDD_VOLTAGE      0x38 // 32-bit
+#define I2C_SLAVE_REGISTER_PA2_IDD_CURRENT      0x3C // 32-bit
+#define I2C_SLAVE_REGISTER_PA2_TEMP             0x40 // 32-bit
+#define I2C_SLAVE_REGISTER_TEC1_VOLTAGE         0x60 // 32-bit
+#define I2C_SLAVE_REGISTER_TEC2_VOLTAGE         0x64 // 32-bit
+#define I2C_SLAVE_REGISTER_TEC3_VOLTAGE         0x68 // 32-bit
+#define I2C_SLAVE_REGISTER_TEC4_VOLTAGE         0x6C // 32-bit
 #define I2C_SLAVE_REGISTER_VIN_VOLTAGE          0xC0 // 32-bit
 #define I2C_SLAVE_REGISTER_5V0_VOLTAGE          0xC4 // 32-bit
 #define I2C_SLAVE_REGISTER_AVDD_VOLTAGE         0xD0 // 32-bit
@@ -36,9 +50,18 @@
 #define I2C_SLAVE_REGISTER_CORE_VOLTAGE         0xDC // 32-bit
 #define I2C_SLAVE_REGISTER_EMU_TEMP             0xE0 // 32-bit
 #define I2C_SLAVE_REGISTER_ADC_TEMP             0xE4 // 32-bit
+#define I2C_SLAVE_REGISTER_AFE_TEMP             0xE8 // 32-bit
 #define I2C_SLAVE_REGISTER_SW_VERSION           0xF4 // 16-bit
 #define I2C_SLAVE_REGISTER_DEV_UIDL             0xF8 // 32-bit
 #define I2C_SLAVE_REGISTER_DEV_UIDH             0xFC // 32-bit
+
+#define PA1_INDEX   0
+#define PA2_INDEX   1
+
+#define TEC1_INDEX  0
+#define TEC2_INDEX  1
+#define TEC3_INDEX  2
+#define TEC4_INDEX  3
 
 // Forward declarations
 static void reset() __attribute__((noreturn));
@@ -57,13 +80,24 @@ static uint8_t i2c_slave_tx_data_isr();
 static uint8_t i2c_slave_rx_data_isr(uint8_t ubData);
 
 static void afe_init();
+static void afe_pa_set_raw_vgg(uint8_t ubPAIndex, float fVoltage);
+static float afe_pa_get_raw_vgg(uint8_t ubPAIndex);
+static float afe_pa_get_vgg(uint8_t ubPAIndex);
+static float afe_pa_get_vdd(uint8_t ubPAIndex);
+static float afe_pa_get_idd(uint8_t ubPAIndex);
+static float afe_pa_get_temperature(uint8_t ubPAIndex);
+
+static void tec_init();
+static void tec_set_channel_voltage(uint8_t ubChannel, float fVoltage);
+static float tec_get_channel_voltage(uint8_t ubChannel);
 
 // Variables
 volatile uint8_t ubI2CRegister[I2C_SLAVE_REGISTER_COUNT];
 volatile uint8_t ubI2CRegisterWriteMask[I2C_SLAVE_REGISTER_COUNT];
 volatile uint8_t ubI2CRegisterReadMask[I2C_SLAVE_REGISTER_COUNT];
 volatile uint8_t ubI2CRegisterPointer = 0x00;
-volatile uint8_t ubI2CFirstWrite = 1;
+volatile uint8_t ubI2CByteCount = 0;
+volatile float fTECVoltageUpdated[4] = {-1.f, -1.f, -1.f, -1.f};
 
 // ISRs
 
@@ -232,44 +266,89 @@ void i2c_slave_register_init()
 {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_VIN_VOLTAGE)      = -1.f;
-        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_VIN_VOLTAGE)      = 0x00000000;
-        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_VIN_VOLTAGE)      = 0xFFFFFFFF;
-        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_5V0_VOLTAGE)      = -1.f;
-        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_5V0_VOLTAGE)      = 0x00000000;
-        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_5V0_VOLTAGE)      = 0xFFFFFFFF;
-        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_AVDD_VOLTAGE)     = -1.f;
-        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_AVDD_VOLTAGE)     = 0x00000000;
-        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_AVDD_VOLTAGE)     = 0xFFFFFFFF;
-        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_DVDD_VOLTAGE)     = -1.f;
-        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_DVDD_VOLTAGE)     = 0x00000000;
-        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_DVDD_VOLTAGE)     = 0xFFFFFFFF;
-        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_IOVDD_VOLTAGE)    = -1.f;
-        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_IOVDD_VOLTAGE)    = 0x00000000;
-        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_IOVDD_VOLTAGE)    = 0xFFFFFFFF;
-        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_CORE_VOLTAGE)     = -1.f;
-        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_CORE_VOLTAGE)     = 0x00000000;
-        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_CORE_VOLTAGE)     = 0xFFFFFFFF;
-        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_EMU_TEMP)         = -1.f;
-        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_EMU_TEMP)         = 0x00000000;
-        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_EMU_TEMP)         = 0xFFFFFFFF;
-        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_ADC_TEMP)         = -1.f;
-        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_ADC_TEMP)         = 0x00000000;
-        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_ADC_TEMP)         = 0xFFFFFFFF;
-        I2C_SLAVE_REGISTER              (uint16_t, I2C_SLAVE_REGISTER_SW_VERSION)       = BUILD_VERSION;
-        I2C_SLAVE_REGISTER_WRITE_MASK   (uint16_t, I2C_SLAVE_REGISTER_SW_VERSION)       = 0x0000;
-        I2C_SLAVE_REGISTER_READ_MASK    (uint16_t, I2C_SLAVE_REGISTER_SW_VERSION)       = 0xFFFF;
-        I2C_SLAVE_REGISTER              (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDL)         = DEVINFO->UNIQUEL;
-        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDL)         = 0x00000000;
-        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDL)         = 0xFFFFFFFF;
-        I2C_SLAVE_REGISTER              (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDH)         = DEVINFO->UNIQUEH;
-        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDH)         = 0x00000000;
-        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDH)         = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_PA1_VGG_RAW_VOLTAGE)  = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_PA1_VGG_RAW_VOLTAGE)  = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_PA1_VGG_RAW_VOLTAGE)  = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_PA1_VGG_VOLTAGE)      = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_PA1_VGG_VOLTAGE)      = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_PA1_VGG_VOLTAGE)      = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_PA1_VDD_VOLTAGE)      = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_PA1_VDD_VOLTAGE)      = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_PA1_VDD_VOLTAGE)      = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_PA1_IDD_CURRENT)      = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_PA1_IDD_CURRENT)      = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_PA1_IDD_CURRENT)      = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_PA1_TEMP)             = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_PA1_TEMP)             = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_PA1_TEMP)             = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_PA2_VGG_RAW_VOLTAGE)  = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_PA2_VGG_RAW_VOLTAGE)  = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_PA2_VGG_RAW_VOLTAGE)  = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_PA2_VGG_VOLTAGE)      = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_PA2_VGG_VOLTAGE)      = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_PA2_VGG_VOLTAGE)      = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_PA2_VDD_VOLTAGE)      = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_PA2_VDD_VOLTAGE)      = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_PA2_VDD_VOLTAGE)      = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_PA2_IDD_CURRENT)      = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_PA2_IDD_CURRENT)      = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_PA2_IDD_CURRENT)      = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_PA2_TEMP)             = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_PA2_TEMP)             = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_PA2_TEMP)             = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_TEC1_VOLTAGE)         = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_TEC1_VOLTAGE)         = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_TEC1_VOLTAGE)         = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_TEC2_VOLTAGE)         = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_TEC2_VOLTAGE)         = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_TEC2_VOLTAGE)         = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_TEC3_VOLTAGE)         = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_TEC3_VOLTAGE)         = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_TEC3_VOLTAGE)         = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_TEC4_VOLTAGE)         = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_TEC4_VOLTAGE)         = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_TEC4_VOLTAGE)         = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_VIN_VOLTAGE)          = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_VIN_VOLTAGE)          = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_VIN_VOLTAGE)          = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_5V0_VOLTAGE)          = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_5V0_VOLTAGE)          = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_5V0_VOLTAGE)          = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_AVDD_VOLTAGE)         = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_AVDD_VOLTAGE)         = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_AVDD_VOLTAGE)         = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_DVDD_VOLTAGE)         = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_DVDD_VOLTAGE)         = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_DVDD_VOLTAGE)         = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_IOVDD_VOLTAGE)        = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_IOVDD_VOLTAGE)        = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_IOVDD_VOLTAGE)        = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_CORE_VOLTAGE)         = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_CORE_VOLTAGE)         = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_CORE_VOLTAGE)         = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_EMU_TEMP)             = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_EMU_TEMP)             = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_EMU_TEMP)             = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_ADC_TEMP)             = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_ADC_TEMP)             = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_ADC_TEMP)             = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_AFE_TEMP)             = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_AFE_TEMP)             = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_AFE_TEMP)             = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (uint16_t, I2C_SLAVE_REGISTER_SW_VERSION)           = BUILD_VERSION;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint16_t, I2C_SLAVE_REGISTER_SW_VERSION)           = 0x0000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint16_t, I2C_SLAVE_REGISTER_SW_VERSION)           = 0xFFFF;
+        I2C_SLAVE_REGISTER              (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDL)             = DEVINFO->UNIQUEL;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDL)             = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDL)             = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDH)             = DEVINFO->UNIQUEH;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDH)             = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDH)             = 0xFFFFFFFF;
     }
 }
 uint8_t i2c_slave_addr_isr(uint8_t ubAddress)
 {
-    ubI2CFirstWrite = 1;
+    ubI2CByteCount = 0;
 
     // Hardware address comparator already verifies if the address matches
     // This is only called if address is valid
@@ -279,6 +358,8 @@ uint8_t i2c_slave_addr_isr(uint8_t ubAddress)
 }
 uint8_t i2c_slave_tx_data_isr()
 {
+    ubI2CByteCount++;
+
     uint8_t ubData = ubI2CRegister[ubI2CRegisterPointer] & ubI2CRegisterReadMask[ubI2CRegisterPointer];
     ubI2CRegisterPointer++;
 
@@ -286,16 +367,53 @@ uint8_t i2c_slave_tx_data_isr()
 }
 uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
 {
-    if(ubI2CFirstWrite)
+    ubI2CByteCount++;
+
+    if(ubI2CByteCount == 1)
     {
         ubI2CRegisterPointer = ubData;
-        ubI2CFirstWrite = 0;
 
         return 1; // ACK
     }
 
     ubI2CRegister[ubI2CRegisterPointer] = (ubI2CRegister[ubI2CRegisterPointer] & ~ubI2CRegisterWriteMask[ubI2CRegisterPointer]) | (ubData & ubI2CRegisterWriteMask[ubI2CRegisterPointer]);
     ubI2CRegisterPointer++;
+
+    switch(ubI2CRegisterPointer)
+    {
+        case I2C_SLAVE_REGISTER_TEC1_VOLTAGE + sizeof(float):
+        {
+            if((ubI2CByteCount - 1) < sizeof(float))
+                break;
+
+            fTECVoltageUpdated[TEC1_INDEX] = I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_TEC1_VOLTAGE);
+        }
+        break;
+        case I2C_SLAVE_REGISTER_TEC2_VOLTAGE + sizeof(float):
+        {
+            if((ubI2CByteCount - 1) < sizeof(float))
+                break;
+
+            fTECVoltageUpdated[TEC2_INDEX] = I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_TEC2_VOLTAGE);
+        }
+        break;
+        case I2C_SLAVE_REGISTER_TEC3_VOLTAGE + sizeof(float):
+        {
+            if((ubI2CByteCount - 1) < sizeof(float))
+                break;
+
+            fTECVoltageUpdated[TEC3_INDEX] = I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_TEC3_VOLTAGE);
+        }
+        break;
+        case I2C_SLAVE_REGISTER_TEC4_VOLTAGE + sizeof(float):
+        {
+            if((ubI2CByteCount - 1) < sizeof(float))
+                break;
+
+            fTECVoltageUpdated[TEC4_INDEX] = I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_TEC4_VOLTAGE);
+        }
+        break;
+    }
 
     return 1; // ACK
 }
@@ -318,27 +436,162 @@ void afe_init()
     max11300_port_config(1, MAX11300_REG_PORTn_CONFIG_FUNCID_DIG_IN_PROG_LEVEL);
     max11300_port_dac_set_data(1, 2000.f / MAX11300_DAC_INTERNAL_REF * 4096); // 2 V logic threshold
     //// PORT4 - PA1_VG_RAW
-    max11300_port_config(4, MAX11300_REG_PORTn_CONFIG_FUNCID_ANA_OUT_MON | MAX11300_REG_PORTn_CONFIG_FUNCPRM_AVR_EXTERNAL | MAX11300_REG_PORTn_CONFIG_FUNCPRM_RANGE_ADC_0_P2p5_DAC_0_P10 | MAX11300_REG_PORTn_CONFIG_FUNCPRM_NSAMPLES_32);
-    max11300_port_dac_set_data(4, 1300.f / 10000.f * 4096);
+    max11300_port_config(4, MAX11300_REG_PORTn_CONFIG_FUNCID_ANA_OUT_MON | MAX11300_REG_PORTn_CONFIG_FUNCPRM_AVR_EXTERNAL | MAX11300_REG_PORTn_CONFIG_FUNCPRM_RANGE_ADC_0_P2p5_DAC_0_P10 | MAX11300_REG_PORTn_CONFIG_FUNCPRM_NSAMPLES_128);
+    max11300_port_dac_set_data(4, 0.f / 10000.f * 4096);
     //// PORT5 - PA1_VG_FLT
     max11300_port_config(5, MAX11300_REG_PORTn_CONFIG_FUNCID_GPI_CONTROLLED_SWITCH | 0);
     //// PORT6 - PA1_VG_SW
-    max11300_port_config(6, MAX11300_REG_PORTn_CONFIG_FUNCID_SINGLE_ANA_IN_POS | MAX11300_REG_PORTn_CONFIG_FUNCPRM_AVR_EXTERNAL | MAX11300_REG_PORTn_CONFIG_FUNCPRM_RANGE_ADC_0_P2p5_DAC_0_P10 | MAX11300_REG_PORTn_CONFIG_FUNCPRM_NSAMPLES_32);
+    max11300_port_config(6, MAX11300_REG_PORTn_CONFIG_FUNCID_SINGLE_ANA_IN_POS | MAX11300_REG_PORTn_CONFIG_FUNCPRM_AVR_EXTERNAL | MAX11300_REG_PORTn_CONFIG_FUNCPRM_RANGE_ADC_0_P2p5_DAC_0_P10 | MAX11300_REG_PORTn_CONFIG_FUNCPRM_NSAMPLES_128);
     //// PORT8 - PA2_VG_RAW
-    max11300_port_config(8, MAX11300_REG_PORTn_CONFIG_FUNCID_ANA_OUT_MON | MAX11300_REG_PORTn_CONFIG_FUNCPRM_AVR_EXTERNAL | MAX11300_REG_PORTn_CONFIG_FUNCPRM_RANGE_ADC_0_P2p5_DAC_0_P10 | MAX11300_REG_PORTn_CONFIG_FUNCPRM_NSAMPLES_32);
-    max11300_port_dac_set_data(8, 1000.f / 10000.f * 4096);
+    max11300_port_config(8, MAX11300_REG_PORTn_CONFIG_FUNCID_ANA_OUT_MON | MAX11300_REG_PORTn_CONFIG_FUNCPRM_AVR_EXTERNAL | MAX11300_REG_PORTn_CONFIG_FUNCPRM_RANGE_ADC_0_P2p5_DAC_0_P10 | MAX11300_REG_PORTn_CONFIG_FUNCPRM_NSAMPLES_128);
+    max11300_port_dac_set_data(8, 0.f / 10000.f * 4096);
     //// PORT9 - PA2_VG_FLT
     max11300_port_config(9, MAX11300_REG_PORTn_CONFIG_FUNCID_GPI_CONTROLLED_SWITCH | 1);
     //// PORT10 - PA2_VG_SW
-    max11300_port_config(10, MAX11300_REG_PORTn_CONFIG_FUNCID_SINGLE_ANA_IN_POS | MAX11300_REG_PORTn_CONFIG_FUNCPRM_AVR_EXTERNAL | MAX11300_REG_PORTn_CONFIG_FUNCPRM_RANGE_ADC_0_P2p5_DAC_0_P10 | MAX11300_REG_PORTn_CONFIG_FUNCPRM_NSAMPLES_32);
+    max11300_port_config(10, MAX11300_REG_PORTn_CONFIG_FUNCID_SINGLE_ANA_IN_POS | MAX11300_REG_PORTn_CONFIG_FUNCPRM_AVR_EXTERNAL | MAX11300_REG_PORTn_CONFIG_FUNCPRM_RANGE_ADC_0_P2p5_DAC_0_P10 | MAX11300_REG_PORTn_CONFIG_FUNCPRM_NSAMPLES_128);
     //// PORT14 - VPA1_VD_SENSE
-    max11300_port_config(14, MAX11300_REG_PORTn_CONFIG_FUNCID_SINGLE_ANA_IN_POS | MAX11300_REG_PORTn_CONFIG_FUNCPRM_AVR_EXTERNAL | MAX11300_REG_PORTn_CONFIG_FUNCPRM_RANGE_ADC_0_P2p5_DAC_0_P10 | MAX11300_REG_PORTn_CONFIG_FUNCPRM_NSAMPLES_32);
+    max11300_port_config(14, MAX11300_REG_PORTn_CONFIG_FUNCID_SINGLE_ANA_IN_POS | MAX11300_REG_PORTn_CONFIG_FUNCPRM_AVR_EXTERNAL | MAX11300_REG_PORTn_CONFIG_FUNCPRM_RANGE_ADC_0_P2p5_DAC_0_P10 | MAX11300_REG_PORTn_CONFIG_FUNCPRM_NSAMPLES_128);
     //// PORT15 - VPA2_VD_SENSE
-    max11300_port_config(15, MAX11300_REG_PORTn_CONFIG_FUNCID_SINGLE_ANA_IN_POS | MAX11300_REG_PORTn_CONFIG_FUNCPRM_AVR_EXTERNAL | MAX11300_REG_PORTn_CONFIG_FUNCPRM_RANGE_ADC_0_P2p5_DAC_0_P10 | MAX11300_REG_PORTn_CONFIG_FUNCPRM_NSAMPLES_32);
+    max11300_port_config(15, MAX11300_REG_PORTn_CONFIG_FUNCID_SINGLE_ANA_IN_POS | MAX11300_REG_PORTn_CONFIG_FUNCPRM_AVR_EXTERNAL | MAX11300_REG_PORTn_CONFIG_FUNCPRM_RANGE_ADC_0_P2p5_DAC_0_P10 | MAX11300_REG_PORTn_CONFIG_FUNCPRM_NSAMPLES_128);
     //// PORT18 - VPA1_ID_SENSE
-    max11300_port_config(18, MAX11300_REG_PORTn_CONFIG_FUNCID_SINGLE_ANA_IN_POS | MAX11300_REG_PORTn_CONFIG_FUNCPRM_AVR_EXTERNAL | MAX11300_REG_PORTn_CONFIG_FUNCPRM_RANGE_ADC_0_P2p5_DAC_0_P10 | MAX11300_REG_PORTn_CONFIG_FUNCPRM_NSAMPLES_32);
+    max11300_port_config(18, MAX11300_REG_PORTn_CONFIG_FUNCID_SINGLE_ANA_IN_POS | MAX11300_REG_PORTn_CONFIG_FUNCPRM_AVR_EXTERNAL | MAX11300_REG_PORTn_CONFIG_FUNCPRM_RANGE_ADC_0_P2p5_DAC_0_P10 | MAX11300_REG_PORTn_CONFIG_FUNCPRM_NSAMPLES_128);
     //// PORT19 - VPA2_ID_SENSE
-    max11300_port_config(19, MAX11300_REG_PORTn_CONFIG_FUNCID_SINGLE_ANA_IN_POS | MAX11300_REG_PORTn_CONFIG_FUNCPRM_AVR_EXTERNAL | MAX11300_REG_PORTn_CONFIG_FUNCPRM_RANGE_ADC_0_P2p5_DAC_0_P10 | MAX11300_REG_PORTn_CONFIG_FUNCPRM_NSAMPLES_32);
+    max11300_port_config(19, MAX11300_REG_PORTn_CONFIG_FUNCID_SINGLE_ANA_IN_POS | MAX11300_REG_PORTn_CONFIG_FUNCPRM_AVR_EXTERNAL | MAX11300_REG_PORTn_CONFIG_FUNCPRM_RANGE_ADC_0_P2p5_DAC_0_P10 | MAX11300_REG_PORTn_CONFIG_FUNCPRM_NSAMPLES_128);
+}
+void afe_pa_set_raw_vgg(uint8_t ubPAIndex, float fVoltage)
+{
+    if(fVoltage < 0.f)
+        return;
+
+    switch(ubPAIndex)
+    {
+        case PA1_INDEX:
+            max11300_port_dac_set_data(4, fVoltage / 10000.f * 4096);
+        break;
+        case PA2_INDEX:
+            max11300_port_dac_set_data(8, fVoltage / 10000.f * 4096);
+        break;
+    }
+}
+float afe_pa_get_raw_vgg(uint8_t ubPAIndex)
+{
+    switch(ubPAIndex)
+    {
+        case PA1_INDEX:
+            return max11300_port_adc_get_data(4) * (MAX11300_ADC_EXTERNAL_REF / 4096.f);
+        break;
+        case PA2_INDEX:
+            return max11300_port_adc_get_data(8) * (MAX11300_ADC_EXTERNAL_REF / 4096.f);
+        break;
+    }
+
+    return 0.f;
+}
+float afe_pa_get_vgg(uint8_t ubPAIndex)
+{
+    switch(ubPAIndex)
+    {
+        case PA1_INDEX:
+            return max11300_port_adc_get_data(6) * (MAX11300_ADC_EXTERNAL_REF / 4096.f);
+        break;
+        case PA2_INDEX:
+            return max11300_port_adc_get_data(10) * (MAX11300_ADC_EXTERNAL_REF / 4096.f);
+        break;
+    }
+
+    return 0.f;
+}
+float afe_pa_get_vdd(uint8_t ubPAIndex)
+{
+    switch(ubPAIndex)
+    {
+        case PA1_INDEX:
+            return (max11300_port_adc_get_data(14) * (MAX11300_ADC_EXTERNAL_REF / 4096.f) * 16 - 175.78125f) * 1.013f;
+        break;
+        case PA2_INDEX:
+            return (max11300_port_adc_get_data(15) * (MAX11300_ADC_EXTERNAL_REF / 4096.f) * 16 - 175.78125f) * 1.013f;
+        break;
+    }
+
+    return 0.f;
+}
+float afe_pa_get_idd(uint8_t ubPAIndex)
+{
+    switch(ubPAIndex)
+    {
+        case PA1_INDEX:
+            return (max11300_port_adc_get_data(18) * (MAX11300_ADC_EXTERNAL_REF / 4096.f) / 20 / 0.1f - 4.577f) * 1.102f;
+        break;
+        case PA2_INDEX:
+            return (max11300_port_adc_get_data(19) * (MAX11300_ADC_EXTERNAL_REF / 4096.f) / 20 / (0.012f / 3) - 99.182f) * 1.135f;
+        break;
+    }
+
+    return 0.f;
+}
+float afe_pa_get_temperature(uint8_t ubPAIndex)
+{
+    switch(ubPAIndex)
+    {
+        case PA1_INDEX:
+            return max11300_ext1_temp_read();
+        break;
+        case PA2_INDEX:
+            return max11300_ext2_temp_read();
+        break;
+    }
+
+    return 0.f;
+}
+
+void tec_init()
+{
+    TEC1_DISABLE();
+    TEC2_DISABLE();
+    TEC3_DISABLE();
+    TEC4_DISABLE();
+
+    mcp4728_channel_write(0, MCP4728_CHAN_VREF_INTERNAL | MCP4728_CHAN_PD_NORMAL | MCP4728_CHAN_GAIN_X1 | 0x0FFF);
+    mcp4728_channel_write(1, MCP4728_CHAN_VREF_INTERNAL | MCP4728_CHAN_PD_NORMAL | MCP4728_CHAN_GAIN_X1 | 0x0FFF);
+    mcp4728_channel_write(2, MCP4728_CHAN_VREF_INTERNAL | MCP4728_CHAN_PD_NORMAL | MCP4728_CHAN_GAIN_X1 | 0x0FFF);
+    mcp4728_channel_write(3, MCP4728_CHAN_VREF_INTERNAL | MCP4728_CHAN_PD_NORMAL | MCP4728_CHAN_GAIN_X1 | 0x0FFF);
+}
+void tec_set_channel_voltage(uint8_t ubChannel, float fVoltage)
+{
+    if(ubChannel > 3)
+        return;
+
+    float fDACVoltage = -0.1f * fVoltage + 2525.646f;
+
+    if(fDACVoltage < 0.f || fDACVoltage >= MCP4728_INTERNAL_REF)
+        return;
+
+    uint16_t usCode = fDACVoltage / MCP4728_INTERNAL_REF * 4096.f;
+
+    if(usCode > 4095)
+        usCode = 4095;
+
+    mcp4728_channel_write(ubChannel, MCP4728_CHAN_VREF_INTERNAL | MCP4728_CHAN_PD_NORMAL | MCP4728_CHAN_GAIN_X1 | (usCode & 0x0FFF));
+}
+float tec_get_channel_voltage(uint8_t ubChannel)
+{
+    if(ubChannel > 3)
+        return 0.f;
+
+    uint16_t usCode = mcp4728_channel_read(ubChannel);
+    float fDACVoltage = 0.f;
+
+    if(usCode & MCP4728_CHAN_VREF_INTERNAL)
+        fDACVoltage = (usCode & 0x0FFF) * (MCP4728_INTERNAL_REF / 4096.f);
+    else
+        fDACVoltage = (usCode & 0x0FFF) * (MCP4728_EXTERNAL_REF / 4096.f);
+
+    if(usCode & MCP4728_CHAN_GAIN_X2)
+        fDACVoltage *= 2.f;
+
+    float fVoltage = -10.f * fDACVoltage + 25256.46f;
+
+    return fVoltage;
 }
 
 int init()
@@ -458,6 +711,11 @@ int init()
     else
         DBGPRINTLN_CTX("MAX11300 init NOK!");
 
+    if(mcp4728_init())
+        DBGPRINTLN_CTX("MCP4728 init OK!");
+    else
+        DBGPRINTLN_CTX("MCP4728 init NOK!");
+
     return 0;
 }
 int main()
@@ -468,67 +726,71 @@ int main()
     // Analog frontent
     afe_init();
 
-    uint8_t buf[] = {
-        0x40, 0x81, 0xFF,
-        0x42, 0x81, 0xFF,
-        0x44, 0x81, 0xFF,
-        0x46, 0x81, 0xFF
-    };
-    i2c1_write(0x60, buf, sizeof(buf), I2C_STOP);
-    //TEC1_ENABLE();
-    //TEC2_ENABLE();
-    //TEC3_ENABLE();
-    //TEC4_ENABLE();
-
-    PA1_ENABLE();
-    PA2_ENABLE();
+    // TEC
+    tec_init();
 
     while(1)
     {
         wdog_feed();
 
-        static uint64_t ullLastLEDTick = 0;
-        static uint64_t ullLastDebugPrint = 0;
-
-        if(g_ullSystemTick - ullLastLEDTick > 2000)
+        for(uint8_t ubTECChannel = 0; ubTECChannel < 4; ubTECChannel++)
         {
-            ullLastLEDTick = g_ullSystemTick;
+            if(fTECVoltageUpdated[ubTECChannel] < 0.f)
+                continue;
 
-            LED_HIGH();
-            delay_ms(50);
-            LED_LOW();
+            ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+            {
+                tec_set_channel_voltage(ubTECChannel, fTECVoltageUpdated[ubTECChannel]);
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_TEC1_VOLTAGE + ubTECChannel * sizeof(float)) = tec_get_channel_voltage(ubTECChannel);
+
+                fTECVoltageUpdated[ubTECChannel] = -1.f;
+            }
         }
 
-        if(g_ullSystemTick - ullLastDebugPrint > 5000)
-        {
-            ullLastDebugPrint = g_ullSystemTick;
+        static uint64_t ullLastHeartBeat = 0;
+        static uint64_t ullLastTelemetryUpdate = 0;
 
+        if(g_ullSystemTick - ullLastHeartBeat > 2000)
+        {
+            ullLastHeartBeat = g_ullSystemTick;
+
+            LED_TOGGLE();
+
+            if(LED_STATUS())
+                ullLastHeartBeat -= 1900;
+        }
+
+        if(g_ullSystemTick - ullLastTelemetryUpdate > 5000)
+        {
+            ullLastTelemetryUpdate = g_ullSystemTick;
+
+            // System Temperatures
             float fADCTemp = adc_get_temperature();
             float fEMUTemp = emu_get_temperature();
             float fAFETemp = max11300_int_temp_read();
-            float fPA1Temp = max11300_ext1_temp_read();
-            float fPA2Temp = max11300_ext2_temp_read();
 
+            ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+            {
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_ADC_TEMP) = fADCTemp;
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_EMU_TEMP) = fEMUTemp;
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_AFE_TEMP) = fAFETemp;
+            }
+
+            DBGPRINTLN_CTX("----------------------------------");
+            DBGPRINTLN_CTX("ADC Temperature: %.2f C", fADCTemp);
+            DBGPRINTLN_CTX("EMU Temperature: %.2f C", fEMUTemp);
+            DBGPRINTLN_CTX("AFE Temperature: %.2f C", fAFETemp);
+
+            // System Voltages/Currents
             float fVIN = adc_get_vin();
             float f5V0 = adc_get_5v0();
             float fAVDD = adc_get_avdd();
             float fDVDD = adc_get_dvdd();
             float fIOVDD = adc_get_iovdd();
             float fCoreVDD = adc_get_corevdd();
-            float fPA1VGGRaw = max11300_port_adc_get_data(4) * (MAX11300_ADC_EXTERNAL_REF / 4096.f);
-            float fPA2VGGRaw = max11300_port_adc_get_data(8) * (MAX11300_ADC_EXTERNAL_REF / 4096.f);
-            float fPA1VGG = max11300_port_adc_get_data(6) * (MAX11300_ADC_EXTERNAL_REF / 4096.f);
-            float fPA2VGG = max11300_port_adc_get_data(10) * (MAX11300_ADC_EXTERNAL_REF / 4096.f);
-            float fPA1VDD = max11300_port_adc_get_data(14) * (MAX11300_ADC_EXTERNAL_REF / 4096.f) * 16;
-            float fPA2VDD = max11300_port_adc_get_data(15) * (MAX11300_ADC_EXTERNAL_REF / 4096.f) * 16;
-            float fPA1IDD = max11300_port_adc_get_data(18) * (MAX11300_ADC_EXTERNAL_REF / 4096.f) / 20 / 0.1f;
-            float fPA2IDD = max11300_port_adc_get_data(19) * (MAX11300_ADC_EXTERNAL_REF / 4096.f) / 20 / (0.012f / 3);
 
             ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
             {
-                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_ADC_TEMP) = fADCTemp;
-                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_EMU_TEMP) = fEMUTemp;
-
                 I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_VIN_VOLTAGE) = fVIN;
                 I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_5V0_VOLTAGE) = f5V0;
                 I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_AVDD_VOLTAGE) = fAVDD;
@@ -538,27 +800,78 @@ int main()
             }
 
             DBGPRINTLN_CTX("----------------------------------");
-            DBGPRINTLN_CTX("ADC Temperature: %.2f C", fADCTemp);
-            DBGPRINTLN_CTX("EMU Temperature: %.2f C", fEMUTemp);
-            DBGPRINTLN_CTX("AFE Temperature: %.2f C", fAFETemp);
             DBGPRINTLN_CTX("AVDD Voltage: %.2f mV", fAVDD);
             DBGPRINTLN_CTX("DVDD Voltage: %.2f mV", fDVDD);
             DBGPRINTLN_CTX("IOVDD Voltage: %.2f mV", fIOVDD);
             DBGPRINTLN_CTX("Core Voltage: %.2f mV", fCoreVDD);
             DBGPRINTLN_CTX("VIN Voltage: %.2f mV", fVIN);
             DBGPRINTLN_CTX("5V0 Voltage: %.2f mV", f5V0);
+
+            // PA1
+            float fPA1VGGRaw = afe_pa_get_raw_vgg(PA1_INDEX);
+            float fPA1VGG = afe_pa_get_vgg(PA1_INDEX);
+            float fPA1VDD = afe_pa_get_vdd(PA1_INDEX);
+            float fPA1IDD = afe_pa_get_idd(PA1_INDEX);
+            float fPA1Temp = afe_pa_get_temperature(PA1_INDEX);
+
+            ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+            {
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_PA1_VGG_RAW_VOLTAGE) = fPA1VGGRaw;
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_PA1_VGG_VOLTAGE) = fPA1VGG;
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_PA1_VDD_VOLTAGE) = fPA1VDD;
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_PA1_IDD_CURRENT) = fPA1IDD;
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_PA1_TEMP) = fPA1Temp;
+            }
+
             DBGPRINTLN_CTX("----------------------------------");
             DBGPRINTLN_CTX("PA #1 Temperature: %.2f C", fPA1Temp);
             DBGPRINTLN_CTX("PA #1 Drain Voltage: %.2f mV", fPA1VDD);
             DBGPRINTLN_CTX("PA #1 Drain Current: %.2f mA", fPA1IDD);
             DBGPRINTLN_CTX("PA #1 Gate Raw Voltage: %.2f mV", fPA1VGGRaw);
             DBGPRINTLN_CTX("PA #1 Gate Voltage: %.2f mV", fPA1VGG);
+
+            // PA2
+            float fPA2VGGRaw = afe_pa_get_raw_vgg(PA2_INDEX);
+            float fPA2VGG = afe_pa_get_vgg(PA2_INDEX);
+            float fPA2VDD = afe_pa_get_vdd(PA2_INDEX);
+            float fPA2IDD = afe_pa_get_idd(PA2_INDEX);
+            float fPA2Temp = afe_pa_get_temperature(PA2_INDEX);
+
+            ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+            {
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_PA2_VGG_RAW_VOLTAGE) = fPA2VGGRaw;
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_PA2_VGG_VOLTAGE) = fPA2VGG;
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_PA2_VDD_VOLTAGE) = fPA2VDD;
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_PA2_IDD_CURRENT) = fPA2IDD;
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_PA2_TEMP) = fPA2Temp;
+            }
+
             DBGPRINTLN_CTX("----------------------------------");
             DBGPRINTLN_CTX("PA #2 Temperature: %.2f C", fPA2Temp);
             DBGPRINTLN_CTX("PA #2 Drain Voltage: %.2f mV", fPA2VDD);
             DBGPRINTLN_CTX("PA #2 Drain Current: %.2f mA", fPA2IDD);
             DBGPRINTLN_CTX("PA #2 Gate Raw Voltage: %.2f mV", fPA2VGGRaw);
             DBGPRINTLN_CTX("PA #2 Gate Voltage: %.2f mV", fPA2VGG);
+
+            // TECs
+            float fTEC1Voltage = tec_get_channel_voltage(TEC1_INDEX);
+            float fTEC2Voltage = tec_get_channel_voltage(TEC2_INDEX);
+            float fTEC3Voltage = tec_get_channel_voltage(TEC3_INDEX);
+            float fTEC4Voltage = tec_get_channel_voltage(TEC4_INDEX);
+
+            ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+            {
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_TEC1_VOLTAGE) = fTEC1Voltage;
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_TEC2_VOLTAGE) = fTEC2Voltage;
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_TEC3_VOLTAGE) = fTEC3Voltage;
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_TEC4_VOLTAGE) = fTEC4Voltage;
+            }
+
+            DBGPRINTLN_CTX("----------------------------------");
+            DBGPRINTLN_CTX("TEC #1 Voltage: %.2f mV", fTEC1Voltage);
+            DBGPRINTLN_CTX("TEC #2 Voltage: %.2f mV", fTEC2Voltage);
+            DBGPRINTLN_CTX("TEC #3 Voltage: %.2f mV", fTEC3Voltage);
+            DBGPRINTLN_CTX("TEC #4 Voltage: %.2f mV", fTEC4Voltage);
         }
     }
 
