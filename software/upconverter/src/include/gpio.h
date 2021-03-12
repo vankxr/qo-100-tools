@@ -11,6 +11,7 @@
 #define LED_HIGH()          PERI_REG_BIT_SET(&(GPIO->P[1].DOUT)) = BIT(7)
 #define LED_LOW()           PERI_REG_BIT_CLEAR(&(GPIO->P[1].DOUT)) = BIT(7)
 #define LED_TOGGLE()        GPIO->P[1].DOUTTGL = BIT(7);
+#define LED_STATUS()        !!(GPIO->P[1].DOUT & BIT(7))
 
 // PLL MACROS
 #define PLL_ENABLE()        PERI_REG_BIT_SET(&(GPIO->P[2].DOUT)) = BIT(15)
