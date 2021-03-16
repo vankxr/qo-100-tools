@@ -69,7 +69,7 @@ class DS2484OneWire extends OneWire
     }
     async read(count = 1)
     {
-        if(typeof(count) !== "number" || count < 1)
+        if(typeof(count) !== "number" || isNaN(count) || count < 1)
             throw new Error("Invalid count");
 
         let data = [];

@@ -41,10 +41,10 @@ class HPPSUMCU extends I2CDevice
 
     async write(reg, data)
     {
-        if(typeof(reg) !== "number" || reg < 0 || reg > 255)
+        if(typeof(reg) !== "number" || isNaN(reg) || reg < 0 || reg > 255)
             throw new Error("Invalid register");
 
-        if(typeof(data) !== "number" || reg < 0 || reg > 65535)
+        if(typeof(data) !== "number" || isNaN(data) || data < 0 || data > 65535)
             throw new Error("Invalid data");
 
         let buf = Buffer.alloc(4, 0);
@@ -58,7 +58,7 @@ class HPPSUMCU extends I2CDevice
     }
     async read(reg)
     {
-        if(typeof(reg) !== "number" || reg < 0 || reg > 255)
+        if(typeof(reg) !== "number" || isNaN(reg) || reg < 0 || reg > 255)
             throw new Error("Invalid register");
 
         let buf = Buffer.alloc(2, 0);
@@ -95,7 +95,7 @@ class HPPSUEEPROM extends I2CDevice
 
     async write(mem_addr, data)
     {
-        if(typeof(mem_addr) !== "number" || mem_addr < 0 || mem_addr > 255)
+        if(typeof(mem_addr) !== "number" || isNaN(mem_addr) || mem_addr < 0 || mem_addr > 255)
             throw new Error("Invalid memory address");
 
         if(typeof(data) === "number")
@@ -116,10 +116,10 @@ class HPPSUEEPROM extends I2CDevice
     }
     async read(mem_addr, count)
     {
-        if(typeof(mem_addr) !== "number" || mem_addr < 0 || mem_addr > 255)
+        if(typeof(mem_addr) !== "number" || isNaN(mem_addr) || mem_addr < 0 || mem_addr > 255)
             throw new Error("Invalid memory address");
 
-        if(typeof(count) !== "number" || count < 1)
+        if(typeof(count) !== "number" || isNaN(count) || count < 1)
             throw new Error("Invalid count");
 
         await super.write(mem_addr);
@@ -240,7 +240,7 @@ class HPPSU
     }
     async set_input_undervoltage_threshold(voltage)
     {
-        if(voltage < 0 || voltage > 65535/32)
+        if(isNaN(voltage) || voltage < 0 || voltage > 65535/32)
             throw new Error("Voltage threshold out of bounds");
 
         await this.mcu.write(0x44, voltage * 32);
@@ -253,7 +253,7 @@ class HPPSU
     }
     async set_input_overvoltage_threshold(voltage)
     {
-        if(voltage < 0 || voltage > 65535/32)
+        if(isNaN(voltage) || voltage < 0 || voltage > 65535/32)
             throw new Error("Voltage threshold out of bounds");
 
         await this.mcu.write(0x46, voltage * 32);
@@ -299,7 +299,7 @@ class HPPSU
     }
     async set_output_undervoltage_threshold(voltage)
     {
-        if(voltage < 0 || voltage > 65535/256)
+        if(isNaN(voltage) || voltage < 0 || voltage > 65535/256)
             throw new Error("Voltage threshold out of bounds");
 
         await this.mcu.write(0x48, voltage * 256);
@@ -312,7 +312,7 @@ class HPPSU
     }
     async set_output_overvoltage_threshold(voltage)
     {
-        if(voltage < 0 || voltage > 65535/256)
+        if(isNaN(voltage) || voltage < 0 || voltage > 65535/256)
             throw new Error("Voltage threshold out of bounds");
 
         await this.mcu.write(0x4A, voltage * 256);
@@ -339,7 +339,7 @@ class HPPSU
     }
     async set_fan_target_speed(rpm)
     {
-        if(rpm < 0 || rpm > 17500)
+        if(isNaN(rpm) || rpm < 0 || rpm > 17500)
             throw new Error("RPM out of bounds");
 
         // Only values > 3300 actually work

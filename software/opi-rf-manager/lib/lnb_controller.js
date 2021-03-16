@@ -1,13 +1,13 @@
 const { I2C, I2CDevice } = require.main.require("./lib/i2c");
 
-class F2915 extends I2CDevice
+class LNBController extends I2CDevice
 {
-    constructor(bus, addr, bus_enable_gpio)
+    constructor(bus, bus_enable_gpio)
     {
         if(bus instanceof I2CDevice)
             super(bus.bus, bus.addr, bus.bus_enable_gpio);
         else
-            super(bus, 0x20 | (addr & 0x07), bus_enable_gpio);
+            super(bus, 0x3C, bus_enable_gpio);
     }
 
     async write(reg, data)
@@ -44,51 +44,53 @@ class F2915 extends I2CDevice
         return super.read(count);
     }
 
-    async config()
+    async reset()
     {
-        let regs = [
-            0x7F, // IODIR
-            0x00, // IPOL
-            0x00, // GPINTEN
-            0x00, // DEFVAL
-            0x00, // INTCON
-            0x04, // IOCON
-            0x00, // GPPU
-            0x00, // INTF
-            0x00, // INTCAP
-            0x00, // GPIO
-            0x00  // OLAT
-        ];
+        await this.write(0x01, 0x80);
+    }
+    async get_unique_id()
+    {
+        let buf = await this.read(0xF8, 8);
 
-        await this.write(0x00, regs);
+        return buf.readUInt32LE(4) + "-" + buf.readUInt32LE(0);
+    }
+    async get_software_version()
+    {
+        let buf = await this.read(0xF4, 2);
+
+        return buf.readUInt16LE(0);
+    }
+    async get_chip_temperatures()
+    {
+        let buf = await this.read(0xE0, 8);
+
+        return {
+            emu: buf.readFloatLE(0),
+            adc: buf.readFloatLE(4)
+        };
+    }
+    async get_chip_voltages()
+    {
+        let buf = await this.read(0xD0, 16);
+
+        return {
+            avdd: buf.readFloatLE(0),
+            dvdd: buf.readFloatLE(4),
+            iovdd: buf.readFloatLE(8),
+            core: buf.readFloatLE(12)
+        };
+    }
+    async get_system_voltages()
+    {
+        let buf = await this.read(0xC0, 8);
+
+        return {
+            vin: buf.readFloatLE(0),
+            v5v0: buf.readFloatLE(4)
+        };
     }
 
-    async set_rf_path(path)
-    {
-        if(isNaN(path) || path < 0 || path > 5)
-            throw new Error("Invalid RF path");
-
-        await this.write(0x00, 0x63 | ((path & 0x07) << 2));
-    }
-    async get_rf_path()
-    {
-        let path = ((await this.read(0x09)) & 0x1C) >> 2;
-
-        return path < 6 ? path : 0;
-    }
-
-    async is_powered()
-    {
-        return ((await this.read(0x09)) & 0x01) == 0x01;
-    }
-    async set_power_enable(enable)
-    {
-        await this.write(0x0A, enable ? 0x80 : 0x00);
-    }
-    async get_power_enable(enable)
-    {
-        return (await this.read(0x09)) & 0x80;
-    }
+    // TODO
 }
 
-module.exports = F2915;
+module.exports = LNBController;

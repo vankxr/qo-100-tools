@@ -21,8 +21,12 @@ const MCP23008 = require("./lib/mcp23008");
 const MCP23017 = require("./lib/mcp23017");
 const F2915 = require("./lib/f2915");
 const LTC5597 = require("./lib/ltc5597");
+const LTC4151 = require("./lib/ltc4151");
 const DS18B20 = require("./lib/ds18b20");
 const RelayController = require("./lib/relay_controller");
+const PABiasController = require("./lib/pa_bias_controller");
+const LNBController = require("./lib/lnb_controller");
+const Upconverter = require("./lib/upconverter");
 const LogFileManager = require("./util/log_file_manager");
 const Printer = require("./util/printer");
 const delay = require("./util/delay");
@@ -391,21 +395,50 @@ async function ssh_server_init()
                 {
                     case "":
                     {
-                        this.tprintln(null, "RelayController", "Unique ID: %s", await device.get_unique_id());
-                        cl.tprintln(null, "RelayController", "Software Version: v%d", await device.get_software_version());
+                        this.tprintln(null, "Relay Controller", "Unique ID: %s", await device.get_unique_id());
+                        this.tprintln(null, "Relay Controller", "Software Version: v%d", await device.get_software_version());
 
                         let chip_voltages = await device.get_chip_voltages();
-                        this.tprintln(null, "RelayController", "AVDD Voltage: %d mV", chip_voltages.avdd);
-                        this.tprintln(null, "RelayController", "DVDD Voltage: %d mV", chip_voltages.dvdd);
-                        this.tprintln(null, "RelayController", "IOVDD Voltage: %d mV", chip_voltages.iovdd);
-                        this.tprintln(null, "RelayController", "Core Voltage: %d mV", chip_voltages.core);
+                        this.tprintln(null, "Relay Controller", "AVDD Voltage: %d mV", chip_voltages.avdd);
+                        this.tprintln(null, "Relay Controller", "DVDD Voltage: %d mV", chip_voltages.dvdd);
+                        this.tprintln(null, "Relay Controller", "IOVDD Voltage: %d mV", chip_voltages.iovdd);
+                        this.tprintln(null, "Relay Controller", "Core Voltage: %d mV", chip_voltages.core);
 
                         let system_voltages = await device.get_system_voltages();
-                        this.tprintln(null, "RelayController", "VIN Voltage: %d mV", system_voltages.vin);
+                        this.tprintln(null, "Relay Controller", "VIN Voltage: %d mV", system_voltages.vin);
+
+                        let uvth = await device.set_relay_undervoltage_protection(true, 20000);
+                        this.tprintln(null, "Relay Controller", "VIN Undervoltage threshold: %d mV", uvth);
+                        this.tprintln(null, "Relay Controller", "VIN Undervoltage status: %s", (await device.is_undervoltage()) ? "LOW" : "OK");
 
                         let chip_temperatures = await device.get_chip_temperatures();
-                        this.tprintln(null, "RelayController", "ADC Temperature: %d C", chip_temperatures.adc);
-                        this.tprintln(null, "RelayController", "EMU Temperature: %d C", chip_temperatures.emu);
+                        this.tprintln(null, "Relay Controller", "ADC Temperature: %d C", chip_temperatures.adc);
+                        this.tprintln(null, "Relay Controller", "EMU Temperature: %d C", chip_temperatures.emu);
+                    }
+                    break;
+                    case "relay_status":
+                    {
+                        let i = parseInt(argv[2]);
+
+                        if(isNaN(i) || i < 0 || i > 11)
+                        {
+                            this.tprintln(null, "Relay Controller", "Relays:");
+
+                            let rstatus = await device.get_relay_status();
+
+                            for(i = 0; i < 12; i++)
+                            {
+                                this.tprintln(null, "Relay Controller", "  Relay #%d status: %s", i, (rstatus & (1 << i)) ? "ON" : "OFF");
+                                this.tprintln(null, "Relay Controller", "  Relay #%d duty cycle: %d %%", i, await device.get_relay_duty_cycle(i) * 100);
+                                this.tprintln(null, "Relay Controller", "  Relay #%d voltage: %d mV", i, await device.get_relay_voltage(i));
+                            }
+                        }
+                        else
+                        {
+                            this.tprintln(null, "Relay Controller", "Relay #%d status: %s", i, (await device.get_relay_status(i)) ? "ON" : "OFF");
+                            this.tprintln(null, "Relay Controller", "Relay #%d duty cycle: %d %%", i, await device.get_relay_duty_cycle(i) * 100);
+                            this.tprintln(null, "Relay Controller", "Relay #%d voltage: %d mV", i, await device.get_relay_voltage(i));
+                        }
                     }
                     break;
                     default:
@@ -451,7 +484,7 @@ async function ssh_server_init()
                 else if(device instanceof F2915)
                     device_param_names = [];
                 else if(device instanceof RelayController)
-                    device_param_names = [];
+                    device_param_names = ["relay_status"];
 
                 for(const param of device_param_names)
                     param_names.push(device_name + "." + param);
@@ -584,6 +617,28 @@ async function ssh_server_init()
                     break;
                 }
             }
+            else if(device instanceof OAQ)
+            {
+                switch(param_name)
+                {
+                    default:
+                    {
+                        throw new Error("OAQ parameter not supported");
+                    }
+                    break;
+                }
+            }
+            else if(device instanceof SI1133)
+            {
+                switch(param_name)
+                {
+                    default:
+                    {
+                        throw new Error("SI1133 parameter not supported");
+                    }
+                    break;
+                }
+            }
             else if(device instanceof MCP3221)
             {
                 switch(param_name)
@@ -630,6 +685,53 @@ async function ssh_server_init()
             {
                 switch(param_name)
                 {
+                    case "turn_relay_on":
+                    {
+                        let i = parseInt(argv[2]);
+
+                        if(isNaN(i) || i < 0 || i > 11)
+                            throw new Error("Invalid relay index");
+
+                        await device.set_relay_status(i, true);
+
+                        this.tprintln(null, "Relay Controller", "Relay #%d status: %s", i, (await device.get_relay_status(i)) ? "ON" : "OFF");
+                        this.tprintln(null, "Relay Controller", "Relay #%d duty cycle: %d %%", i, await device.get_relay_duty_cycle(i) * 100);
+                        this.tprintln(null, "Relay Controller", "Relay #%d voltage: %d mV", i, await device.get_relay_voltage(i));
+                    }
+                    break;
+                    case "turn_relay_off":
+                    {
+                        let i = parseInt(argv[2]);
+
+                        if(isNaN(i) || i < 0 || i > 11)
+                            throw new Error("Invalid relay index");
+
+                        await device.set_relay_status(i, false);
+
+                        this.tprintln(null, "Relay Controller", "Relay #%d status: %s", i, (await device.get_relay_status(i)) ? "ON" : "OFF");
+                        this.tprintln(null, "Relay Controller", "Relay #%d duty cycle: %d %%", i, await device.get_relay_duty_cycle(i) * 100);
+                        this.tprintln(null, "Relay Controller", "Relay #%d voltage: %d mV", i, await device.get_relay_voltage(i));
+                    }
+                    break;
+                    case "set_relay_voltage":
+                    {
+                        let i = parseInt(argv[2]);
+
+                        if(isNaN(i) || i < 0 || i > 11)
+                            throw new Error("Invalid relay index");
+
+                        let voltage = parseInt(argv[3]);
+
+                        if(isNaN(voltage))
+                            throw new Error("Invalid relay index");
+
+                        await device.set_relay_voltage(i, voltage);
+
+                        this.tprintln(null, "Relay Controller", "Relay #%d status: %s", i, (await device.get_relay_status(i)) ? "ON" : "OFF");
+                        this.tprintln(null, "Relay Controller", "Relay #%d duty cycle: %d %%", i, await device.get_relay_duty_cycle(i) * 100);
+                        this.tprintln(null, "Relay Controller", "Relay #%d voltage: %d mV", i, await device.get_relay_voltage(i));
+                    }
+                    break;
                     default:
                     {
                         throw new Error("RelayController parameter not supported");
@@ -660,6 +762,10 @@ async function ssh_server_init()
                     device_param_names = [];
                 else if(device instanceof BME280)
                     device_param_names = [];
+                else if(device instanceof OAQ)
+                    device_param_names = [];
+                else if(device instanceof SI1133)
+                    device_param_names = [];
                 else if(device instanceof MCP3221)
                     device_param_names = [];
                 else if(device instanceof LTC5597)
@@ -667,7 +773,7 @@ async function ssh_server_init()
                 else if(device instanceof F2915)
                     device_param_names = ["rf_path"];
                 else if(device instanceof RelayController)
-                    device_param_names = [];
+                    device_param_names = ["turn_relay_on", "turn_relay_off", "set_relay_voltage"];
 
                 for(const param of device_param_names)
                     param_names.push(device_name + "." + param);
@@ -1336,11 +1442,12 @@ async function ipma_fetch_sea_hpa()
     if(!(ipma instanceof IPMA))
         cl.tprintln("red", "IPMA", "No valid IPMA instance defined");
 
-    let sea_hpa;
-
     try
     {
-        sea_hpa = (await ipma.get_latest_surface_observation()).pressao;
+        let sea_hpa = (await ipma.get_latest_surface_observation()).pressao;
+
+        if(sea_hpa < 0)
+            return cl.tprintln("yellow", "IPMA", "Got invalid Sea pressure from IPMA: %d hPa", sea_hpa);
 
         cl.tprintln("green", "IPMA", "Got IPMA Sea pressure: %d hPa", sea_hpa);
 
@@ -1712,6 +1819,46 @@ async function main()
         cl.tprintln(null, "LTC5597", "  Power: %d dBm", await sensor.get_power_level(2, 3) + 18.1 + 20);
     }
 
+    //// LTC4151
+    const ltc4151_sensors = [];
+    ltc4151_sensors.push(new LTC4151(buses.i2c[0], 8, gpios.ext_i2c_enable[0]));
+
+    for(let i = 0; i < ltc4151_sensors.length; i++)
+    {
+        let sensor = ltc4151_sensors[i];
+
+        try
+        {
+            await sensor.probe();
+        }
+        catch (e)
+        {
+            cl.tprintln("red", "LTC4151", e);
+
+            continue;
+        }
+
+        cl.tprintln("green", "LTC4151", "LTC4151 #%d found!", i);
+
+        await sensor.config();
+
+        sensor.set_current_shunt_value(0.012 / 3);
+        sensor.set_adin_scale_factor((165 + 10) / 10); // Voltage divider factor
+
+        if(false)
+        {
+            devices["ltc4151_" + i] = sensor;
+        }
+        else
+        {
+            devices["ltc4151_" + i] = sensor;
+        }
+
+        cl.tprintln(null, "LTC4151", "  VIN Voltage: %d mV", await sensor.get_vin_voltage(10));
+        cl.tprintln(null, "LTC4151", "  Load Voltage: %d mV", await sensor.get_adin_voltage(10));
+        cl.tprintln(null, "LTC4151", "  Load Current: %d mA", await sensor.get_current(10));
+    }
+
     //// F2915 (RFSwitch with MCP23008 IO Controller)
     const f2915_rf_switches = [];
     f2915_rf_switches.push(new F2915(buses.i2c[0], 0, gpios.ext_i2c_enable[1]));
@@ -1755,7 +1902,7 @@ async function main()
     //// Controllers
     // Relay Controller
     const relay_controllers = [];
-    relay_controllers.push(new RelayController(buses.i2c[0], gpios.ext_i2c_enable[1]));
+    relay_controllers.push(new RelayController(buses.i2c[0], gpios.ext_i2c_enable[0]));
 
     for(let i = 0; i < relay_controllers.length; i++)
     {
@@ -1767,12 +1914,15 @@ async function main()
         }
         catch (e)
         {
-            cl.tprintln("red", "RelayController", e);
+            cl.tprintln("red", "Relay Controller", e);
 
             continue;
         }
 
-        cl.tprintln("green", "RelayController", "Relay Controller #%d found!", i);
+        cl.tprintln("green", "Relay Controller", "Relay Controller #%d found!", i);
+
+        await controller.reset();
+        await delay(5500);
 
         if(i == 0)
         {
@@ -1783,24 +1933,217 @@ async function main()
             devices["relay_controller_" + i] = controller;
         }
 
-        cl.tprintln(null, "RelayController", "  Unique ID: %s", await controller.get_unique_id());
-        cl.tprintln(null, "RelayController", "  Software Version: v%d", await controller.get_software_version());
+        cl.tprintln(null, "Relay Controller", "  Unique ID: %s", await controller.get_unique_id());
+        cl.tprintln(null, "Relay Controller", "  Software Version: v%d", await controller.get_software_version());
 
         let chip_voltages = await controller.get_chip_voltages();
-        cl.tprintln(null, "RelayController", "  AVDD Voltage: %d mV", chip_voltages.avdd);
-        cl.tprintln(null, "RelayController", "  DVDD Voltage: %d mV", chip_voltages.dvdd);
-        cl.tprintln(null, "RelayController", "  IOVDD Voltage: %d mV", chip_voltages.iovdd);
-        cl.tprintln(null, "RelayController", "  Core Voltage: %d mV", chip_voltages.core);
+        cl.tprintln(null, "Relay Controller", "  AVDD Voltage: %d mV", chip_voltages.avdd);
+        cl.tprintln(null, "Relay Controller", "  DVDD Voltage: %d mV", chip_voltages.dvdd);
+        cl.tprintln(null, "Relay Controller", "  IOVDD Voltage: %d mV", chip_voltages.iovdd);
+        cl.tprintln(null, "Relay Controller", "  Core Voltage: %d mV", chip_voltages.core);
 
         let system_voltages = await controller.get_system_voltages();
-        cl.tprintln(null, "RelayController", "  VIN Voltage: %d mV", system_voltages.vin);
+        cl.tprintln(null, "Relay Controller", "  VIN Voltage: %d mV", system_voltages.vin);
+
+        let uvth = await controller.set_relay_undervoltage_protection(true, 20000);
+        cl.tprintln(null, "Relay Controller", "  VIN Undervoltage threshold: %d mV", uvth);
+        cl.tprintln(null, "Relay Controller", "  VIN Undervoltage status: %s", (await controller.is_undervoltage()) ? "LOW" : "OK");
 
         let chip_temperatures = await controller.get_chip_temperatures();
-        cl.tprintln(null, "RelayController", "  ADC Temperature: %d C", chip_temperatures.adc);
-        cl.tprintln(null, "RelayController", "  EMU Temperature: %d C", chip_temperatures.emu);
+        cl.tprintln(null, "Relay Controller", "  ADC Temperature: %d C", chip_temperatures.adc);
+        cl.tprintln(null, "Relay Controller", "  EMU Temperature: %d C", chip_temperatures.emu);
+
+        cl.tprintln(null, "Relay Controller", "  Relays:");
+
+        let rstatus = await controller.get_relay_status();
+
+        for(let j = 0; j < 12; j++)
+        {
+            cl.tprintln(null, "Relay Controller", "    Relay #%d status: %s", j, (rstatus & (1 << j)) ? "ON" : "OFF");
+            cl.tprintln(null, "Relay Controller", "    Relay #%d duty cycle: %d %%", j, await controller.get_relay_duty_cycle(j) * 100);
+            cl.tprintln(null, "Relay Controller", "    Relay #%d voltage: %d mV", j, await controller.get_relay_voltage(j));
+        }
     }
 
-    // TODO: Other controllers
+    // PA Bias Controller
+    const pa_bias_controllers = [];
+    pa_bias_controllers.push(new PABiasController(buses.i2c[0], gpios.ext_i2c_enable[0]));
+
+    for(let i = 0; i < pa_bias_controllers.length; i++)
+    {
+        let controller = pa_bias_controllers[i];
+
+        try
+        {
+            await controller.probe();
+        }
+        catch (e)
+        {
+            cl.tprintln("red", "PA Bias Controller", e);
+
+            continue;
+        }
+
+        cl.tprintln("green", "PA Bias Controller", "PA Bias Controller #%d found!", i);
+
+        await controller.reset();
+        await delay(5500);
+
+        if(i == 0)
+        {
+            devices["pa_bias_controller"] = controller;
+        }
+        else
+        {
+            devices["pa_bias_controller_" + i] = controller;
+        }
+
+        cl.tprintln(null, "PA Bias Controller", "  Unique ID: %s", await controller.get_unique_id());
+        cl.tprintln(null, "PA Bias Controller", "  Software Version: v%d", await controller.get_software_version());
+
+        let chip_voltages = await controller.get_chip_voltages();
+        cl.tprintln(null, "PA Bias Controller", "  AVDD Voltage: %d mV", chip_voltages.avdd);
+        cl.tprintln(null, "PA Bias Controller", "  DVDD Voltage: %d mV", chip_voltages.dvdd);
+        cl.tprintln(null, "PA Bias Controller", "  IOVDD Voltage: %d mV", chip_voltages.iovdd);
+        cl.tprintln(null, "PA Bias Controller", "  Core Voltage: %d mV", chip_voltages.core);
+
+        let system_voltages = await controller.get_system_voltages();
+        cl.tprintln(null, "PA Bias Controller", "  VIN Voltage: %d mV", system_voltages.vin);
+        cl.tprintln(null, "PA Bias Controller", "  5V0 Voltage: %d mV", system_voltages.v5v0);
+
+        let chip_temperatures = await controller.get_chip_temperatures();
+        cl.tprintln(null, "PA Bias Controller", "  ADC Temperature: %d C", chip_temperatures.adc);
+        cl.tprintln(null, "PA Bias Controller", "  EMU Temperature: %d C", chip_temperatures.emu);
+
+        let system_temperatures = await controller.get_system_temperatures();
+        cl.tprintln(null, "PA Bias Controller", "  AFE Temperature: %d C", system_temperatures.afe);
+
+        cl.tprintln(null, "PA Bias Controller", "  TECs:");
+
+        for(let j = 0; j < 4; j++)
+        {
+            cl.tprintln(null, "PA Bias Controller", "    TEC #%d status: %s", j, false ? "ON" : "OFF");
+            cl.tprintln(null, "PA Bias Controller", "    TEC #%d voltage: %d mV", j, await controller.get_tec_voltage(j));
+        }
+
+        cl.tprintln(null, "PA Bias Controller", "  PAs:");
+
+        for(let j = 0; j < 2; j++)
+        {
+            let data = await controller.get_pa_telemetry(j);
+
+            cl.tprintln(null, "PA Bias Controller", "    PA #%d VGG Raw Voltage: %d mV", j, data.vgg_raw);
+            cl.tprintln(null, "PA Bias Controller", "    PA #%d VGG Voltage: %d mV", j, data.vgg);
+            cl.tprintln(null, "PA Bias Controller", "    PA #%d VDD Voltage: %d mV", j, data.vdd);
+            cl.tprintln(null, "PA Bias Controller", "    PA #%d VDD Current: %d mA", j, data.idd);
+            cl.tprintln(null, "PA Bias Controller", "    PA #%d Temperature: %d C", j, data.temperature);
+        }
+    }
+
+    // LNB Controller
+    const lnb_controllers = [];
+    lnb_controllers.push(new LNBController(buses.i2c[0], gpios.ext_i2c_enable[0]));
+
+    for(let i = 0; i < lnb_controllers.length; i++)
+    {
+        let controller = lnb_controllers[i];
+
+        try
+        {
+            await controller.probe();
+        }
+        catch (e)
+        {
+            cl.tprintln("red", "LNB Controller", e);
+
+            continue;
+        }
+
+        cl.tprintln("green", "LNB Controller", "LNB Controller #%d found!", i);
+
+        await controller.reset();
+        await delay(5500);
+
+        if(i == 0)
+        {
+            devices["lnb_controller"] = controller;
+        }
+        else
+        {
+            devices["lnb_controller_" + i] = controller;
+        }
+
+        cl.tprintln(null, "LNB Controller", "  Unique ID: %s", await controller.get_unique_id());
+        cl.tprintln(null, "LNB Controller", "  Software Version: v%d", await controller.get_software_version());
+
+        let chip_voltages = await controller.get_chip_voltages();
+        cl.tprintln(null, "LNB Controller", "  AVDD Voltage: %d mV", chip_voltages.avdd);
+        cl.tprintln(null, "LNB Controller", "  DVDD Voltage: %d mV", chip_voltages.dvdd);
+        cl.tprintln(null, "LNB Controller", "  IOVDD Voltage: %d mV", chip_voltages.iovdd);
+        cl.tprintln(null, "LNB Controller", "  Core Voltage: %d mV", chip_voltages.core);
+
+        let system_voltages = await controller.get_system_voltages();
+        cl.tprintln(null, "LNB Controller", "  VIN Voltage: %d mV", system_voltages.vin);
+        cl.tprintln(null, "LNB Controller", "  5V0 Voltage: %d mV", system_voltages.v5v0);
+
+        let chip_temperatures = await controller.get_chip_temperatures();
+        cl.tprintln(null, "LNB Controller", "  ADC Temperature: %d C", chip_temperatures.adc);
+        cl.tprintln(null, "LNB Controller", "  EMU Temperature: %d C", chip_temperatures.emu);
+    }
+
+    // Upconverter
+    const upconverters = [];
+    upconverters.push(new Upconverter(buses.i2c[0], gpios.ext_i2c_enable[0]));
+
+    for(let i = 0; i < upconverters.length; i++)
+    {
+        let controller = upconverters[i];
+
+        try
+        {
+            await controller.probe();
+        }
+        catch (e)
+        {
+            cl.tprintln("red", "Upconverter", e);
+
+            continue;
+        }
+
+        cl.tprintln("green", "Upconverter", "Upconverter #%d found!", i);
+
+        await controller.reset();
+        await delay(5500);
+
+        if(i == 0)
+        {
+            devices["upconverter"] = controller;
+        }
+        else
+        {
+            devices["upconverter_" + i] = controller;
+        }
+
+        cl.tprintln(null, "Upconverter", "  Unique ID: %s", await controller.get_unique_id());
+        cl.tprintln(null, "Upconverter", "  Software Version: v%d", await controller.get_software_version());
+
+        let chip_voltages = await controller.get_chip_voltages();
+        cl.tprintln(null, "Upconverter", "  AVDD Voltage: %d mV", chip_voltages.avdd);
+        cl.tprintln(null, "Upconverter", "  DVDD Voltage: %d mV", chip_voltages.dvdd);
+        cl.tprintln(null, "Upconverter", "  IOVDD Voltage: %d mV", chip_voltages.iovdd);
+        cl.tprintln(null, "Upconverter", "  Core Voltage: %d mV", chip_voltages.core);
+
+        let system_voltages = await controller.get_system_voltages();
+        cl.tprintln(null, "Upconverter", "  VIN Voltage: %d mV", system_voltages.vin);
+        cl.tprintln(null, "Upconverter", "  5V0 Voltage: %d mV", system_voltages.v5v0);
+
+        let system_currents = await controller.get_system_currents();
+        cl.tprintln(null, "Upconverter", "  5V0 Current: %d mA", system_currents.i5v0);
+
+        let chip_temperatures = await controller.get_chip_temperatures();
+        cl.tprintln(null, "Upconverter", "  ADC Temperature: %d C", chip_temperatures.adc);
+        cl.tprintln(null, "Upconverter", "  EMU Temperature: %d C", chip_temperatures.emu);
+    }
 
     //// PSU
     // PSU GPIO Controlers

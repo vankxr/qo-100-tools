@@ -35,7 +35,7 @@ class I2CDevice
                 await this.bus_enable_gpio.set_value(GPIO.HIGH);
 
             if((await this.bus.scan(this.addr)).indexOf(this.addr) === -1)
-                throw new Error("Could not find I2C device at address 0x" + this.addr.toString(16));
+                throw new Error("Could not find I2C device at address 0x" + this.addr.toString(16).toUpperCase());
         }
         finally
         {

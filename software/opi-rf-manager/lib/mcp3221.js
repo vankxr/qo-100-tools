@@ -36,7 +36,7 @@ class MCP3221 extends I2CDevice
 
     async get_voltage(samples = 1)
     {
-        if(samples < 1)
+        if(isNaN(samples) || samples < 1)
             throw new Error("Invalid sample count");
 
         let result = await super.read(2 * samples);

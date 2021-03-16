@@ -44,7 +44,7 @@ class ZMOD4510 extends I2CDevice
 
     async write(reg, data)
     {
-        if(typeof(reg) !== "number" || reg < 0 || reg > 255)
+        if(typeof(reg) !== "number" || isNaN(reg) || reg < 0 || reg > 255)
             throw new Error("Invalid register");
 
         if(typeof(data) === "number")
@@ -65,10 +65,10 @@ class ZMOD4510 extends I2CDevice
     }
     async read(reg, count = 1)
     {
-        if(typeof(reg) !== "number" || reg < 0 || reg > 255)
+        if(typeof(reg) !== "number" || isNaN(reg) || reg < 0 || reg > 255)
             throw new Error("Invalid register");
 
-        if(typeof(count) !== "number" || count < 1)
+        if(typeof(count) !== "number" || isNaN(count) || count < 1)
             throw new Error("Invalid count");
 
         await super.write(reg);
