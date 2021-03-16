@@ -5252,7 +5252,7 @@ Logo</text>
 </part>
 <part name="C5" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100nF"/>
 <part name="GND19" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="C7" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100pF"/>
+<part name="C7" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="150pF"/>
 <part name="GND21" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="C21" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100pF"/>
 <part name="L13" library="Inductor" deviceset="INDUCTOR" device="-0603" value="470nH"/>
@@ -5453,7 +5453,7 @@ Logo</text>
 </part>
 <part name="C6" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100nF"/>
 <part name="GND64" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="C8" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100pF"/>
+<part name="C8" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="150pF"/>
 <part name="GND66" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="C22" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100pF"/>
 <part name="L15" library="Inductor" deviceset="INDUCTOR" device="-0603" value="470nH"/>

@@ -1640,7 +1640,7 @@ design rules under a new name.</description>
 <attribute name="VALUE" x="21.8536" y="26.268" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="60.36" y="-54.25" size="1.778" layer="27" display="off"/>
 </element>
-<element name="C7" library="Capacitor" package="CAP0603" value="100pF" x="24.8" y="23.3" smashed="yes">
+<element name="C7" library="Capacitor" package="CAP0603" value="150pF" x="24.8" y="23.3" smashed="yes">
 <attribute name="NAME" x="21.8536" y="23.316" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="21.8536" y="21.268" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="65.44" y="-59.25" size="1.778" layer="27" display="off"/>
@@ -2217,7 +2217,7 @@ design rules under a new name.</description>
 <attribute name="VALUE" x="21.8536" y="69.668" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="-41.2" y="84.7" size="1.778" layer="27" display="off"/>
 </element>
-<element name="C8" library="Capacitor" package="CAP0603" value="100pF" x="24.8" y="76.7" smashed="yes">
+<element name="C8" library="Capacitor" package="CAP0603" value="150pF" x="24.8" y="76.7" smashed="yes">
 <attribute name="NAME" x="21.8536" y="76.716" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="21.8536" y="74.668" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="-10.2" y="89.7" size="1.778" layer="27" display="off"/>
