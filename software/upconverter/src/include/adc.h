@@ -7,8 +7,8 @@
 #define ADC_VIN_DIV             11.f // Voltage divider ratio
 #define ADC_5V0_DIV             2.333333f // Voltage divider ratio
 
-#define ADC_VIN_CHAN            ADC_SINGLECTRL_POSSEL_APORT2XCH29
-#define ADC_5V0_CHAN            ADC_SINGLECTRL_POSSEL_APORT1XCH30
+#define ADC_VIN_CHAN            ADC_SINGLECTRL_POSSEL_APORT1XCH30
+#define ADC_5V0_CHAN            ADC_SINGLECTRL_POSSEL_APORT2XCH29
 
 void adc_init();
 
