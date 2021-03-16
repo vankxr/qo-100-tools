@@ -1736,12 +1736,12 @@ design rules under a new name.</description>
 <attribute name="NAME" x="0.395" y="44.31" size="0.8" layer="25" font="vector" ratio="10" align="center-left"/>
 <attribute name="VALUE" x="0.095" y="42.92" size="0.8" layer="27" font="vector" ratio="10" align="center-left"/>
 </element>
-<element name="R2" library="Resistor" package="RES0603" value="1K Ohms" x="8.5" y="49.7" smashed="yes">
+<element name="R2" library="Resistor" package="RES0603" value="100 Ohms" x="8.5" y="49.7" smashed="yes">
 <attribute name="NAME" x="10.2456" y="49.716" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="-15.8" y="16.1" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="5.0456" y="47.668" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 </element>
-<element name="R3" library="Resistor" package="RES0603" value="1K Ohms" x="8.5" y="48" smashed="yes">
+<element name="R3" library="Resistor" package="RES0603" value="100 Ohms" x="8.5" y="48" smashed="yes">
 <attribute name="NAME" x="10.2456" y="48.016" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="-23.4" y="9.3" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="5.0456" y="45.968" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
@@ -2198,12 +2198,12 @@ design rules under a new name.</description>
 <element name="U1" library="EFM32" package="QFN32_0.5P_TG" value="EFM32TG11B120F128GM32" x="15.4" y="46" smashed="yes">
 <attribute name="NAME" x="13.4" y="49.7" size="0.8" layer="25" font="vector" ratio="10" align="center-left"/>
 </element>
-<element name="R39" library="Resistor" package="RES0603" value="47K Ohms" x="8.5" y="42.9" smashed="yes">
+<element name="R39" library="Resistor" package="RES0603" value="1K Ohms" x="8.5" y="42.9" smashed="yes">
 <attribute name="NAME" x="4.8456" y="42.916" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="8.5" y="42.9" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="5.0456" y="40.868" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 </element>
-<element name="R40" library="Resistor" package="RES0603" value="47K Ohms" x="8.5" y="44.6" smashed="yes">
+<element name="R40" library="Resistor" package="RES0603" value="1K Ohms" x="8.5" y="44.6" smashed="yes">
 <attribute name="NAME" x="4.8456" y="44.616" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="8.5" y="44.6" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="5.0456" y="42.568" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>

@@ -5499,8 +5499,8 @@ Logo</text>
 <part name="5V00003" library="Supply Symbol" deviceset="5V0" device=""/>
 <part name="CON1" library="JST" deviceset="3P" device="-SH-SIDE" value="3P-SH-SIDE"/>
 <part name="GND24" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="R4" library="Resistor" deviceset="RESISTOR" device="-0603" value="1K Ohms"/>
-<part name="R5" library="Resistor" deviceset="RESISTOR" device="-0603" value="1K Ohms"/>
+<part name="R4" library="Resistor" deviceset="RESISTOR" device="-0603" value="100 Ohms"/>
+<part name="R5" library="Resistor" deviceset="RESISTOR" device="-0603" value="100 Ohms"/>
 <part name="C3" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100nF"/>
 <part name="GND26" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="3V3" library="Supply Symbol" deviceset="3V3" device=""/>
