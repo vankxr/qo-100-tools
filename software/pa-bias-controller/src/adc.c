@@ -118,9 +118,9 @@ float adc_get_5v0()
 
     while(!(ADC0->IF & ADC_IF_SINGLE));
 
-    float fVIN = ADC0->SINGLEDATA * 2500.f / 65535.f;
+    float f5V0 = ADC0->SINGLEDATA * 2500.f / 65535.f;
 
-    return fVIN * ADC_5V0_DIV;
+    return f5V0 * ADC_5V0_DIV;
 }
 
 float adc_get_temperature()

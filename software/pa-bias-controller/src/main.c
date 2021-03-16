@@ -28,6 +28,8 @@
 #define I2C_SLAVE_REGISTER(t, a)                (*(t *)&ubI2CRegister[(a)])
 #define I2C_SLAVE_REGISTER_WRITE_MASK(t, a)     (*(t *)&ubI2CRegisterWriteMask[(a)])
 #define I2C_SLAVE_REGISTER_READ_MASK(t, a)      (*(t *)&ubI2CRegisterReadMask[(a)])
+#define I2C_SLAVE_REGISTER_STATUS               0x00 // 8-bit
+#define I2C_SLAVE_REGISTER_CONFIG               0x01 // 8-bit
 #define I2C_SLAVE_REGISTER_PA1_VGG_RAW_VOLTAGE  0x10 // 32-bit
 #define I2C_SLAVE_REGISTER_PA1_VGG_VOLTAGE      0x14 // 32-bit
 #define I2C_SLAVE_REGISTER_PA1_VDD_VOLTAGE      0x18 // 32-bit
@@ -266,6 +268,12 @@ void i2c_slave_register_init()
 {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
+        I2C_SLAVE_REGISTER              (uint8_t,  I2C_SLAVE_REGISTER_STATUS)               = 0x00;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint8_t,  I2C_SLAVE_REGISTER_STATUS)               = 0x00;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint8_t,  I2C_SLAVE_REGISTER_STATUS)               = 0xFF;
+        I2C_SLAVE_REGISTER              (uint8_t,  I2C_SLAVE_REGISTER_CONFIG)               = 0x00;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint8_t,  I2C_SLAVE_REGISTER_CONFIG)               = 0xFF;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint8_t,  I2C_SLAVE_REGISTER_CONFIG)               = 0xFF;
         I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_PA1_VGG_RAW_VOLTAGE)  = -1.f;
         I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_PA1_VGG_RAW_VOLTAGE)  = 0x00000000;
         I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_PA1_VGG_RAW_VOLTAGE)  = 0xFFFFFFFF;
@@ -732,6 +740,13 @@ int main()
     while(1)
     {
         wdog_feed();
+
+        if(I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_CONFIG) & BIT(7))
+        {
+            delay_ms(20);
+
+            reset();
+        }
 
         for(uint8_t ubTECChannel = 0; ubTECChannel < 4; ubTECChannel++)
         {

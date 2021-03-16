@@ -99,6 +99,7 @@ volatile uint32_t * const pulDutyCycleRegister[12] = {
 };
 volatile uint16_t usRelaySetOnChanged = 0x0000;
 volatile uint16_t usRelaySetOffChanged = 0x0000;
+volatile uint8_t ubRelaySetDCChanged = 0;
 volatile float fRelayUVThreshChanged = -1.f;
 
 // ISRs
@@ -296,7 +297,7 @@ void i2c_slave_register_init()
 {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-        I2C_SLAVE_REGISTER              (uint8_t,  I2C_SLAVE_REGISTER_STATUS)               = 0x00;
+        I2C_SLAVE_REGISTER              (uint8_t,  I2C_SLAVE_REGISTER_STATUS)               = 0x00 | ((ACMP0->STATUS & ACMP_STATUS_ACMPOUT) ? BIT(1) : 0);
         I2C_SLAVE_REGISTER_WRITE_MASK   (uint8_t,  I2C_SLAVE_REGISTER_STATUS)               = 0x00;
         I2C_SLAVE_REGISTER_READ_MASK    (uint8_t,  I2C_SLAVE_REGISTER_STATUS)               = 0xFF;
         I2C_SLAVE_REGISTER              (uint8_t,  I2C_SLAVE_REGISTER_CONFIG)               = 0x00;
@@ -348,7 +349,7 @@ void i2c_slave_register_init()
         I2C_SLAVE_REGISTER_WRITE_MASK   (uint8_t,  I2C_SLAVE_REGISTER_RELAY11_DUTY_CYCLE)   = 0xFF;
         I2C_SLAVE_REGISTER_READ_MASK    (uint8_t,  I2C_SLAVE_REGISTER_RELAY11_DUTY_CYCLE)   = 0xFF;
         I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_RELAY_UV_THRESH)      = -1.f;
-        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_RELAY_UV_THRESH)      = 0x00000000;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_RELAY_UV_THRESH)      = 0xFFFFFFFF;
         I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_RELAY_UV_THRESH)      = 0xFFFFFFFF;
         I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_VIN_VOLTAGE)          = -1.f;
         I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_VIN_VOLTAGE)          = 0x00000000;
@@ -399,6 +400,18 @@ uint8_t i2c_slave_tx_data_isr()
     uint8_t ubData = ubI2CRegister[ubI2CRegisterPointer] & ubI2CRegisterReadMask[ubI2CRegisterPointer];
     ubI2CRegisterPointer++;
 
+    switch(ubI2CRegisterPointer)
+    {
+        case I2C_SLAVE_REGISTER_STATUS + sizeof(uint8_t):
+        {
+            if((ubI2CByteCount - 1) < sizeof(uint8_t))
+                break;
+
+            I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_STATUS) &= ~BIT(0); // Clear on read
+        }
+        break;
+    }
+
     return ubData;
 }
 uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
@@ -441,6 +454,26 @@ uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
             fRelayUVThreshChanged = I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_RELAY_UV_THRESH);
         }
         break;
+        case I2C_SLAVE_REGISTER_RELAY0_DUTY_CYCLE + sizeof(uint8_t):
+        case I2C_SLAVE_REGISTER_RELAY1_DUTY_CYCLE + sizeof(uint8_t):
+        case I2C_SLAVE_REGISTER_RELAY2_DUTY_CYCLE + sizeof(uint8_t):
+        case I2C_SLAVE_REGISTER_RELAY3_DUTY_CYCLE + sizeof(uint8_t):
+        case I2C_SLAVE_REGISTER_RELAY4_DUTY_CYCLE + sizeof(uint8_t):
+        case I2C_SLAVE_REGISTER_RELAY5_DUTY_CYCLE + sizeof(uint8_t):
+        case I2C_SLAVE_REGISTER_RELAY6_DUTY_CYCLE + sizeof(uint8_t):
+        case I2C_SLAVE_REGISTER_RELAY7_DUTY_CYCLE + sizeof(uint8_t):
+        case I2C_SLAVE_REGISTER_RELAY8_DUTY_CYCLE + sizeof(uint8_t):
+        case I2C_SLAVE_REGISTER_RELAY9_DUTY_CYCLE + sizeof(uint8_t):
+        case I2C_SLAVE_REGISTER_RELAY10_DUTY_CYCLE + sizeof(uint8_t):
+        case I2C_SLAVE_REGISTER_RELAY11_DUTY_CYCLE + sizeof(uint8_t):
+        {
+            if((ubI2CByteCount - 1) < sizeof(uint8_t))
+                break;
+
+            ubRelaySetDCChanged = 1;
+        }
+        break;
+
     }
 
     return 1; // ACK
@@ -704,6 +737,13 @@ int main()
     {
         wdog_feed();
 
+        if(I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_CONFIG) & BIT(7))
+        {
+            delay_ms(20);
+
+            reset();
+        }
+
         if(fRelayUVThreshChanged >= 0.f)
         {
             ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
@@ -738,7 +778,6 @@ int main()
 
             usRelaySetOnChanged = 0x0000;
         }
-
         if(usRelaySetOffChanged)
         {
             for(uint8_t i = 0; i < 12; i++)
@@ -754,6 +793,19 @@ int main()
             }
 
             usRelaySetOffChanged = 0x0000;
+        }
+        if(ubRelaySetDCChanged)
+        {
+            for(uint8_t i = 0; i < 12; i++)
+            {
+                ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+                {
+                    if(I2C_SLAVE_REGISTER(uint16_t, I2C_SLAVE_REGISTER_RELAY_STATUS) & BIT(i))
+                        *pulDutyCycleRegister[i] = I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_RELAY0_DUTY_CYCLE + i);
+                }
+            }
+
+            ubRelaySetDCChanged = 0;
         }
 
         static uint64_t ullLastHeartBeat = 0;
