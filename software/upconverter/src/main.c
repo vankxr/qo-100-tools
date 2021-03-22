@@ -16,7 +16,7 @@
 #include "crc.h"
 #include "usart.h"
 #include "adf4351.h"
-#include "f1951.h"
+#include "f1958.h"
 #include "i2c.h"
 #include "mcp3421.h"
 #include "wdog.h"
@@ -58,7 +58,9 @@ static uint8_t i2c_slave_addr_isr(uint8_t ubRnW);
 static uint8_t i2c_slave_tx_data_isr();
 static uint8_t i2c_slave_rx_data_isr(uint8_t ubData);
 
-static float ext_adc_read_5v0_current(uint32_t ulSamples);
+static float ext_adc_get_5v0_current(uint32_t ulSamples);
+
+static float get_rf_out_power(uint32_t ulSamples);
 
 // Variables
 volatile uint8_t ubI2CRegister[I2C_SLAVE_REGISTER_COUNT];
@@ -308,7 +310,7 @@ uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
     return 1; // ACK
 }
 
-float ext_adc_read_5v0_current(uint32_t ulSamples)
+float ext_adc_get_5v0_current(uint32_t ulSamples)
 {
     float fShuntVoltage = 0.f;
 
@@ -322,6 +324,48 @@ float ext_adc_read_5v0_current(uint32_t ulSamples)
     fShuntVoltage /= 20; // Differential amplifier gain
 
     return fShuntVoltage / 0.03f; // 0.03 Ohm current shunt resistor
+}
+
+float get_rf_out_power(uint32_t ulSamples)
+{
+    // Calibration tables
+    static const float fPData[] = {-40, -35,    -30,    -25,    -20,    -15,    -10,    -5,     0,      5};
+    static const float fVData[] = {1,   120.7,  263.2,  405.7,  548.2,  690.7,  833.2,  975.7,  1118.2, 1260.7};
+
+    float fVoltage = 0.f;
+
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+    {
+        for(uint32_t i = 0; i < ulSamples; i++)
+            fVoltage += adc_get_vpdet();
+    }
+
+    fVoltage /= ulSamples; // Average
+    fVoltage /= 2; // Op Amp gain
+
+    // Interpolate
+    float fV0;
+    float fP0;
+    float fV1;
+    float fP1;
+
+    for(uint8_t i = 1; i < sizeof(fPData) / sizeof(float); i++)
+    {
+        fV0 = fVData[i - 1];
+        fP0 = fPData[i - 1];
+        fV1 = fVData[i];
+        fP1 = fPData[i];
+
+        if(fV0 <= fVoltage && fV1 > fVoltage)
+            break;
+    }
+
+    float fDeltaV = fV1 - fV0;
+    float fDeltaP = fP1 - fP0;
+    float fSlope = fDeltaP / fDeltaV;
+    float fInterp = fP0 + (fVoltage - fV0) * fSlope;
+
+    return fInterp + 33.4; // ~10 dB coupling, ~20 dB last stage gain, calibrated
 }
 
 int init()
@@ -359,7 +403,7 @@ int init()
     usart0_init(12000000, 0, USART_SPI_MSB_FIRST, -1, 0, 0);
     usart1_init(1000000, USART_FRAME_STOPBITS_ONE | USART_FRAME_PARITY_NONE | USART_FRAME_DATABITS_EIGHT, -1, 5, -1, -1);
 
-    i2c0_init(I2C_SLAVE_ADDRESS, 1, 1);
+    i2c0_init(I2C_SLAVE_ADDRESS, 4, 4);
     i2c0_set_slave_addr_isr(i2c_slave_addr_isr);
     i2c0_set_slave_tx_data_isr(i2c_slave_tx_data_isr);
     i2c0_set_slave_rx_data_isr(i2c_slave_rx_data_isr);
@@ -446,15 +490,20 @@ int init()
     else
         DBGPRINTLN_CTX("ADF4351 init NOK!");
 
-    if(f1951_init(F1951_IF_ATT_ID))
-        DBGPRINTLN_CTX("IF F1951 init OK!");
+    if(f1958_init(F1958_IF_ATT_ID))
+        DBGPRINTLN_CTX("IF F1958 init OK!");
     else
-        DBGPRINTLN_CTX("IF F1951 init NOK!");
+        DBGPRINTLN_CTX("IF F1958 init NOK!");
 
-    if(f1951_init(F1951_RF_ATT_ID))
-        DBGPRINTLN_CTX("RF F1951 init OK!");
+    if(f1958_init(F1958_RF1_ATT_ID))
+        DBGPRINTLN_CTX("RF1 F1958 init OK!");
     else
-        DBGPRINTLN_CTX("RF F1951 init NOK!");
+        DBGPRINTLN_CTX("RF1 F1958 init NOK!");
+
+    if(f1958_init(F1958_RF2_ATT_ID))
+        DBGPRINTLN_CTX("RF2 F1958 init OK!");
+    else
+        DBGPRINTLN_CTX("RF2 F1958 init NOK!");
 
     return 0;
 }
@@ -467,20 +516,22 @@ int main()
     mcp3421_write_config(MCP3421_RESOLUTION_16BIT | MCP3421_ONE_SHOT);
 
     // Attenuators
-    f1951_set_attenuation(F1951_IF_ATT_ID, 16.0f);
-    DBGPRINTLN_CTX("IF Attenuator value: -%.3f dB", (float)F1951_ATTENUATION[F1951_IF_ATT_ID]);
-    f1951_set_attenuation(F1951_RF_ATT_ID, 1.0f);
-    DBGPRINTLN_CTX("RF Attenuator value: -%.3f dB", (float)F1951_ATTENUATION[F1951_RF_ATT_ID]);
+    f1958_set_attenuation(F1958_IF_ATT_ID, 16.0f);
+    DBGPRINTLN_CTX("IF Attenuator value: -%.3f dB", (float)F1958_ATTENUATION[F1958_IF_ATT_ID]);
+    f1958_set_attenuation(F1958_RF1_ATT_ID, 25.0f);
+    DBGPRINTLN_CTX("RF Attenuator value: -%.3f dB", (float)F1958_ATTENUATION[F1958_RF1_ATT_ID]);
+    f1958_set_attenuation(F1958_RF2_ATT_ID, 6.0f);
+    DBGPRINTLN_CTX("RF Attenuator value: -%.3f dB", (float)F1958_ATTENUATION[F1958_RF2_ATT_ID]);
 
     // PLL
-    adf4351_pfd_config(26000000, 1, 0, 13, 0);
+    adf4351_pfd_config(26000000, 1, 0, 1, 0);
     DBGPRINTLN_CTX("PLL Reference frequency: %.3f MHz", (float)ADF4351_REF_FREQ / 1000000);
     DBGPRINTLN_CTX("PLL PFD frequency: %.3f MHz", (float)ADF4351_PFD_FREQ / 1000000);
 
-    adf4351_charge_pump_set_current(5.0f); // 3.8 mA
+    adf4351_charge_pump_set_current(5.f); // 5 mA
     DBGPRINTLN_CTX("PLL CP current: %.2f mA", adf4351_charge_pump_get_current());
 
-    adf4351_main_out_config(1, 5); // 5 dBm
+    adf4351_main_out_config(1, -1); // -1 dBm
     DBGPRINTLN_CTX("PLL output power: %i dBm", adf4351_main_out_get_power());
 
     adf4351_set_frequency(1875000000U);
@@ -490,9 +541,9 @@ int main()
     delay_ms(100);
     MIXER_ENABLE();
     delay_ms(500);
-    PA_STG2_ENABLE();
+    PA_STG3_ENABLE();
     delay_ms(200);
-    PA_STG1_ENABLE();
+    PA_STG1_2_ENABLE();
 
     while(1)
     {
@@ -532,7 +583,7 @@ int main()
             // System Voltages/Currents
             float fVIN = adc_get_vin();
             float f5V0 = adc_get_5v0();
-            float f5V0I = ext_adc_read_5v0_current(10);
+            float f5V0I = ext_adc_get_5v0_current(10);
             float fAVDD = adc_get_avdd();
             float fDVDD = adc_get_dvdd();
             float fIOVDD = adc_get_iovdd();
@@ -557,6 +608,11 @@ int main()
             DBGPRINTLN_CTX("VIN Voltage: %.2f mV", fVIN);
             DBGPRINTLN_CTX("5V0 Voltage: %.2f mV", f5V0);
             DBGPRINTLN_CTX("5V0 Current: %.2f mA", f5V0I);
+
+            // Output Power
+            float fOutputPower = get_rf_out_power(10);
+
+            DBGPRINTLN_CTX("RF Output Power: %.2f dBm", fOutputPower);
         }
     }
 

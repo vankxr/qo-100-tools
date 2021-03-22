@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.05" altunitdist="mm" altunit="mm"/>
+<grid distance="1" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.05" altunitdist="mm" altunit="mm"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="16" fill="1" visible="yes" active="yes"/>
@@ -1751,7 +1751,7 @@ design rules under a new name.</description>
 </pass>
 </autorouter>
 <elements>
-<element name="C29" library="Capacitor" package="CAP0603" value="150pF" x="88.3" y="9.8" smashed="yes" rot="R90">
+<element name="C29" library="Capacitor" package="CAP0603" value="100pF" x="88.3" y="9.8" smashed="yes" rot="R90">
 <attribute name="NAME" x="86.884" y="8.2536" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="VALUE" x="90.332" y="6.8536" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="155.60999375" y="42.82000625" size="1.778" layer="27" rot="R90" display="off"/>
@@ -1981,17 +1981,17 @@ design rules under a new name.</description>
 <attribute name="VALUE" x="70.932" y="32.5536" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="156.53" y="76.14" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
-<element name="C22" library="Capacitor" package="CAP0603" value="1uF" x="61.6" y="27.2" smashed="yes" rot="R270">
+<element name="C22" library="Capacitor" package="CAP0603" value="20nF" x="61.6" y="27.2" smashed="yes" rot="R270">
 <attribute name="NAME" x="60.4536" y="29.316" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="59.568" y="30.1464" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="-26.03" y="-18.52" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
-<element name="C23" library="Capacitor" package="CAP0603" value="220nF" x="63.3" y="27.2" smashed="yes" rot="R270">
+<element name="C23" library="Capacitor" package="CAP0603" value="1nF" x="63.3" y="27.2" smashed="yes" rot="R270">
 <attribute name="NAME" x="62.4536" y="29.316" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="61.268" y="30.1464" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="-24.33" y="-23.6" size="1.778" layer="27" rot="R270" display="off"/>
 </element>
-<element name="C24" library="Capacitor" package="CAP0603" value="2.7nF" x="66.7" y="27.2" smashed="yes" rot="R90">
+<element name="C24" library="Capacitor" package="CAP0603" value="470pF" x="66.7" y="27.2" smashed="yes" rot="R90">
 <attribute name="NAME" x="68.084" y="25.6536" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="VALUE" x="68.732" y="24.2536" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="154.33" y="83.08" size="1.778" layer="27" rot="R90" display="off"/>
@@ -2129,7 +2129,7 @@ design rules under a new name.</description>
 <attribute name="TOLERANCE" value="" x="120.43" y="99.59" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VALUE" x="60.232" y="23.7456" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 </element>
-<element name="R17" library="Resistor" package="RES0603" value="150 Ohms" x="59.9" y="27.2" smashed="yes" rot="R270">
+<element name="R17" library="Resistor" package="RES0603" value="330 Ohms" x="59.9" y="27.2" smashed="yes" rot="R270">
 <attribute name="NAME" x="58.3456" y="29.316" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="TOLERANCE" value="" x="7.83" y="-46.46" size="1.778" layer="27" rot="R270" display="off"/>
 <attribute name="VALUE" x="57.868" y="30.6544" size="0.8" layer="27" font="vector" ratio="10" rot="SR270" align="center-left"/>
@@ -2211,7 +2211,7 @@ design rules under a new name.</description>
 <attribute name="VALUE" x="88.9536" y="17.168" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="91.9" y="19.2" size="1.778" layer="27" display="off"/>
 </element>
-<element name="C34" library="Capacitor" package="CAP0603" value="150pF" x="88.3" y="20.5" smashed="yes" rot="R90">
+<element name="C34" library="Capacitor" package="CAP0603" value="100pF" x="88.3" y="20.5" smashed="yes" rot="R90">
 <attribute name="NAME" x="86.884" y="18.9536" size="0.8" layer="25" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="VALUE" x="90.332" y="17.5536" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="88.3" y="20.5" size="1.778" layer="27" rot="R90" display="off"/>
@@ -2484,7 +2484,7 @@ design rules under a new name.</description>
 <attribute name="TOLERANCE" value="" x="82.2" y="51.6" size="1.778" layer="27" display="off"/>
 <attribute name="VALUE" x="85.7456" y="40.568" size="0.8" layer="27" font="vector" ratio="10" rot="SR0" align="center-left"/>
 </element>
-<element name="L5" library="Inductor" package="IND0603" value="4.7nH" x="88.1" y="48.9" smashed="yes" rot="R225">
+<element name="L5" library="Inductor" package="IND0603" value="5.1nH" x="88.1" y="48.9" smashed="yes" rot="R225">
 <attribute name="CURRENT" value="" x="88.1" y="48.9" size="1.778" layer="27" rot="R225" display="off"/>
 <attribute name="NAME" x="89.43895" y="50.17579375" size="0.8" layer="25" font="vector" ratio="10" rot="SR45" align="center-left"/>
 <attribute name="VALUE" x="89.1057875" y="52.77946875" size="0.8" layer="27" font="vector" ratio="10" rot="SR225" align="center-left"/>
@@ -2499,27 +2499,27 @@ design rules under a new name.</description>
 <attribute name="VALUE" x="89.320259375" y="49.45341875" size="0.8" layer="27" font="vector" ratio="10" rot="SR135" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="85.8" y="50.1" size="1.778" layer="27" rot="R135" display="off"/>
 </element>
-<element name="C31" library="Capacitor" package="CAP0603" value="1.8pF" x="83.5" y="52.4" smashed="yes" rot="R135">
+<element name="C31" library="Capacitor" package="CAP0603" value="DNP" x="83.5" y="52.4" smashed="yes" rot="R135">
 <attribute name="NAME" x="82.864996875" y="49.698159375" size="0.8" layer="25" font="vector" ratio="10" rot="SR135" align="center-left"/>
 <attribute name="VALUE" x="87.020259375" y="51.75341875" size="0.8" layer="27" font="vector" ratio="10" rot="SR135" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="83.5" y="52.4" size="1.778" layer="27" rot="R135" display="off"/>
 </element>
-<element name="C32" library="Capacitor" package="CAP0603" value="1.5pF" x="81.2" y="54.7" smashed="yes" rot="R135">
+<element name="C32" library="Capacitor" package="CAP0603" value="DNP" x="81.2" y="54.7" smashed="yes" rot="R135">
 <attribute name="NAME" x="80.564996875" y="51.898159375" size="0.8" layer="25" font="vector" ratio="10" rot="SR135" align="center-left"/>
 <attribute name="VALUE" x="84.720259375" y="54.05341875" size="0.8" layer="27" font="vector" ratio="10" rot="SR135" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="81.2" y="54.7" size="1.778" layer="27" rot="R135" display="off"/>
 </element>
-<element name="C33" library="Capacitor" package="CAP0603" value="1.5pF" x="77.6" y="55.3" smashed="yes" rot="R180">
+<element name="C33" library="Capacitor" package="CAP0603" value="12pF" x="77.6" y="55.3" smashed="yes" rot="R180">
 <attribute name="NAME" x="76.0536" y="56.716" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VALUE" x="80.5464" y="57.332" size="0.8" layer="27" font="vector" ratio="10" rot="SR180" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="77.6" y="55.3" size="1.778" layer="27" rot="R180" display="off"/>
 </element>
-<element name="L10" library="Inductor" package="IND0603" value="3.9nH" x="85.9" y="55.9" smashed="yes" rot="R225">
+<element name="L10" library="Inductor" package="IND0603" value="1.8pF" x="85.9" y="55.9" smashed="yes" rot="R225">
 <attribute name="CURRENT" value="" x="85.9" y="55.9" size="1.778" layer="27" rot="R225" display="off"/>
 <attribute name="NAME" x="87.23895" y="57.17579375" size="0.8" layer="25" font="vector" ratio="10" rot="SR45" align="center-left"/>
 <attribute name="VALUE" x="86.9057875" y="59.77946875" size="0.8" layer="27" font="vector" ratio="10" rot="SR225" align="center-left"/>
 </element>
-<element name="L12" library="Inductor" package="IND0603" value="3.3nH" x="83.6" y="58.2" smashed="yes" rot="R225">
+<element name="L12" library="Inductor" package="IND0603" value="2.2pF" x="83.6" y="58.2" smashed="yes" rot="R225">
 <attribute name="CURRENT" value="" x="83.6" y="58.2" size="1.778" layer="27" rot="R225" display="off"/>
 <attribute name="NAME" x="84.93895" y="59.57579375" size="0.8" layer="25" font="vector" ratio="10" rot="SR45" align="center-left"/>
 <attribute name="VALUE" x="84.6057875" y="62.07946875" size="0.8" layer="27" font="vector" ratio="10" rot="SR225" align="center-left"/>
@@ -2592,17 +2592,17 @@ design rules under a new name.</description>
 <attribute name="TOLERANCE" value="" x="67" y="21.2" size="1.778" layer="27" rot="R90" display="off"/>
 <attribute name="VALUE" x="58.032" y="52.7456" size="0.8" layer="27" font="vector" ratio="10" rot="SR90" align="center-left"/>
 </element>
-<element name="L6" library="Inductor" package="IND0603" value="12nH" x="87" y="51.3" smashed="yes" rot="R135">
+<element name="L6" library="Inductor" package="IND0603" value="5.1nH" x="87" y="51.3" smashed="yes" rot="R135">
 <attribute name="CURRENT" value="" x="87" y="51.3" size="1.778" layer="27" rot="R135" display="off"/>
 <attribute name="NAME" x="85.82420625" y="48.038946875" size="0.8" layer="25" font="vector" ratio="10" rot="SR135" align="center-left"/>
 <attribute name="VALUE" x="90.87946875" y="50.294209375" size="0.8" layer="27" font="vector" ratio="10" rot="SR135" align="center-left"/>
 </element>
-<element name="L8" library="Inductor" package="IND0603" value="3.9nH" x="84.7" y="53.6" smashed="yes" rot="R135">
+<element name="L8" library="Inductor" package="IND0603" value="0 Ohms" x="84.7" y="53.6" smashed="yes" rot="R135">
 <attribute name="CURRENT" value="" x="84.7" y="53.6" size="1.778" layer="27" rot="R135" display="off"/>
 <attribute name="NAME" x="83.52420625" y="50.438946875" size="0.8" layer="25" font="vector" ratio="10" rot="SR135" align="center-left"/>
 <attribute name="VALUE" x="88.57946875" y="52.594209375" size="0.8" layer="27" font="vector" ratio="10" rot="SR135" align="center-left"/>
 </element>
-<element name="L11" library="Inductor" package="IND0603" value="5.6nH" x="82.4" y="55.9" smashed="yes" rot="R135">
+<element name="L11" library="Inductor" package="IND0603" value="0 Ohms" x="82.4" y="55.9" smashed="yes" rot="R135">
 <attribute name="CURRENT" value="" x="82.4" y="55.9" size="1.778" layer="27" rot="R135" display="off"/>
 <attribute name="NAME" x="81.22420625" y="52.638946875" size="0.8" layer="25" font="vector" ratio="10" rot="SR135" align="center-left"/>
 <attribute name="VALUE" x="86.27946875" y="54.894209375" size="0.8" layer="27" font="vector" ratio="10" rot="SR135" align="center-left"/>

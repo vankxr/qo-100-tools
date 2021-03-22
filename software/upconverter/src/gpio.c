@@ -32,9 +32,9 @@ void gpio_init()
     // Port A
     GPIO->P[0].CTRL   = GPIO_P_CTRL_DRIVESTRENGTHALT_STRONG | (5 << _GPIO_P_CTRL_SLEWRATEALT_SHIFT)
                       | GPIO_P_CTRL_DRIVESTRENGTH_STRONG | (5 << _GPIO_P_CTRL_SLEWRATE_SHIFT);
-    GPIO->P[0].MODEL  = GPIO_P_MODEL_MODE0_PUSHPULL     // PLL_LE
-                      | GPIO_P_MODEL_MODE1_PUSHPULL     // nRF_ATT_CS
-                      | GPIO_P_MODEL_MODE2_PUSHPULL     // nPA_STG1_BIAS_EN
+    GPIO->P[0].MODEL  = GPIO_P_MODEL_MODE0_DISABLED     // VPDET_VSENSE
+                      | GPIO_P_MODEL_MODE1_PUSHPULL     // RF_ATT1_LE
+                      | GPIO_P_MODEL_MODE2_PUSHPULL     // RF_ATT2_LE
                       | GPIO_P_MODEL_MODE3_DISABLED     // NC
                       | GPIO_P_MODEL_MODE4_DISABLED     // NC
                       | GPIO_P_MODEL_MODE5_DISABLED     // NC
@@ -49,7 +49,7 @@ void gpio_init()
                       | GPIO_P_MODEH_MODE14_DISABLED    // NC
                       | GPIO_P_MODEH_MODE15_DISABLED;   // NC
     GPIO->P[0].DOUT   = BIT(1) | BIT(2);
-    GPIO->P[0].OVTDIS = 0;
+    GPIO->P[0].OVTDIS = BIT(0);
 
     // Port B
     GPIO->P[1].CTRL   = GPIO_P_CTRL_DRIVESTRENGTHALT_STRONG | (5 << _GPIO_P_CTRL_SLEWRATEALT_SHIFT)
@@ -61,11 +61,11 @@ void gpio_init()
                       | GPIO_P_MODEL_MODE4_DISABLED         // NC
                       | GPIO_P_MODEL_MODE5_DISABLED         // NC
                       | GPIO_P_MODEL_MODE6_DISABLED         // NC
-                      | GPIO_P_MODEL_MODE7_PUSHPULL;        // LED
-    GPIO->P[1].MODEH  = GPIO_P_MODEH_MODE8_DISABLED         // NU
+                      | GPIO_P_MODEL_MODE7_PUSHPULL;        // PA_STG1_2_BIAS_EN
+    GPIO->P[1].MODEH  = GPIO_P_MODEH_MODE8_PUSHPULL         // PA_STG3_BIAS_EN
                       | GPIO_P_MODEH_MODE9_DISABLED         // NC
                       | GPIO_P_MODEH_MODE10_DISABLED        // NC
-                      | GPIO_P_MODEH_MODE11_DISABLED        // NU
+                      | GPIO_P_MODEH_MODE11_PUSHPULL        // LED
                       | GPIO_P_MODEH_MODE12_DISABLED        // NC
                       | GPIO_P_MODEH_MODE13_DISABLED        // 5V0_VSENSE
                       | GPIO_P_MODEH_MODE14_DISABLED        // VIN_VSENSE
@@ -76,23 +76,23 @@ void gpio_init()
     // Port C
     GPIO->P[2].CTRL   = GPIO_P_CTRL_DRIVESTRENGTHALT_STRONG | (5 << _GPIO_P_CTRL_SLEWRATEALT_SHIFT)
                       | GPIO_P_CTRL_DRIVESTRENGTH_STRONG | (5 << _GPIO_P_CTRL_SLEWRATE_SHIFT);
-    GPIO->P[2].MODEL  = GPIO_P_MODEL_MODE0_PUSHPULL         // PA_STG2_BIAS_EN
-                      | GPIO_P_MODEL_MODE1_DISABLED         // NU
-                      | GPIO_P_MODEL_MODE2_DISABLED         // NC
-                      | GPIO_P_MODEL_MODE3_DISABLED         // NC
-                      | GPIO_P_MODEL_MODE4_DISABLED         // NC
-                      | GPIO_P_MODEL_MODE5_DISABLED         // NC
-                      | GPIO_P_MODEL_MODE6_DISABLED         // NC
-                      | GPIO_P_MODEL_MODE7_DISABLED;        // NC
-    GPIO->P[2].MODEH  = GPIO_P_MODEH_MODE8_DISABLED         // NC
-                      | GPIO_P_MODEH_MODE9_DISABLED         // NC
-                      | GPIO_P_MODEH_MODE10_DISABLED        // NC
-                      | GPIO_P_MODEH_MODE11_DISABLED        // NC
-                      | GPIO_P_MODEH_MODE12_DISABLED        // NC
-                      | GPIO_P_MODEH_MODE13_PUSHPULL        // nIF_ATT_CS
-                      | GPIO_P_MODEH_MODE14_PUSHPULL        // nMIXER_SHDN
-                      | GPIO_P_MODEH_MODE15_PUSHPULL;       // PLL_EN
-    GPIO->P[2].DOUT   = BIT(13);
+    GPIO->P[2].MODEL  = GPIO_P_MODEL_MODE0_WIREDANDPULLUPFILTER     // I2C0_SDA - Location 4
+                      | GPIO_P_MODEL_MODE1_WIREDANDPULLUPFILTER     // I2C0_SCL - Location 4
+                      | GPIO_P_MODEL_MODE2_DISABLED                 // NC
+                      | GPIO_P_MODEL_MODE3_DISABLED                 // NC
+                      | GPIO_P_MODEL_MODE4_DISABLED                 // NC
+                      | GPIO_P_MODEL_MODE5_DISABLED                 // NC
+                      | GPIO_P_MODEL_MODE6_DISABLED                 // NC
+                      | GPIO_P_MODEL_MODE7_DISABLED;                // NC
+    GPIO->P[2].MODEH  = GPIO_P_MODEH_MODE8_DISABLED                 // NC
+                      | GPIO_P_MODEH_MODE9_DISABLED                 // NC
+                      | GPIO_P_MODEH_MODE10_DISABLED                // NC
+                      | GPIO_P_MODEH_MODE11_DISABLED                // NC
+                      | GPIO_P_MODEH_MODE12_DISABLED                // NC
+                      | GPIO_P_MODEH_MODE13_DISABLED                // NU
+                      | GPIO_P_MODEH_MODE14_PUSHPULL                // PLL_EN
+                      | GPIO_P_MODEH_MODE15_PUSHPULL;               // PLL_LE
+    GPIO->P[2].DOUT   = BIT(15);
     GPIO->P[2].OVTDIS = 0;
 
     // Port D
@@ -104,8 +104,8 @@ void gpio_init()
                       | GPIO_P_MODEL_MODE3_DISABLED                 // NC
                       | GPIO_P_MODEL_MODE4_WIREDANDPULLUPFILTER     // I2C1_SDA - Location 3
                       | GPIO_P_MODEL_MODE5_WIREDANDPULLUPFILTER     // I2C1_SCL - Location 3
-                      | GPIO_P_MODEL_MODE6_WIREDANDPULLUPFILTER     // I2C0_SDA - Location 1
-                      | GPIO_P_MODEL_MODE7_WIREDANDPULLUPFILTER;    // I2C0_SCL - Location 1
+                      | GPIO_P_MODEL_MODE6_PUSHPULL                 // IF_ATT_LE
+                      | GPIO_P_MODEL_MODE7_PUSHPULL;                // nMIXER_SHDN
     GPIO->P[3].MODEH  = GPIO_P_MODEH_MODE8_DISABLED                 // NC
                       | GPIO_P_MODEH_MODE9_DISABLED                 // NC
                       | GPIO_P_MODEH_MODE10_DISABLED                // NC
@@ -114,7 +114,7 @@ void gpio_init()
                       | GPIO_P_MODEH_MODE13_DISABLED                // NC
                       | GPIO_P_MODEH_MODE14_DISABLED                // NC
                       | GPIO_P_MODEH_MODE15_DISABLED;               // NC
-    GPIO->P[3].DOUT   = 0;
+    GPIO->P[3].DOUT   = BIT(6);
     GPIO->P[3].OVTDIS = 0;
 
     // Port E

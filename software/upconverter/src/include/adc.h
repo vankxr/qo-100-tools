@@ -10,6 +10,8 @@
 #define ADC_VIN_CHAN            ADC_SINGLECTRL_POSSEL_APORT1XCH30
 #define ADC_5V0_CHAN            ADC_SINGLECTRL_POSSEL_APORT2XCH29
 
+#define ADC_VPDET_CHAN          ADC_SINGLECTRL_POSSEL_APORT1XCH0
+
 void adc_init();
 
 float adc_get_avdd();
@@ -18,6 +20,7 @@ float adc_get_iovdd();
 float adc_get_corevdd();
 float adc_get_vin();
 float adc_get_5v0();
+float adc_get_vpdet();
 
 float adc_get_temperature();
 

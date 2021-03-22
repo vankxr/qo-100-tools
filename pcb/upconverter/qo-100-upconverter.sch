@@ -6008,10 +6008,10 @@ Logo</text>
 <part name="GND605" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="C9" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100nF"/>
 <part name="GND607" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="C23" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="220nF"/>
-<part name="C22" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1uF"/>
-<part name="R17" library="Resistor" deviceset="RESISTOR" device="-0603" value="150 Ohms"/>
-<part name="C24" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="2.7nF"/>
+<part name="C23" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1nF"/>
+<part name="C22" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="20nF"/>
+<part name="R17" library="Resistor" deviceset="RESISTOR" device="-0603" value="330 Ohms"/>
+<part name="C24" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="470pF"/>
 <part name="R19" library="Resistor" deviceset="RESISTOR" device="-0603" value="1K Ohms"/>
 <part name="GND618" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND620" library="Supply Symbol" deviceset="GND" device=""/>
@@ -6046,7 +6046,7 @@ Logo</text>
 <part name="FRAME5" library="Frame" deviceset="A2-LANDSCAPE" device=""/>
 <part name="U5" library="Maxim Integrated" deviceset="MAX2671" device=""/>
 <part name="RFCON2" library="RF Connector" deviceset="RFCON" device="-SMA-EDGE"/>
-<part name="C29" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="150pF"/>
+<part name="C29" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100pF"/>
 <part name="GND2" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND3" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="C27" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100nF"/>
@@ -6202,7 +6202,7 @@ Logo</text>
 <part name="GND67" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="C28" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100nF"/>
 <part name="GND73" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="C34" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="150pF"/>
+<part name="C34" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100pF"/>
 <part name="R18" library="Resistor" deviceset="RESISTOR" device="-0603" value="61.9 Ohms"/>
 <part name="R16" library="Resistor" deviceset="RESISTOR" device="-0603" value="105 Ohms"/>
 <part name="R20" library="Resistor" deviceset="RESISTOR" device="-0603" value="105 Ohms"/>
@@ -6308,17 +6308,17 @@ Logo</text>
 <part name="GND9" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="R27" library="Resistor" deviceset="RESISTOR" device="-0603" value="0 Ohms"/>
 <part name="R26" library="Resistor" deviceset="RESISTOR" device="-0603" value="DNP"/>
-<part name="L5" library="Inductor" deviceset="INDUCTOR" device="-0603" value="4.7nH"/>
+<part name="L5" library="Inductor" deviceset="INDUCTOR" device="-0603" value="5.1nH"/>
 <part name="GND12" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="L7" library="Inductor" deviceset="INDUCTOR" device="-0603" value="3.3nH"/>
 <part name="GND66" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="C26" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1.2pF"/>
-<part name="C31" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1.8pF"/>
-<part name="C32" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1.5pF"/>
-<part name="C33" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="1.5pF"/>
-<part name="L10" library="Inductor" deviceset="INDUCTOR" device="-0603" value="3.9nH"/>
+<part name="C31" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="DNP"/>
+<part name="C32" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="DNP"/>
+<part name="C33" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="12pF"/>
+<part name="L10" library="Inductor" deviceset="INDUCTOR" device="-0603" value="1.8pF"/>
 <part name="GND77" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="L12" library="Inductor" deviceset="INDUCTOR" device="-0603" value="3.3nH"/>
+<part name="L12" library="Inductor" deviceset="INDUCTOR" device="-0603" value="2.2pF"/>
 <part name="GND78" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="U8" library="Analog Devices" deviceset="ADL5?" device="" technology="601"/>
 <part name="C43" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100nF"/>
@@ -6342,9 +6342,9 @@ Logo</text>
 <part name="GND85" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="R32" library="Resistor" deviceset="RESISTOR" device="-0603" value="0 Ohms"/>
 <part name="R30" library="Resistor" deviceset="RESISTOR" device="-0603" value="DNP"/>
-<part name="L6" library="Inductor" deviceset="INDUCTOR" device="-0603" value="12nH"/>
-<part name="L8" library="Inductor" deviceset="INDUCTOR" device="-0603" value="3.9nH"/>
-<part name="L11" library="Inductor" deviceset="INDUCTOR" device="-0603" value="5.6nH"/>
+<part name="L6" library="Inductor" deviceset="INDUCTOR" device="-0603" value="5.1nH"/>
+<part name="L8" library="Inductor" deviceset="INDUCTOR" device="-0603" value="0 Ohms"/>
+<part name="L11" library="Inductor" deviceset="INDUCTOR" device="-0603" value="0 Ohms"/>
 <part name="U13" library="Anaren" deviceset="DC2337J5010AHF" device="">
 <attribute name="OCLCSC" value="C509396"/>
 </part>
@@ -7010,7 +7010,7 @@ Logo</text>
 <description>LO Synthesizer</description>
 <plain>
 <text x="441.96" y="248.92" size="1.778" layer="98" align="center">-9 dB Pi Attenuator</text>
-<text x="444.5" y="170.18" size="1.778" layer="98" align="center">2kHz Loop Bandwidth at 2 mA</text>
+<text x="441.96" y="170.18" size="1.778" layer="98" align="center">100kHz Loop Bandwidth at 2.5 mA</text>
 </plain>
 <instances>
 <instance part="U3" gate="G$1" x="317.5" y="231.14" smashed="yes">
@@ -7850,8 +7850,6 @@ Logo</text>
 <plain>
 <text x="297.18" y="205.74" size="1.778" layer="98" align="center">+9 dB</text>
 <text x="289.56" y="325.12" size="1.778" layer="98" align="center">-1.2 dB to -32.5 dB</text>
-<text x="256.54" y="91.44" size="1.778" layer="98" align="center">-0.1 dB at 2.4 GHz
--55 dB 1.875 GHz</text>
 </plain>
 <instances>
 <instance part="FRAME3" gate="G$1" x="0" y="0" smashed="yes">
