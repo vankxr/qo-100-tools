@@ -1529,11 +1529,11 @@ async function main()
     for(let i = 0; i < buses.onewire.length; i++)
     {
         let bus = buses.onewire[i];
-        let devices;
+        let bus_devices;
 
         try
         {
-            devices = await bus.scan();
+            bus_devices = await bus.scan();
         }
         catch (e)
         {
@@ -1542,9 +1542,9 @@ async function main()
             continue;
         }
 
-        cl.tprintln(devices.length > 0 ? null : "yellow", "OneWire", "  Found %d devices on OneWire bus %d:", devices.length, i);
+        cl.tprintln(bus_devices.length > 0 ? null : "yellow", "OneWire", "  Found %d devices on OneWire bus %d:", bus_devices.length, i);
 
-        for(const device of devices)
+        for(const device of bus_devices)
         {
             cl.tprintln(null, "OneWire", "    %s", device);
 
@@ -1565,6 +1565,139 @@ async function main()
                 cl.tprintln(null, "DS18B20", "        Low Alarm Temperature: %d C", (await sensor.get_alarm()).low);
                 cl.tprintln(null, "DS18B20", "        Parasidic powered: %s", await sensor.is_parasidic_power());
             }
+        }
+    }
+
+    //// PSU
+    // PSU GPIO Controlers
+    const psu_gpio_controllers = [];
+    psu_gpio_controllers.push(new MCP23008(buses.i2c[1], 0, gpios.psu_i2c_enable[0]));
+    psu_gpio_controllers.push(new MCP23008(buses.i2c[1], 0, gpios.psu_i2c_enable[1]));
+
+    for(let i = 0; i < psu_gpio_controllers.length; i++)
+    {
+        let gpio_controller = psu_gpio_controllers[i];
+
+        try
+        {
+            await gpio_controller.probe();
+        }
+        catch (e)
+        {
+            cl.tprintln("red", "MCP23008", e);
+
+            continue;
+        }
+
+        cl.tprintln("green", "MCP23008", "PSU GPIO Controller #%d found!", i);
+
+        gpio_controller.config();
+
+        let present_gpio = gpio_controller.get_gpio("PA0");
+        let enable_gpio = gpio_controller.get_gpio("PA4");
+
+        present_gpio.set_direction(GPIO.INPUT);
+        present_gpio.set_pull(GPIO.PULLUP);
+        enable_gpio.set_direction(GPIO.INPUT);
+        enable_gpio.set_pull(GPIO.PULLUP);
+    }
+
+    // PSU
+    const psus = [];
+    psus.push(new HPPSU(buses.i2c[1], 7, gpios.psu_i2c_enable[0], psu_gpio_controllers[0].get_gpio("PA0"), psu_gpio_controllers[0].get_gpio("PA4")));
+    psus.push(new HPPSU(buses.i2c[1], 7, gpios.psu_i2c_enable[1], psu_gpio_controllers[1].get_gpio("PA0"), psu_gpio_controllers[1].get_gpio("PA4")));
+
+    for(let i = 0; i < psus.length; i++)
+    {
+        let psu = psus[i];
+        let psu_present = true;
+
+        try
+        {
+            psu_present = await psu.is_present();
+
+            cl.tprintln(psu_present ? "green" : "red", "HPPSU", "PSU #%d Present: %s", i, psu_present);
+        }
+        catch (e)
+        {
+            cl.tprintln("yellow", "HPPSU", e);
+        }
+
+        if(!psu_present)
+            continue;
+
+        try
+        {
+            await psu.probe();
+        }
+        catch (e)
+        {
+            cl.tprintln("red", "HPPSU", e);
+
+            continue;
+        }
+
+        cl.tprintln("green", "HPPSU", "PSU #%d and EEPROM #%d found!", i, i);
+
+        devices["psu" + i] = psu;
+
+        cl.tprintln(null, "HPPSU", "  ID: 0x%s", (await psu.get_id()).toString(16));
+        cl.tprintln(null, "HPPSU", "  SPN: %s", await psu.get_spn());
+        cl.tprintln(null, "HPPSU", "  Date: %s", await psu.get_date());
+        cl.tprintln(null, "HPPSU", "  Name: %s", await psu.get_name());
+        cl.tprintln(null, "HPPSU", "  CT: %s", await psu.get_ct());
+        cl.tprintln(null, "HPPSU", "  Input Present: %s", await psu.is_input_present());
+        cl.tprintln(null, "HPPSU", "  Input Voltage: %d V", await psu.get_input_voltage());
+        cl.tprintln(null, "HPPSU", "  Input Undervoltage threshold: %d V", await psu.get_input_undervoltage_threshold());
+        cl.tprintln(null, "HPPSU", "  Input Overvoltage threshold: %d V", await psu.get_input_overvoltage_threshold());
+        cl.tprintln(null, "HPPSU", "  Input Current: %d A (max. %d A)", await psu.get_input_current(), await psu.get_peak_input_current());
+        cl.tprintln(null, "HPPSU", "  Input Power: %d W (max. %d W)", await psu.get_input_power(), await psu.get_peak_input_power());
+        cl.tprintln(null, "HPPSU", "  Input Energy: %d Wh", await psu.get_input_energy());
+        cl.tprintln(null, "HPPSU", "  Output Enabled: %s", await psu.is_main_output_enabled());
+        cl.tprintln(null, "HPPSU", "  Output Voltage: %d V", await psu.get_output_voltage());
+        cl.tprintln(null, "HPPSU", "  Output Undervoltage threshold: %d V", await psu.get_output_undervoltage_threshold());
+        cl.tprintln(null, "HPPSU", "  Output Overvoltage threshold: %d V", await psu.get_output_overvoltage_threshold());
+        cl.tprintln(null, "HPPSU", "  Output Current: %d A (max. %d A)", await psu.get_output_current(), await psu.get_peak_output_current());
+        cl.tprintln(null, "HPPSU", "  Output Power: %d W", await psu.get_output_power());
+        cl.tprintln(null, "HPPSU", "  Intake Temperature: %d C", await psu.get_intake_temperature());
+        cl.tprintln(null, "HPPSU", "  Internal Temperature: %d C", await psu.get_internal_temperature());
+        cl.tprintln(null, "HPPSU", "  Fan speed: %d RPM", await psu.get_fan_speed());
+        cl.tprintln(null, "HPPSU", "  Fan target speed: %d RPM", await psu.get_fan_target_speed());
+        cl.tprintln(null, "HPPSU", "  On time: %d s", await psu.get_on_time());
+        cl.tprintln(null, "HPPSU", "  Total on time: %d days", await psu.get_total_on_time() / 60 / 24);
+        cl.tprintln(null, "HPPSU", "  Status flags: 0x%s", (await psu.get_status_flags()).toString(16));
+
+        await psu.set_enable(false);
+
+        cl.tprintln("magenta", "HPPSU", "  Testing fan at max RPM...");
+        await psu.set_fan_target_speed(17500);
+        await delay(3000);
+        let fan_speed = await psu.get_fan_speed();
+        await psu.set_fan_target_speed(0);
+
+        if(fan_speed >= 16000)
+            cl.tprintln("green", "HPPSU", "    Fan test passed (%d)!", fan_speed);
+        else
+            cl.tprintln("yellow", "HPPSU", "    Fan test failed (%d)!", fan_speed);
+
+        //await psu.clear_on_time_and_energy();
+        //await psu.clear_peak_input_current();
+
+        //while(1)
+        {
+            //cl.tprintln(null, null, "PSU #%d Input Voltage: %d V", i, await psu.get_input_voltage());
+            //cl.tprintln(null, null, "PSU #%d Status flags: 0x%s", i, (await psu.get_status_flags()).toString(16));
+            /*
+            if(!(await psu.is_input_present()))
+            {
+                cl.tprintln("cyan", null, "Power loss! Shutting down system...");
+
+                require('child_process').exec("shutdown now");
+                while(1);
+            }
+
+            await delay(500);
+            */
         }
     }
 
@@ -1747,7 +1880,7 @@ async function main()
 
     //// LTC5597 (RFPowerMeter with MCP3421 ADC)
     const ltc5597_sensors = [];
-    ltc5597_sensors.push(new LTC5597(buses.i2c[0], 0, gpios.ext_i2c_enable[0]));
+    ltc5597_sensors.push(new LTC5597(buses.i2c[0], 0, gpios.ext_i2c_enable[1]));
 
     for(let i = 0; i < ltc5597_sensors.length; i++)
     {
@@ -2143,139 +2276,6 @@ async function main()
         let chip_temperatures = await controller.get_chip_temperatures();
         cl.tprintln(null, "Upconverter", "  ADC Temperature: %d C", chip_temperatures.adc);
         cl.tprintln(null, "Upconverter", "  EMU Temperature: %d C", chip_temperatures.emu);
-    }
-
-    //// PSU
-    // PSU GPIO Controlers
-    const psu_gpio_controllers = [];
-    psu_gpio_controllers.push(new MCP23008(buses.i2c[1], 0, gpios.psu_i2c_enable[0]));
-    psu_gpio_controllers.push(new MCP23008(buses.i2c[1], 0, gpios.psu_i2c_enable[1]));
-
-    for(let i = 0; i < psu_gpio_controllers.length; i++)
-    {
-        let gpio_controller = psu_gpio_controllers[i];
-
-        try
-        {
-            await gpio_controller.probe();
-        }
-        catch (e)
-        {
-            cl.tprintln("red", "MCP23008", e);
-
-            continue;
-        }
-
-        cl.tprintln("green", "MCP23008", "PSU GPIO Controller #%d found!", i);
-
-        gpio_controller.config();
-
-        let present_gpio = gpio_controller.get_gpio("PA0");
-        let enable_gpio = gpio_controller.get_gpio("PA4");
-
-        present_gpio.set_direction(GPIO.INPUT);
-        present_gpio.set_pull(GPIO.PULLUP);
-        enable_gpio.set_direction(GPIO.INPUT);
-        enable_gpio.set_pull(GPIO.PULLUP);
-    }
-
-    // PSU
-    const psus = [];
-    psus.push(new HPPSU(buses.i2c[1], 7, gpios.psu_i2c_enable[0], psu_gpio_controllers[0].get_gpio("PA0"), psu_gpio_controllers[0].get_gpio("PA4")));
-    psus.push(new HPPSU(buses.i2c[1], 7, gpios.psu_i2c_enable[1], psu_gpio_controllers[1].get_gpio("PA0"), psu_gpio_controllers[1].get_gpio("PA4")));
-
-    for(let i = 0; i < psus.length; i++)
-    {
-        let psu = psus[i];
-        let psu_present = true;
-
-        try
-        {
-            psu_present = await psu.is_present();
-
-            cl.tprintln(psu_present ? "green" : "red", "HPPSU", "PSU #%d Present: %s", i, psu_present);
-        }
-        catch (e)
-        {
-            cl.tprintln("yellow", "HPPSU", e);
-        }
-
-        if(!psu_present)
-            continue;
-
-        try
-        {
-            await psu.probe();
-        }
-        catch (e)
-        {
-            cl.tprintln("red", "HPPSU", e);
-
-            continue;
-        }
-
-        cl.tprintln("green", "HPPSU", "PSU #%d and EEPROM #%d found!", i, i);
-
-        devices["psu" + i] = psu;
-
-        cl.tprintln(null, "HPPSU", "  ID: 0x%s", (await psu.get_id()).toString(16));
-        cl.tprintln(null, "HPPSU", "  SPN: %s", await psu.get_spn());
-        cl.tprintln(null, "HPPSU", "  Date: %s", await psu.get_date());
-        cl.tprintln(null, "HPPSU", "  Name: %s", await psu.get_name());
-        cl.tprintln(null, "HPPSU", "  CT: %s", await psu.get_ct());
-        cl.tprintln(null, "HPPSU", "  Input Present: %s", await psu.is_input_present());
-        cl.tprintln(null, "HPPSU", "  Input Voltage: %d V", await psu.get_input_voltage());
-        cl.tprintln(null, "HPPSU", "  Input Undervoltage threshold: %d V", await psu.get_input_undervoltage_threshold());
-        cl.tprintln(null, "HPPSU", "  Input Overvoltage threshold: %d V", await psu.get_input_overvoltage_threshold());
-        cl.tprintln(null, "HPPSU", "  Input Current: %d A (max. %d A)", await psu.get_input_current(), await psu.get_peak_input_current());
-        cl.tprintln(null, "HPPSU", "  Input Power: %d W (max. %d W)", await psu.get_input_power(), await psu.get_peak_input_power());
-        cl.tprintln(null, "HPPSU", "  Input Energy: %d Wh", await psu.get_input_energy());
-        cl.tprintln(null, "HPPSU", "  Output Enabled: %s", await psu.is_main_output_enabled());
-        cl.tprintln(null, "HPPSU", "  Output Voltage: %d V", await psu.get_output_voltage());
-        cl.tprintln(null, "HPPSU", "  Output Undervoltage threshold: %d V", await psu.get_output_undervoltage_threshold());
-        cl.tprintln(null, "HPPSU", "  Output Overvoltage threshold: %d V", await psu.get_output_overvoltage_threshold());
-        cl.tprintln(null, "HPPSU", "  Output Current: %d A (max. %d A)", await psu.get_output_current(), await psu.get_peak_output_current());
-        cl.tprintln(null, "HPPSU", "  Output Power: %d W", await psu.get_output_power());
-        cl.tprintln(null, "HPPSU", "  Intake Temperature: %d C", await psu.get_intake_temperature());
-        cl.tprintln(null, "HPPSU", "  Internal Temperature: %d C", await psu.get_internal_temperature());
-        cl.tprintln(null, "HPPSU", "  Fan speed: %d RPM", await psu.get_fan_speed());
-        cl.tprintln(null, "HPPSU", "  Fan target speed: %d RPM", await psu.get_fan_target_speed());
-        cl.tprintln(null, "HPPSU", "  On time: %d s", await psu.get_on_time());
-        cl.tprintln(null, "HPPSU", "  Total on time: %d days", await psu.get_total_on_time() / 60 / 24);
-        cl.tprintln(null, "HPPSU", "  Status flags: 0x%s", (await psu.get_status_flags()).toString(16));
-
-        await psu.set_enable(false);
-
-        cl.tprintln("magenta", "HPPSU", "  Testing fan at max RPM...");
-        await psu.set_fan_target_speed(17500);
-        await delay(3000);
-        let fan_speed = await psu.get_fan_speed();
-        await psu.set_fan_target_speed(0);
-
-        if(fan_speed >= 16000)
-            cl.tprintln("green", "HPPSU", "    Fan test passed (%d)!", fan_speed);
-        else
-            cl.tprintln("yellow", "HPPSU", "    Fan test failed (%d)!", fan_speed);
-
-        //await psu.clear_on_time_and_energy();
-        //await psu.clear_peak_input_current();
-
-        //while(1)
-        {
-            //cl.tprintln(null, null, "PSU #%d Input Voltage: %d V", i, await psu.get_input_voltage());
-            //cl.tprintln(null, null, "PSU #%d Status flags: 0x%s", i, (await psu.get_status_flags()).toString(16));
-            /*
-            if(!(await psu.is_input_present()))
-            {
-                cl.tprintln("cyan", null, "Power loss! Shutting down system...");
-
-                require('child_process').exec("shutdown now");
-                while(1);
-            }
-
-            await delay(500);
-            */
-        }
     }
 
     // Wideband Spectrum monitor

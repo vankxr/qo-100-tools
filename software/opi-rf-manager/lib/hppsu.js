@@ -267,11 +267,11 @@ class HPPSU
     }
     async get_output_current()
     {
-        return await this.mcu.read(0x10) / 32;
+        return await this.mcu.read(0x10) / 64;
     }
     async get_peak_output_current()
     {
-        return await this.mcu.read(0x36) / 32;
+        return await this.mcu.read(0x36) / 64;
     }
     async clear_peak_output_current()
     {
@@ -281,7 +281,7 @@ class HPPSU
     }
     async get_output_power()
     {
-        let ret = await this.mcu.read(0x12) * 2;
+        let ret = await this.mcu.read(0x12) / 2;
 
         if(ret <= 72)
         {

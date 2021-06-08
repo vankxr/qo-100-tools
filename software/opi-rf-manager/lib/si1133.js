@@ -142,9 +142,15 @@ class SI1133 extends I2CDevice
         await this.send_command(0x11);
 
         let irq = 0;
+        let start = Date.now();
 
         do
+        {
             irq |= await this.read(0x12);
+
+            if((Date.now() - start) >= 5000)
+                throw new Error("Timed out waiting for measure");
+        }
         while(irq != chan_mask);
     }
     async get_chip_id()
@@ -183,7 +189,7 @@ class SI1133 extends I2CDevice
 
         return {
             lux: 0, // TODO: https://siliconlabs.github.io/Gecko_SDK_Doc/efm32pg12/html/si1133_8c_source.html
-            uv: 0.0104 * (0.00391 * uv_raw * uv_raw + uv_raw)
+            uv: 0.00104 * (0.00391 * uv_raw * uv_raw + uv_raw)
         };
     }
     async get_lux()
