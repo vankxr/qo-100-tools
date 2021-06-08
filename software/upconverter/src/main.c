@@ -341,7 +341,7 @@ float get_rf_out_power(uint32_t ulSamples)
     }
 
     fVoltage /= ulSamples; // Average
-    fVoltage /= 2; // Op Amp gain
+    fVoltage /= 1 + (2000 / 1000); // Op Amp gain
 
     // Interpolate
     float fV0;
@@ -518,9 +518,9 @@ int main()
     // Attenuators
     f1958_set_attenuation(F1958_IF_ATT_ID, 16.0f);
     DBGPRINTLN_CTX("IF Attenuator value: -%.3f dB", (float)F1958_ATTENUATION[F1958_IF_ATT_ID]);
-    f1958_set_attenuation(F1958_RF1_ATT_ID, 25.0f);
+    f1958_set_attenuation(F1958_RF1_ATT_ID, 16.f);
     DBGPRINTLN_CTX("RF Attenuator value: -%.3f dB", (float)F1958_ATTENUATION[F1958_RF1_ATT_ID]);
-    f1958_set_attenuation(F1958_RF2_ATT_ID, 6.0f);
+    f1958_set_attenuation(F1958_RF2_ATT_ID, 3.0f);
     DBGPRINTLN_CTX("RF Attenuator value: -%.3f dB", (float)F1958_ATTENUATION[F1958_RF2_ATT_ID]);
 
     // PLL
@@ -537,13 +537,13 @@ int main()
     adf4351_set_frequency(1875000000U);
     DBGPRINTLN_CTX("PLL output frequency: %.3f MHz", (float)ADF4351_FREQ / 1000000);
 
-    PLL_UNMUTE();
+    //PLL_UNMUTE();
     delay_ms(100);
-    MIXER_ENABLE();
+    //MIXER_ENABLE();
     delay_ms(500);
-    PA_STG3_ENABLE();
+    //PA_STG3_ENABLE();
     delay_ms(200);
-    PA_STG1_2_ENABLE();
+    //PA_STG1_2_ENABLE();
 
     while(1)
     {
