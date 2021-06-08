@@ -5985,7 +5985,7 @@ Logo</text>
 </libraries>
 <attributes>
 <attribute name="CNAME" value=""/>
-<attribute name="CREVISION" value="2"/>
+<attribute name="CREVISION" value="3"/>
 <attribute name="DESIGNER" value="Joao Silva"/>
 </attributes>
 <variantdefs>
