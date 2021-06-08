@@ -132,8 +132,8 @@ void gpio_init()
                       | GPIO_P_MODEH_MODE9_DISABLED                 // NC
                       | GPIO_P_MODEH_MODE10_DISABLED                // NU
                       | GPIO_P_MODEH_MODE11_PUSHPULL                // LED
-                      | GPIO_P_MODEH_MODE12_WIREDANDPULLUPFILTER    // I2C_SDA
-                      | GPIO_P_MODEH_MODE13_WIREDANDPULLUPFILTER    // I2C_SCL
+                      | GPIO_P_MODEH_MODE12_WIREDANDPULLUPFILTER    // I2C0_SDA - Location 6
+                      | GPIO_P_MODEH_MODE13_WIREDANDPULLUPFILTER    // I2C0_SCL - Location 6
                       | GPIO_P_MODEH_MODE14_DISABLED                // NC
                       | GPIO_P_MODEH_MODE15_DISABLED;               // NC
     GPIO->P[4].DOUT   = BIT(12) | BIT(13);
