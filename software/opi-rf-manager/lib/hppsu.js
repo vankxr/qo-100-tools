@@ -281,7 +281,7 @@ class HPPSU
     }
     async get_output_power()
     {
-        let ret = await this.mcu.read(0x12) / 2;
+        let ret = await this.mcu.read(0x12);
 
         if(ret <= 72)
         {
