@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="1" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="5" altunitdist="mil" altunit="mil"/>
+<grid distance="0.5" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="5" altunitdist="mil" altunit="mil"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="16" fill="1" visible="no" active="no"/>
@@ -186,47 +186,96 @@
 </layers>
 <board>
 <plain>
-<wire x1="-42" y1="0" x2="-42" y2="60" width="0" layer="20"/>
-<wire x1="-42" y1="60" x2="-2" y2="60" width="0" layer="20"/>
-<wire x1="-2" y1="60" x2="-2" y2="0" width="0" layer="20"/>
-<wire x1="-2" y1="0" x2="-42" y2="0" width="0" layer="20"/>
-<hole x="-37" y="5" drill="3"/>
-<hole x="-27" y="5" drill="3"/>
-<hole x="-17" y="5" drill="3"/>
-<hole x="-7" y="5" drill="3"/>
-<hole x="-37" y="55" drill="3"/>
-<hole x="-27" y="55" drill="3"/>
-<hole x="-17" y="55" drill="3"/>
-<hole x="-7" y="55" drill="3"/>
-<hole x="-16" y="41" drill="3"/>
-<hole x="-37" y="38" drill="3"/>
-<hole x="-37" y="22" drill="3"/>
-<hole x="-16" y="19" drill="3"/>
-<wire x1="2" y1="0" x2="2" y2="60" width="0" layer="20"/>
-<wire x1="2" y1="60" x2="78" y2="60" width="0" layer="20"/>
-<wire x1="78" y1="60" x2="78" y2="0" width="0" layer="20"/>
-<wire x1="78" y1="0" x2="2" y2="0" width="0" layer="20"/>
-<hole x="7" y="55" drill="3"/>
-<hole x="17" y="55" drill="3"/>
-<hole x="27" y="55" drill="3"/>
-<hole x="37" y="55" drill="3"/>
-<hole x="7" y="5" drill="3"/>
-<hole x="17" y="5" drill="3"/>
-<hole x="27" y="5" drill="3"/>
-<hole x="37" y="5" drill="3"/>
-<hole x="37" y="38" drill="3"/>
-<hole x="37" y="22" drill="3"/>
-<hole x="16" y="19" drill="3"/>
-<hole x="16" y="41" drill="3"/>
-<hole x="73" y="55" drill="3"/>
-<hole x="73" y="5" drill="3"/>
-<hole x="73" y="38" drill="3"/>
-<hole x="73" y="22" drill="3"/>
-<hole x="57" y="5" drill="3"/>
-<hole x="47" y="55" drill="3"/>
-<hole x="57" y="55" drill="3"/>
-<hole x="57" y="15" drill="3"/>
-<hole x="57" y="45" drill="3"/>
+<wire x1="-70" y1="0" x2="-70" y2="60" width="0" layer="20"/>
+<wire x1="-70" y1="60" x2="-5" y2="60" width="0" layer="20"/>
+<wire x1="-5" y1="60" x2="-5" y2="0" width="0" layer="20"/>
+<wire x1="-5" y1="0" x2="-70" y2="0" width="0" layer="20"/>
+<hole x="-65" y="5" drill="3"/>
+<hole x="-30" y="5" drill="3"/>
+<hole x="-20" y="5" drill="3"/>
+<hole x="-10" y="5" drill="3"/>
+<hole x="-65" y="55" drill="3"/>
+<hole x="-30" y="55" drill="3"/>
+<hole x="-20" y="55" drill="3"/>
+<hole x="-10" y="55" drill="3"/>
+<hole x="-19" y="41" drill="3"/>
+<hole x="-19" y="19" drill="3"/>
+<wire x1="5" y1="0" x2="5" y2="60" width="0" layer="20"/>
+<wire x1="5" y1="60" x2="80" y2="60" width="0" layer="20"/>
+<wire x1="80" y1="60" x2="80" y2="0" width="0" layer="20"/>
+<wire x1="80" y1="0" x2="5" y2="0" width="0" layer="20"/>
+<hole x="10" y="55" drill="3"/>
+<hole x="20" y="55" drill="3"/>
+<hole x="30" y="55" drill="3"/>
+<hole x="40" y="55" drill="3"/>
+<hole x="10" y="5" drill="3"/>
+<hole x="20" y="5" drill="3"/>
+<hole x="30" y="5" drill="3"/>
+<hole x="40" y="5" drill="3"/>
+<hole x="40" y="40" drill="3"/>
+<hole x="40" y="20" drill="3"/>
+<hole x="19" y="19" drill="3"/>
+<hole x="19" y="41" drill="3"/>
+<hole x="75" y="55" drill="3"/>
+<hole x="75" y="5" drill="3"/>
+<hole x="75" y="40" drill="3"/>
+<hole x="75" y="20" drill="3"/>
+<hole x="60" y="5" drill="3"/>
+<hole x="50" y="55" drill="3"/>
+<hole x="60" y="55" drill="3"/>
+<hole x="60" y="15" drill="3"/>
+<hole x="60" y="45" drill="3"/>
+<hole x="-40" y="5" drill="3"/>
+<hole x="-50" y="5" drill="3"/>
+<hole x="-40" y="40" drill="3"/>
+<hole x="-65" y="40" drill="3"/>
+<hole x="-65" y="20" drill="3"/>
+<hole x="-50" y="20" drill="3"/>
+<hole x="-40" y="20" drill="3"/>
+<hole x="-50" y="40" drill="3"/>
+<hole x="-50" y="55" drill="3"/>
+<hole x="-40" y="55" drill="3"/>
+<circle x="-65" y="5" radius="1.5" width="0" layer="20"/>
+<circle x="-50" y="5" radius="1.5" width="0" layer="20"/>
+<circle x="-40" y="5" radius="1.5" width="0" layer="20"/>
+<circle x="-30" y="5" radius="1.5" width="0" layer="20"/>
+<circle x="-20" y="5" radius="1.5" width="0" layer="20"/>
+<circle x="-10" y="5" radius="1.5" width="0" layer="20"/>
+<circle x="-19" y="19" radius="1.5" width="0" layer="20"/>
+<circle x="-40" y="20" radius="1.5" width="0" layer="20"/>
+<circle x="-50" y="20" radius="1.5" width="0" layer="20"/>
+<circle x="-65" y="20" radius="1.5" width="0" layer="20"/>
+<circle x="-65" y="40" radius="1.5" width="0" layer="20"/>
+<circle x="-50" y="40" radius="1.5" width="0" layer="20"/>
+<circle x="-65" y="55" radius="1.5" width="0" layer="20"/>
+<circle x="-50" y="55" radius="1.5" width="0" layer="20"/>
+<circle x="-40" y="55" radius="1.5" width="0" layer="20"/>
+<circle x="-30" y="55" radius="1.5" width="0" layer="20"/>
+<circle x="-40" y="40" radius="1.5" width="0" layer="20"/>
+<circle x="-19" y="41" radius="1.5" width="0" layer="20"/>
+<circle x="-20" y="55" radius="1.5" width="0" layer="20"/>
+<circle x="-10" y="55" radius="1.5" width="0" layer="20"/>
+<circle x="10" y="55" radius="1.5" width="0" layer="20"/>
+<circle x="20" y="55" radius="1.5" width="0" layer="20"/>
+<circle x="30" y="55" radius="1.5" width="0" layer="20"/>
+<circle x="19" y="41" radius="1.5" width="0" layer="20"/>
+<circle x="40" y="55" radius="1.5" width="0" layer="20"/>
+<circle x="40" y="40" radius="1.5" width="0" layer="20"/>
+<circle x="50" y="55" radius="1.5" width="0" layer="20"/>
+<circle x="60" y="55" radius="1.5" width="0" layer="20"/>
+<circle x="75" y="55" radius="1.5" width="0" layer="20"/>
+<circle x="75" y="40" radius="1.5" width="0" layer="20"/>
+<circle x="60" y="45" radius="1.5" width="0" layer="20"/>
+<circle x="75" y="20" radius="1.5" width="0" layer="20"/>
+<circle x="75" y="5" radius="1.5" width="0" layer="20"/>
+<circle x="60" y="5" radius="1.5" width="0" layer="20"/>
+<circle x="60" y="15" radius="1.5" width="0" layer="20"/>
+<circle x="40" y="20" radius="1.5" width="0" layer="20"/>
+<circle x="19" y="19" radius="1.5" width="0" layer="20"/>
+<circle x="40" y="5" radius="1.5" width="0" layer="20"/>
+<circle x="30" y="5" radius="1.5" width="0" layer="20"/>
+<circle x="20" y="5" radius="1.5" width="0" layer="20"/>
+<circle x="10" y="5" radius="1.5" width="0" layer="20"/>
 </plain>
 <libraries>
 <library name="Silkscreen">
@@ -935,259 +984,267 @@ design rules under a new name.
 </pass>
 </autorouter>
 <elements>
-<element name="E$1" library="Silkscreen" package="JS_5MM" value="" x="76" y="50" smashed="yes"/>
+<element name="E$1" library="Silkscreen" package="JS_5MM" value="" x="79" y="50" smashed="yes"/>
 </elements>
 <signals>
 <signal name="GND">
 <polygon width="0" layer="1" pour="cutout">
-<vertex x="-42" y="32.5135"/>
-<vertex x="-42" y="60"/>
-<vertex x="-2" y="60"/>
-<vertex x="-2" y="51.8125"/>
-<vertex x="-29.434" y="51.8125"/>
-<vertex x="-29.434" y="40.5895"/>
-<vertex x="-19.2" y="40.5895"/>
-<vertex x="-19.2" y="47.6395"/>
-<vertex x="-8.905" y="47.6395" curve="-90"/>
-<vertex x="-8.147" y="46.8815"/>
-<vertex x="-8.147" y="42.8895"/>
-<vertex x="-12.11" y="42.8895"/>
-<vertex x="-12.11" y="37.0025"/>
-<vertex x="-14.38" y="37.0025"/>
-<vertex x="-14.38" y="31.8425"/>
-<vertex x="-21.75" y="31.8425"/>
-<vertex x="-21.75" y="32.5135"/>
+<vertex x="-70" y="32.5135"/>
+<vertex x="-70" y="60"/>
+<vertex x="-5" y="60"/>
+<vertex x="-5" y="51.8125"/>
+<vertex x="-32.434" y="51.8125"/>
+<vertex x="-32.434" y="40.5895"/>
+<vertex x="-22.2" y="40.5895"/>
+<vertex x="-22.2" y="47.6395"/>
+<vertex x="-11.905" y="47.6395" curve="-90"/>
+<vertex x="-11.147" y="46.8815"/>
+<vertex x="-11.147" y="42.8895"/>
+<vertex x="-15.11" y="42.8895"/>
+<vertex x="-15.11" y="37.0025"/>
+<vertex x="-17.38" y="37.0025"/>
+<vertex x="-17.38" y="31.8425"/>
+<vertex x="-24.75" y="31.8425"/>
+<vertex x="-24.75" y="32.5135"/>
 </polygon>
 <polygon width="0" layer="1" pour="cutout">
-<vertex x="-42" y="27.4865"/>
-<vertex x="-42" y="0"/>
-<vertex x="-2" y="0"/>
-<vertex x="-2" y="8.1875"/>
-<vertex x="-29.434" y="8.1875"/>
-<vertex x="-29.434" y="19.4105"/>
-<vertex x="-19.2" y="19.4105"/>
-<vertex x="-19.2" y="12.3605"/>
-<vertex x="-8.905" y="12.3605" curve="90"/>
-<vertex x="-8.147" y="13.1185"/>
-<vertex x="-8.147" y="17.1105"/>
-<vertex x="-12.11" y="17.1105"/>
-<vertex x="-12.11" y="22.9975"/>
-<vertex x="-14.38" y="22.9975"/>
-<vertex x="-14.38" y="28.1575"/>
-<vertex x="-21.75" y="28.1575"/>
-<vertex x="-21.75" y="27.4865"/>
+<vertex x="-70" y="27.4865"/>
+<vertex x="-70" y="0"/>
+<vertex x="-5" y="0"/>
+<vertex x="-5" y="8.1875"/>
+<vertex x="-32.434" y="8.1875"/>
+<vertex x="-32.434" y="19.4105"/>
+<vertex x="-22.2" y="19.4105"/>
+<vertex x="-22.2" y="12.3605"/>
+<vertex x="-11.905" y="12.3605" curve="90"/>
+<vertex x="-11.147" y="13.1185"/>
+<vertex x="-11.147" y="17.1105"/>
+<vertex x="-15.11" y="17.1105"/>
+<vertex x="-15.11" y="22.9975"/>
+<vertex x="-17.38" y="22.9975"/>
+<vertex x="-17.38" y="28.1575"/>
+<vertex x="-24.75" y="28.1575"/>
+<vertex x="-24.75" y="27.4865"/>
 </polygon>
 <polygon width="0" layer="1" pour="cutout">
-<vertex x="2" y="0"/>
-<vertex x="42" y="0"/>
-<vertex x="42" y="27.5"/>
-<vertex x="22.829" y="27.5"/>
-<vertex x="22.829" y="25.84425"/>
-<vertex x="17.955" y="25.84425"/>
-<vertex x="17.955" y="22.31725"/>
-<vertex x="12.735" y="22.31725"/>
-<vertex x="12.735" y="21.55525"/>
-<vertex x="6.4" y="21.55525"/>
-<vertex x="6.4" y="14.79325" curve="90"/>
-<vertex x="7.4" y="13.79325"/>
-<vertex x="19.896490625" y="13.79325"/>
-<vertex x="19.896490625" y="21.00325"/>
-<vertex x="31.7959" y="21.00325"/>
-<vertex x="31.7959" y="9.78125"/>
-<vertex x="2" y="9.78125"/>
+<vertex x="5" y="0"/>
+<vertex x="45" y="0"/>
+<vertex x="45" y="27.5"/>
+<vertex x="25.829" y="27.5"/>
+<vertex x="25.829" y="25.84425"/>
+<vertex x="20.955" y="25.84425"/>
+<vertex x="20.955" y="22.31725"/>
+<vertex x="15.735" y="22.31725"/>
+<vertex x="15.735" y="21.55525"/>
+<vertex x="9.4" y="21.55525"/>
+<vertex x="9.4" y="14.79325" curve="90"/>
+<vertex x="10.4" y="13.79325"/>
+<vertex x="22.896490625" y="13.79325"/>
+<vertex x="22.896490625" y="21.00325"/>
+<vertex x="34.7959" y="21.00325"/>
+<vertex x="34.7959" y="9.78125"/>
+<vertex x="5" y="9.78125"/>
 </polygon>
 <polygon width="0" layer="1" pour="cutout">
-<vertex x="47" y="0"/>
-<vertex x="47" y="21.821"/>
-<vertex x="63.715" y="21.821"/>
-<vertex x="63.715" y="11"/>
-<vertex x="68.715" y="11"/>
-<vertex x="68.715" y="27.5"/>
-<vertex x="78" y="27.5"/>
-<vertex x="78" y="0"/>
+<vertex x="50" y="0"/>
+<vertex x="50" y="21.821"/>
+<vertex x="66.715" y="21.821"/>
+<vertex x="66.715" y="11"/>
+<vertex x="71.715" y="11"/>
+<vertex x="71.715" y="27.5"/>
+<vertex x="80" y="27.5"/>
+<vertex x="80" y="0"/>
 </polygon>
 <polygon width="0" layer="1" pour="cutout">
-<vertex x="78" y="32.5"/>
-<vertex x="68.715" y="32.5"/>
-<vertex x="68.715" y="60"/>
-<vertex x="78" y="60"/>
+<vertex x="80" y="32.5"/>
+<vertex x="71.715" y="32.5"/>
+<vertex x="71.715" y="60"/>
+<vertex x="80" y="60"/>
 </polygon>
 </signal>
 <signal name="IN">
 <polygon width="0" layer="1" pour="cutout">
-<vertex x="-42" y="30.8395"/>
-<vertex x="-42" y="29.1605"/>
-<vertex x="-22.38" y="29.1605"/>
-<vertex x="-22.38" y="30.8395"/>
+<vertex x="-47.5" y="30.8395"/>
+<vertex x="-47.5" y="29.1605"/>
+<vertex x="-25.38" y="29.1605"/>
+<vertex x="-25.38" y="30.8395"/>
 </polygon>
 </signal>
 <signal name="GATE">
 <polygon width="0" layer="1" pour="cutout">
-<vertex x="-21.655" y="29.1605"/>
-<vertex x="-11.875" y="29.1605"/>
-<vertex x="-11.875" y="24.2005"/>
-<vertex x="-9.785" y="24.2005"/>
-<vertex x="-9.785" y="20.4665"/>
-<vertex x="-8.272" y="20.4665"/>
-<vertex x="-8.272" y="18.7945"/>
-<vertex x="-2" y="18.7945"/>
-<vertex x="-2" y="41.2055"/>
-<vertex x="-8.272" y="41.2055"/>
-<vertex x="-8.272" y="39.5335"/>
-<vertex x="-9.785" y="39.5335"/>
-<vertex x="-9.785" y="35.8"/>
-<vertex x="-11.875" y="35.8"/>
-<vertex x="-11.875" y="30.8395"/>
-<vertex x="-21.655" y="30.8395"/>
+<vertex x="-24.655" y="29.1605"/>
+<vertex x="-14.875" y="29.1605"/>
+<vertex x="-14.875" y="24.2005"/>
+<vertex x="-12.785" y="24.2005"/>
+<vertex x="-12.785" y="20.4665"/>
+<vertex x="-11.272" y="20.4665"/>
+<vertex x="-11.272" y="18.7945"/>
+<vertex x="-5.5" y="18.7945"/>
+<vertex x="-5.5" y="41.2055"/>
+<vertex x="-11.272" y="41.2055"/>
+<vertex x="-11.272" y="39.5335"/>
+<vertex x="-12.785" y="39.5335"/>
+<vertex x="-12.785" y="35.8"/>
+<vertex x="-14.875" y="35.8"/>
+<vertex x="-14.875" y="30.8395"/>
+<vertex x="-24.655" y="30.8395"/>
 </polygon>
 </signal>
 <signal name="BIAS">
 <polygon width="0" layer="1" pour="cutout">
-<vertex x="-27.684" y="17.7335"/>
-<vertex x="-27.684" y="9.8625"/>
-<vertex x="-8.258" y="9.8625" curve="90"/>
-<vertex x="-5" y="13.1205"/>
-<vertex x="-5" y="18"/>
-<vertex x="-6.5" y="18"/>
-<vertex x="-6.5" y="13.1205" curve="-90"/>
-<vertex x="-8.258" y="11.3625"/>
-<vertex x="-21.104" y="11.3625"/>
-<vertex x="-21.104" y="17.7335"/>
+<vertex x="-30.684" y="17.7335"/>
+<vertex x="-30.684" y="9.8625"/>
+<vertex x="-11.258" y="9.8625" curve="90"/>
+<vertex x="-8" y="13.1205"/>
+<vertex x="-8" y="18"/>
+<vertex x="-9.5" y="18"/>
+<vertex x="-9.5" y="13.1205" curve="-90"/>
+<vertex x="-11.258" y="11.3625"/>
+<vertex x="-24.104" y="11.3625"/>
+<vertex x="-24.104" y="17.7335"/>
 </polygon>
 <polygon width="0" layer="1" pour="cutout">
-<vertex x="5.2" y="36.8555"/>
-<vertex x="5.2" y="45.26075" curve="-90"/>
-<vertex x="6.958" y="47.01875"/>
-<vertex x="21.335" y="47.01875"/>
-<vertex x="21.335" y="39.97575"/>
-<vertex x="30" y="39.97575"/>
-<vertex x="30" y="48.51875"/>
-<vertex x="6.958" y="48.51875" curve="90"/>
-<vertex x="3.7" y="45.26075"/>
-<vertex x="3.7" y="36.8555"/>
+<vertex x="8.2" y="36.8555"/>
+<vertex x="8.2" y="45.26075" curve="-90"/>
+<vertex x="9.958" y="47.01875"/>
+<vertex x="24.335" y="47.01875"/>
+<vertex x="24.335" y="39.97575"/>
+<vertex x="33" y="39.97575"/>
+<vertex x="33" y="48.51875"/>
+<vertex x="9.958" y="48.51875" curve="90"/>
+<vertex x="6.7" y="45.26075"/>
+<vertex x="6.7" y="36.8555"/>
 </polygon>
 </signal>
 <signal name="BIAS1">
 <polygon width="0" layer="1" pour="cutout">
-<vertex x="-27.684" y="42.2665"/>
-<vertex x="-27.684" y="50.1375"/>
-<vertex x="-8.258" y="50.1375" curve="-90"/>
-<vertex x="-5" y="46.8795"/>
-<vertex x="-5" y="42"/>
-<vertex x="-6.5" y="42"/>
-<vertex x="-6.5" y="46.8795" curve="90"/>
-<vertex x="-8.258" y="48.6375"/>
-<vertex x="-21.104" y="48.6375"/>
-<vertex x="-21.104" y="42.2665"/>
+<vertex x="-30.684" y="42.2665"/>
+<vertex x="-30.684" y="50.1375"/>
+<vertex x="-11.258" y="50.1375" curve="-90"/>
+<vertex x="-8" y="46.8795"/>
+<vertex x="-8" y="42"/>
+<vertex x="-9.5" y="42"/>
+<vertex x="-9.5" y="46.8795" curve="90"/>
+<vertex x="-11.258" y="48.6375"/>
+<vertex x="-24.104" y="48.6375"/>
+<vertex x="-24.104" y="42.2665"/>
 </polygon>
 </signal>
 <signal name="NEGATIVE">
 <polygon width="0" layer="1">
-<vertex x="-42" y="0"/>
-<vertex x="-2" y="0"/>
-<vertex x="-2" y="60"/>
-<vertex x="-42" y="60"/>
+<vertex x="-70" y="0"/>
+<vertex x="-5" y="0"/>
+<vertex x="-5" y="60"/>
+<vertex x="-70" y="60"/>
 </polygon>
 <polygon width="0" layer="1">
-<vertex x="2" y="0"/>
-<vertex x="2" y="60"/>
-<vertex x="78" y="60"/>
-<vertex x="78" y="0"/>
+<vertex x="5" y="0"/>
+<vertex x="5" y="60"/>
+<vertex x="80" y="60"/>
+<vertex x="80" y="0"/>
 </polygon>
 </signal>
 <signal name="IN1">
 <polygon width="0" layer="1" pour="cutout">
-<vertex x="78" y="29.1605"/>
-<vertex x="78" y="30.8395"/>
-<vertex x="26.36" y="30.8395"/>
-<vertex x="26.36" y="29.1605"/>
+<vertex x="80" y="29.1605"/>
+<vertex x="80" y="30.8395"/>
+<vertex x="29.36" y="30.8395"/>
+<vertex x="29.36" y="29.1605"/>
 </polygon>
 </signal>
 <signal name="GND1">
 <polygon width="0" layer="1" pour="cutout">
-<vertex x="2" y="60"/>
-<vertex x="63.715" y="60"/>
-<vertex x="63.715" y="38.179"/>
-<vertex x="47" y="38.179"/>
-<vertex x="47" y="49"/>
-<vertex x="42" y="49"/>
-<vertex x="42" y="32.5"/>
-<vertex x="22.829" y="32.5"/>
-<vertex x="22.829" y="34.15575"/>
-<vertex x="17.955" y="34.15575"/>
-<vertex x="17.955" y="37.68275"/>
-<vertex x="12.735" y="37.68275"/>
-<vertex x="12.735" y="38.44475"/>
-<vertex x="6.4" y="38.44475"/>
-<vertex x="6.4" y="45.20675" curve="-90"/>
-<vertex x="7.4" y="46.20675"/>
-<vertex x="19.896490625" y="46.20675"/>
-<vertex x="19.896490625" y="38.99675"/>
-<vertex x="31.7959" y="38.99675"/>
-<vertex x="31.7959" y="50.21875"/>
-<vertex x="2" y="50.21875"/>
+<vertex x="5" y="60"/>
+<vertex x="66.715" y="60"/>
+<vertex x="66.715" y="38.179"/>
+<vertex x="50" y="38.179"/>
+<vertex x="50" y="49"/>
+<vertex x="45" y="49"/>
+<vertex x="45" y="32.5"/>
+<vertex x="25.829" y="32.5"/>
+<vertex x="25.829" y="34.15575"/>
+<vertex x="20.955" y="34.15575"/>
+<vertex x="20.955" y="37.68275"/>
+<vertex x="15.735" y="37.68275"/>
+<vertex x="15.735" y="38.44475"/>
+<vertex x="9.4" y="38.44475"/>
+<vertex x="9.4" y="45.20675" curve="-90"/>
+<vertex x="10.4" y="46.20675"/>
+<vertex x="22.896490625" y="46.20675"/>
+<vertex x="22.896490625" y="38.99675"/>
+<vertex x="34.7959" y="38.99675"/>
+<vertex x="34.7959" y="50.21875"/>
+<vertex x="5" y="50.21875"/>
 </polygon>
 </signal>
 <signal name="DRAIN">
 <polygon width="0" layer="1" pour="cutout">
-<vertex x="2" y="23.1445"/>
-<vertex x="11.655" y="23.1445"/>
-<vertex x="11.655" y="23.9965"/>
-<vertex x="15.397" y="23.9965"/>
-<vertex x="15.397" y="27.5825"/>
-<vertex x="20.796" y="27.5825"/>
-<vertex x="20.796" y="29.1605"/>
-<vertex x="25.629" y="29.1605"/>
-<vertex x="25.629" y="30.8395"/>
-<vertex x="20.796" y="30.8395"/>
-<vertex x="20.796" y="32.4175"/>
-<vertex x="15.397" y="32.4175"/>
-<vertex x="15.397" y="36.0025"/>
-<vertex x="11.655" y="36.0025"/>
-<vertex x="11.655" y="36.8555"/>
-<vertex x="2" y="36.8555"/>
+<vertex x="5.5" y="23.1445"/>
+<vertex x="14.655" y="23.1445"/>
+<vertex x="14.655" y="23.9965"/>
+<vertex x="18.397" y="23.9965"/>
+<vertex x="18.397" y="27.5825"/>
+<vertex x="23.796" y="27.5825"/>
+<vertex x="23.796" y="29.1605"/>
+<vertex x="28.629" y="29.1605"/>
+<vertex x="28.629" y="30.8395"/>
+<vertex x="23.796" y="30.8395"/>
+<vertex x="23.796" y="32.4175"/>
+<vertex x="18.397" y="32.4175"/>
+<vertex x="18.397" y="36.0025"/>
+<vertex x="14.655" y="36.0025"/>
+<vertex x="14.655" y="36.8555"/>
+<vertex x="5.5" y="36.8555"/>
 </polygon>
 </signal>
 <signal name="BIAS2">
 <polygon width="0" layer="1" pour="cutout">
-<vertex x="5.2" y="23.1445"/>
-<vertex x="5.2" y="14.73925" curve="90"/>
-<vertex x="6.958" y="12.98125"/>
-<vertex x="21.335" y="12.98125"/>
-<vertex x="21.335" y="20.02425"/>
-<vertex x="30" y="20.02425"/>
-<vertex x="30" y="11.48125"/>
-<vertex x="6.958" y="11.48125" curve="-90"/>
-<vertex x="3.7" y="14.73925"/>
-<vertex x="3.7" y="23.1445"/>
+<vertex x="8.2" y="23.1445"/>
+<vertex x="8.2" y="14.73925" curve="90"/>
+<vertex x="9.958" y="12.98125"/>
+<vertex x="24.335" y="12.98125"/>
+<vertex x="24.335" y="20.02425"/>
+<vertex x="33" y="20.02425"/>
+<vertex x="33" y="11.48125"/>
+<vertex x="9.958" y="11.48125" curve="-90"/>
+<vertex x="6.7" y="14.73925"/>
+<vertex x="6.7" y="23.1445"/>
 </polygon>
 </signal>
 <signal name="FWD">
 <polygon width="0" layer="1" pour="cutout">
-<vertex x="43.6605" y="0"/>
-<vertex x="43.6605" y="23.303"/>
-<vertex x="45.518" y="25.1605"/>
-<vertex x="65.518" y="25.1605"/>
-<vertex x="67.0545" y="23.303"/>
-<vertex x="67.0545" y="12.6605"/>
-<vertex x="65.3755" y="12.6605"/>
-<vertex x="65.3755" y="23.4815"/>
-<vertex x="45.3395" y="23.4815"/>
-<vertex x="45.3395" y="0"/>
+<vertex x="46.6605" y="0"/>
+<vertex x="46.6605" y="23.303"/>
+<vertex x="48.518" y="25.1605"/>
+<vertex x="68.518" y="25.1605"/>
+<vertex x="70.0545" y="23.303"/>
+<vertex x="70.0545" y="12.6605"/>
+<vertex x="68.3755" y="12.6605"/>
+<vertex x="68.3755" y="23.4815"/>
+<vertex x="48.3395" y="23.4815"/>
+<vertex x="48.3395" y="0"/>
 </polygon>
 </signal>
 <signal name="FWD1">
 <polygon width="0" layer="1" pour="cutout">
-<vertex x="67.0545" y="60"/>
-<vertex x="67.0545" y="36.697"/>
-<vertex x="65.197" y="34.8395"/>
-<vertex x="45.197" y="34.8395"/>
-<vertex x="43.6605" y="36.697"/>
-<vertex x="43.6605" y="47.3395"/>
-<vertex x="45.3395" y="47.3395"/>
-<vertex x="45.3395" y="36.5185"/>
-<vertex x="65.3755" y="36.5185"/>
-<vertex x="65.3755" y="60"/>
+<vertex x="70.0545" y="60"/>
+<vertex x="70.0545" y="36.697"/>
+<vertex x="68.197" y="34.8395"/>
+<vertex x="48.197" y="34.8395"/>
+<vertex x="46.6605" y="36.697"/>
+<vertex x="46.6605" y="47.3395"/>
+<vertex x="48.3395" y="47.3395"/>
+<vertex x="48.3395" y="36.5185"/>
+<vertex x="68.3755" y="36.5185"/>
+<vertex x="68.3755" y="60"/>
+</polygon>
+</signal>
+<signal name="IN2">
+<polygon width="0" layer="1" pour="cutout">
+<vertex x="-70" y="30.8395"/>
+<vertex x="-70" y="29.1605"/>
+<vertex x="-48.5" y="29.1605"/>
+<vertex x="-48.5" y="30.8395"/>
 </polygon>
 </signal>
 </signals>

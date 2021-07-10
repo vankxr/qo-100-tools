@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="1" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="5" altunitdist="mil" altunit="mil"/>
+<grid distance="0.5" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="5" altunitdist="mil" altunit="mil"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="16" fill="1" visible="no" active="no"/>
@@ -208,6 +208,22 @@
 <hole x="75" y="25" drill="3"/>
 <hole x="55" y="5" drill="3"/>
 <hole x="39" y="22" drill="3"/>
+<circle x="9" y="18.5" radius="1.5" width="0" layer="20"/>
+<circle x="15" y="30" radius="1.5" width="0" layer="20"/>
+<circle x="25" y="35" radius="1.5" width="0" layer="20"/>
+<circle x="35" y="35" radius="1.5" width="0" layer="20"/>
+<circle x="39" y="22" radius="1.5" width="0" layer="20"/>
+<circle x="55" y="25" radius="1.5" width="0" layer="20"/>
+<circle x="65" y="25" radius="1.5" width="0" layer="20"/>
+<circle x="75" y="25" radius="1.5" width="0" layer="20"/>
+<circle x="75" y="5" radius="1.5" width="0" layer="20"/>
+<circle x="65" y="5" radius="1.5" width="0" layer="20"/>
+<circle x="55" y="5" radius="1.5" width="0" layer="20"/>
+<circle x="35" y="5" radius="1.5" width="0" layer="20"/>
+<circle x="25" y="5" radius="1.5" width="0" layer="20"/>
+<circle x="15" y="5" radius="1.5" width="0" layer="20"/>
+<circle x="28.5" y="18.5" radius="1.5" width="0" layer="20"/>
+<circle x="5" y="5" radius="1.5" width="0" layer="20"/>
 </plain>
 <libraries>
 <library name="Silkscreen">
