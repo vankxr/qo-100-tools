@@ -9,8 +9,9 @@ FILE_DESCRIPTION(
 /* implementation_level */ '2;1');
 
 FILE_NAME(
-/* name */ 'D:/Development/qo-100-tools/models/pa-case/pa-case.step',
-/* time_stamp */ '2021-06-07T19:46:05+01:00',
+/* name */ 
+'D:/Development/qo-100-tools/models/pa-case/Caixa PA 250W v10.step',
+/* time_stamp */ '2021-06-09T20:36:17+01:00',
 /* author */ (''),
 /* organization */ (''),
 /* preprocessor_version */ 'ST-DEVELOPER v18.1',
@@ -8719,16 +8720,16 @@ SOLID_ANGLE_UNIT()
 #8619=PRODUCT_DEFINITION_SHAPE('',$,#8622);
 #8620=SHAPE_REPRESENTATION('',(#5014),#8612);
 #8621=PRODUCT_DEFINITION_CONTEXT('part definition',#8626,'design');
-#8622=PRODUCT_DEFINITION('Caixa PA 250W','Caixa PA 250W v8',#8623,#8621);
+#8622=PRODUCT_DEFINITION('Caixa PA 250W','Caixa PA 250W v10',#8623,#8621);
 #8623=PRODUCT_DEFINITION_FORMATION('',$,#8628);
-#8624=PRODUCT_RELATED_PRODUCT_CATEGORY('Caixa PA 250W v8',
-'Caixa PA 250W v8',(#8628));
+#8624=PRODUCT_RELATED_PRODUCT_CATEGORY('Caixa PA 250W v10',
+'Caixa PA 250W v10',(#8628));
 #8625=APPLICATION_PROTOCOL_DEFINITION('international standard',
 'automotive_design',2009,#8626);
 #8626=APPLICATION_CONTEXT(
 'Core Data for Automotive Mechanical Design Process');
 #8627=PRODUCT_CONTEXT('part definition',#8626,'mechanical');
-#8628=PRODUCT('Caixa PA 250W','Caixa PA 250W v8',$,(#8627));
+#8628=PRODUCT('Caixa PA 250W','Caixa PA 250W v10',$,(#8627));
 #8629=PRESENTATION_STYLE_ASSIGNMENT((#8632));
 #8630=PRESENTATION_STYLE_ASSIGNMENT((#8633));
 #8631=PRESENTATION_STYLE_ASSIGNMENT((#8634));
