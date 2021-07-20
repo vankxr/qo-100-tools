@@ -150,7 +150,7 @@ class ZMOD4510 extends I2CDevice
     {
         return this.read(0x94);
     }
-    async get_general_purpose()
+    async get_prod_data()
     {
         return this.read(0x26, 9);
     }
@@ -159,6 +159,10 @@ class ZMOD4510 extends I2CDevice
         let buf = await this.read(0x00, 2);
 
         return buf.readUInt16BE(0);
+    }
+    async get_tracking_number()
+    {
+        return this.read(0x3A, 6);
     }
 
     async get_adc_results()

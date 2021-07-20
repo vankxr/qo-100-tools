@@ -1780,6 +1780,14 @@ async function main()
 
         cl.tprintln("green", "ZMOD4510", "ZMOD4510 #%d found!", i);
 
+        let tracking = await sensor.get_tracking_number();
+        let tracking_str = "";
+
+        for(let byte of tracking)
+            tracking_str += byte.toString(16).toUpperCase();
+
+        cl.tprintln(null, "ZMOD4510", "  Tracking number: %s", tracking_str);
+
         await sensor.config();
 
         let oaq = new OAQ(sensor);

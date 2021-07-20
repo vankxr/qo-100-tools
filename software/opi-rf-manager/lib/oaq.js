@@ -198,21 +198,21 @@ class OAQ
 
     async config()
     {
-        let gp = await this.sensor.get_general_purpose();
+        let prod_data = await this.sensor.get_prod_data();
 
-        if(!Buffer.isBuffer(gp) && !Array.isArray(gp))
-            throw new Error("Invalid sensor general purpose data");
+        if(!Buffer.isBuffer(prod_data) && !Array.isArray(prod_data))
+            throw new Error("Invalid sensor production data");
 
-        if(gp.length !== 9)
-            throw new Error("Invalid sensor general purpose data");
+        if(prod_data.length !== 9)
+            throw new Error("Invalid sensor production data");
 
-        this.trim_data_version = gp[8];
+        this.trim_data_version = prod_data[8];
 
-        let v3 = Math.pow(10, (((gp[0] << 8) | gp[1]) / 65536) * 5 + 4);
-        let v4 = Math.pow(10, (((gp[2] << 8) | gp[3]) / 65536) * 4 - 1.5);
+        let v3 = Math.pow(10, (((prod_data[0] << 8) | prod_data[1]) / 65536) * 5 + 4);
+        let v4 = Math.pow(10, (((prod_data[2] << 8) | prod_data[3]) / 65536) * 4 - 1.5);
 
         this.trim_b = v4 * v3;
-        this.trim_beta2 = (((gp[4] << 8) | gp[5]) / 65536) * 3;
+        this.trim_beta2 = (((prod_data[4] << 8) | prod_data[5]) / 65536) * 3;
         this.conc_no2 = 0;
         this.conc_o3 = 0;
         this.aqi_no2 = 0;

@@ -52,7 +52,7 @@ class LNBController extends I2CDevice
     {
         let buf = await this.read(0xF8, 8);
 
-        return buf.readUInt32LE(4) + "-" + buf.readUInt32LE(0);
+        return buf.readUInt32LE(4).toString(16).toUpperCase() + "-" + buf.readUInt32LE(0).toString(16).toUpperCase();
     }
     async get_software_version()
     {
