@@ -323,6 +323,9 @@ class OAQ
 
         this.prob_no2 += (mult - this.prob_no2) * this.measurement_data.d_class_m1;
         this.aqi = (this.aqi_no2 - this.aqi_o3) * this.prob_no2 + this.aqi_o3;
+
+        if(this.aqi < 0)
+            this.aqi = 0;
     }
 
     async sensor_data_ready_callback()
@@ -403,7 +406,7 @@ class OAQ
     }
     is_stable()
     {
-        return this.aqi >= 0 && this.stabilization_sample == 0;
+        return this.stabilization_sample == 0;
     }
 }
 

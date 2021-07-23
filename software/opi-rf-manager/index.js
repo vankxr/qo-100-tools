@@ -4,10 +4,11 @@ const ReadLine = require('readline');
 const Crypto = require("crypto");
 const SSH2 = require("ssh2");
 const ShellQuote = require("shell-quote");
+const Geolib = require("geolib");
 const GPIO = require("./lib/gpio");
 const { I2C, I2CDevice } = require("./lib/i2c");
 const { OneWire, OneWireDevice } = require("./lib/onewire");
-const IPMA = require("./lib/ipma");
+const { IPMA, IPMAStation, IPMALocation } = require("./lib/ipma");
 const WBSpectrumMonitor = require("./lib/wb_spectrum_monitor");
 const OAQ = require("./lib/oaq");
 const HPPSU = require("./lib/hppsu");
@@ -31,8 +32,10 @@ const LogFileManager = require("./util/log_file_manager");
 const Printer = require("./util/printer");
 const delay = require("./util/delay");
 
+const gs_location = JSON.parse(FileSystem.readFileSync("/root/gs_location.json")); // TODO: Get real location via GPS
 let cl;
-let ipma;
+let ipma_station;
+let ipma_location;
 let wb_spectrum_monitor;
 let wb_signals = {};
 const gpios = {};
@@ -1372,61 +1375,58 @@ async function ipma_init()
 {
     try
     {
-        let ipma_station = null;
-        let ipma_location = null;
-
+        let ipma_station_distance = Infinity;
         let ipma_stations = await IPMA.fetch_stations();
 
         for(const station of ipma_stations)
         {
-            if(!station.properties)
-                continue;
+            let station_distance = Geolib.getDistance(gs_location, station.location, 1);
 
-            if(!station.properties.idEstacao)
-                continue;
-
-            if(!station.properties.localEstacao)
-                continue;
-
-            //if(station.properties.localEstacao.indexOf("Leiria (Aeródromo)") === 0)
-            if(station.properties.localEstacao.indexOf("Lisboa (G.Coutinho)") === 0)
+            if(station_distance < ipma_station_distance)
             {
+                let obs_data = await station.get_observation_data();
+
+                if(!obs_data.length)
+                    continue;
+
+                let avg_missing_data = 0;
+
+                for(const data of obs_data)
+                    avg_missing_data += data.missing_data.length;
+
+                avg_missing_data /= obs_data.length;
+
+                if(avg_missing_data >= 1)
+                    continue;
+
+                ipma_station_distance = station_distance;
                 ipma_station = station;
-
-                cl.tprintln("green", "IPMA", "IPMA station \"" + station.properties.localEstacao + "\" found!");
-
-                break;
             }
         }
 
         if(!ipma_station)
-            cl.tprintln("yellow", "IPMA", "IPMA station not found!");
+            return cl.tprintln("yellow", "IPMA", "IPMA station not found!");
 
+        cl.tprintln("green", "IPMA", "Closest IPMA station \"" + ipma_station.name + "\" found " + ipma_station_distance + " meters away!");
+
+        let ipma_location_distance = Infinity;
         let ipma_locations = await IPMA.fetch_locations();
 
         for(const location of ipma_locations)
         {
-            if(!location.globalIdLocal)
-                continue;
+            let location_distance = Geolib.getDistance(gs_location, location.location, 1);
 
-            if(!location.local)
-                continue;
-
-            //if(location.local.indexOf("Leiria") === 0)
-            if(location.local.indexOf("Lisboa") === 0)
+            if(location_distance < ipma_location_distance)
             {
+                ipma_location_distance = location_distance;
                 ipma_location = location;
-
-                cl.tprintln("green", "IPMA", "IPMA location \"" + location.local + "\" found!");
-
-                break;
             }
         }
 
         if(!ipma_location)
-            cl.tprintln("yellow", "IPMA", "IPMA location not found!");
+            return cl.tprintln("yellow", "IPMA", "IPMA location not found!");
 
-        ipma = new IPMA(ipma_location, ipma_station);
+        cl.tprintln("green", "IPMA", "Closest IPMA location \"" + ipma_location.name + "\" found " + ipma_location_distance + " meters away!");
     }
     catch (e)
     {
@@ -1439,12 +1439,12 @@ async function ipma_init()
 }
 async function ipma_fetch_sea_hpa()
 {
-    if(!(ipma instanceof IPMA))
-        cl.tprintln("red", "IPMA", "No valid IPMA instance defined");
+    if(!(ipma_station instanceof IPMAStation))
+        cl.tprintln("red", "IPMA", "No valid IPMA station instance defined");
 
     try
     {
-        let sea_hpa = (await ipma.get_latest_surface_observation()).pressao;
+        let sea_hpa = (await ipma_station.get_latest_observation_data()).pressao;
 
         if(sea_hpa < 0)
             return cl.tprintln("yellow", "IPMA", "Got invalid Sea pressure from IPMA: %d hPa", sea_hpa);
