@@ -6201,7 +6201,6 @@ Source: &lt;a href="http://www.littelfuse.com/~/media/electronics/datasheets/tvs
 <attribute name="DESIGNER" value="Joao Silva"/>
 </attributes>
 <variantdefs>
-<variantdef name="jlcpcb_assembly"/>
 </variantdefs>
 <classes>
 <class number="0" name="default" width="0" drill="0">
@@ -6219,16 +6218,12 @@ Source: &lt;a href="http://www.littelfuse.com/~/media/electronics/datasheets/tvs
 <part name="R10" library="Resistor" deviceset="RESISTOR" device="-0603" value="10 Ohms"/>
 <part name="R11" library="Resistor" deviceset="RESISTOR" device="-0603" value="DNP"/>
 <part name="C15" library="Capacitor" deviceset="CAPACITOR" device="-0402" value="47pF"/>
-<part name="RFCON1" library="RF Connector" deviceset="RFCON" device="-SMA-EDGE" value="RFCON-SMA-EDGE">
-<variant name="jlcpcb_assembly" populate="no"/>
-</part>
+<part name="RFCON1" library="RF Connector" deviceset="RFCON" device="-SMA-EDGE" value="RFCON-SMA-EDGE"/>
 <part name="GND10" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="L1" library="Inductor" deviceset="INDUCTOR" device="-0805" value="27nH"/>
 <part name="3V2" library="Supply Symbol" deviceset="3V3" device=""/>
 <part name="R9" library="Resistor" deviceset="RESISTOR" device="-0402" value="10K Ohms"/>
-<part name="BAT1" library="Battery" deviceset="CR2032" device="">
-<variant name="jlcpcb_assembly" populate="no"/>
-</part>
+<part name="BAT1" library="Battery" deviceset="CR2032" device=""/>
 <part name="D3" library="Generic Diode" deviceset="B0530W" device=""/>
 <part name="R12" library="Resistor" deviceset="RESISTOR" device="-0402" value="1K Ohms"/>
 <part name="3V3" library="Supply Symbol" deviceset="3V3" device=""/>
@@ -6263,9 +6258,7 @@ Source: &lt;a href="http://www.littelfuse.com/~/media/electronics/datasheets/tvs
 <part name="L2" library="Inductor" deviceset="INDUCTOR" device="-0402" value="560nH"/>
 <part name="L12" library="Inductor" deviceset="INDUCTOR" device="-0402" value="820nH"/>
 <part name="L22" library="Inductor" deviceset="INDUCTOR" device="-0402" value="680nH"/>
-<part name="RFCON2" library="RF Connector" deviceset="RFCON" device="-U.FL" value="RFCON-U.FL">
-<variant name="jlcpcb_assembly" populate="no"/>
-</part>
+<part name="RFCON2" library="RF Connector" deviceset="RFCON" device="-U.FL" value="RFCON-U.FL"/>
 <part name="GND38" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="C68" library="Capacitor" deviceset="CAPACITOR" device="-0402" value="100nF"/>
 <part name="C26" library="Capacitor" deviceset="CAPACITOR" device="-0402" value="1uF"/>
@@ -6299,12 +6292,8 @@ Source: &lt;a href="http://www.littelfuse.com/~/media/electronics/datasheets/tvs
 </part>
 <part name="GND1027" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="5V00005" library="Supply Symbol" deviceset="5V0" device=""/>
-<part name="J1" library="Barrel Jack" deviceset="DCJACK" device="">
-<variant name="jlcpcb_assembly" populate="no"/>
-</part>
-<part name="CON3" library="JST" deviceset="3P" device="-SH-TOP">
-<variant name="jlcpcb_assembly" populate="no"/>
-</part>
+<part name="J1" library="Barrel Jack" deviceset="DCJACK" device=""/>
+<part name="CON3" library="JST" deviceset="3P" device="-SH-TOP"/>
 <part name="GND103" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="L7" library="Inductor" deviceset="INDUCTOR" device="-0402" value="82nH"/>
 <part name="C58" library="Capacitor" deviceset="CAPACITOR" device="-0402" value="180pF"/>
@@ -6318,9 +6307,7 @@ Source: &lt;a href="http://www.littelfuse.com/~/media/electronics/datasheets/tvs
 <part name="L3" library="Inductor" deviceset="INDUCTOR" device="-0402" value="560nH"/>
 <part name="L13" library="Inductor" deviceset="INDUCTOR" device="-0402" value="820nH"/>
 <part name="L23" library="Inductor" deviceset="INDUCTOR" device="-0402" value="680nH"/>
-<part name="RFCON3" library="RF Connector" deviceset="RFCON" device="-U.FL" value="RFCON-U.FL">
-<variant name="jlcpcb_assembly" populate="no"/>
-</part>
+<part name="RFCON3" library="RF Connector" deviceset="RFCON" device="-U.FL" value="RFCON-U.FL"/>
 <part name="GND3" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="C69" library="Capacitor" deviceset="CAPACITOR" device="-0402" value="100nF"/>
 <part name="L8" library="Inductor" deviceset="INDUCTOR" device="-0402" value="82nH"/>
@@ -6335,9 +6322,7 @@ Source: &lt;a href="http://www.littelfuse.com/~/media/electronics/datasheets/tvs
 <part name="L4" library="Inductor" deviceset="INDUCTOR" device="-0402" value="220nH"/>
 <part name="L14" library="Inductor" deviceset="INDUCTOR" device="-0402" value="270nH"/>
 <part name="L24" library="Inductor" deviceset="INDUCTOR" device="-0402" value="270nH"/>
-<part name="RFCON4" library="RF Connector" deviceset="RFCON" device="-U.FL" value="RFCON-U.FL">
-<variant name="jlcpcb_assembly" populate="no"/>
-</part>
+<part name="RFCON4" library="RF Connector" deviceset="RFCON" device="-U.FL" value="RFCON-U.FL"/>
 <part name="GND37" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="C70" library="Capacitor" deviceset="CAPACITOR" device="-0402" value="100nF"/>
 <part name="L9" library="Inductor" deviceset="INDUCTOR" device="-0402" value="33nH"/>
@@ -6352,9 +6337,7 @@ Source: &lt;a href="http://www.littelfuse.com/~/media/electronics/datasheets/tvs
 <part name="L5" library="Inductor" deviceset="INDUCTOR" device="-0402" value="220nH"/>
 <part name="L15" library="Inductor" deviceset="INDUCTOR" device="-0402" value="270nH"/>
 <part name="L25" library="Inductor" deviceset="INDUCTOR" device="-0402" value="270nH"/>
-<part name="RFCON5" library="RF Connector" deviceset="RFCON" device="-U.FL" value="RFCON-U.FL">
-<variant name="jlcpcb_assembly" populate="no"/>
-</part>
+<part name="RFCON5" library="RF Connector" deviceset="RFCON" device="-U.FL" value="RFCON-U.FL"/>
 <part name="GND43" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND44" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="C71" library="Capacitor" deviceset="CAPACITOR" device="-0402" value="100nF"/>
@@ -6370,9 +6353,7 @@ Source: &lt;a href="http://www.littelfuse.com/~/media/electronics/datasheets/tvs
 <part name="L6" library="Inductor" deviceset="INDUCTOR" device="-0402" value="150nH"/>
 <part name="L16" library="Inductor" deviceset="INDUCTOR" device="-0402" value="180nH"/>
 <part name="L26" library="Inductor" deviceset="INDUCTOR" device="-0402" value="180nH"/>
-<part name="RFCON6" library="RF Connector" deviceset="RFCON" device="-U.FL" value="RFCON-U.FL">
-<variant name="jlcpcb_assembly" populate="no"/>
-</part>
+<part name="RFCON6" library="RF Connector" deviceset="RFCON" device="-U.FL" value="RFCON-U.FL"/>
 <part name="GND47" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="C72" library="Capacitor" deviceset="CAPACITOR" device="-0402" value="100nF"/>
 <part name="L11" library="Inductor" deviceset="INDUCTOR" device="-0402" value="22nH"/>
@@ -6383,9 +6364,7 @@ Source: &lt;a href="http://www.littelfuse.com/~/media/electronics/datasheets/tvs
 <part name="GND50" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="L31" library="Inductor" deviceset="INDUCTOR" device="-0402" value="82nH"/>
 <part name="L36" library="Inductor" deviceset="INDUCTOR" device="-0402" value="100nH"/>
-<part name="U4" library="U-Blox" deviceset="MAX-M8*" device="" technology="Q">
-<variant name="jlcpcb_assembly" populate="no"/>
-</part>
+<part name="U4" library="U-Blox" deviceset="MAX-M8*" device="" technology="Q"/>
 <part name="C13" library="Capacitor" deviceset="CAPACITOR" device="-0402" value="100nF"/>
 <part name="GND12" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="3V11" library="Supply Symbol" deviceset="3V3" device=""/>
@@ -6408,25 +6387,15 @@ Source: &lt;a href="http://www.littelfuse.com/~/media/electronics/datasheets/tvs
 <part name="R20" library="Resistor" deviceset="RESISTOR" device="-0402" value="510 Ohms"/>
 <part name="GND71" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND73" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="RFCON7" library="RF Connector" deviceset="RFCON" device="-U.FL" value="RFCON-U.FL">
-<variant name="jlcpcb_assembly" populate="no"/>
-</part>
+<part name="RFCON7" library="RF Connector" deviceset="RFCON" device="-U.FL" value="RFCON-U.FL"/>
 <part name="GND5" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="RFCON8" library="RF Connector" deviceset="RFCON" device="-U.FL" value="RFCON-U.FL">
-<variant name="jlcpcb_assembly" populate="no"/>
-</part>
+<part name="RFCON8" library="RF Connector" deviceset="RFCON" device="-U.FL" value="RFCON-U.FL"/>
 <part name="GND7" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="RFCON9" library="RF Connector" deviceset="RFCON" device="-U.FL" value="RFCON-U.FL">
-<variant name="jlcpcb_assembly" populate="no"/>
-</part>
+<part name="RFCON9" library="RF Connector" deviceset="RFCON" device="-U.FL" value="RFCON-U.FL"/>
 <part name="GND13" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="RFCON10" library="RF Connector" deviceset="RFCON" device="-U.FL" value="RFCON-U.FL">
-<variant name="jlcpcb_assembly" populate="no"/>
-</part>
+<part name="RFCON10" library="RF Connector" deviceset="RFCON" device="-U.FL" value="RFCON-U.FL"/>
 <part name="GND22" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="RFCON11" library="RF Connector" deviceset="RFCON" device="-U.FL" value="RFCON-U.FL">
-<variant name="jlcpcb_assembly" populate="no"/>
-</part>
+<part name="RFCON11" library="RF Connector" deviceset="RFCON" device="-U.FL" value="RFCON-U.FL"/>
 <part name="GND34" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="C34" library="Capacitor" deviceset="CAPACITOR" device="-0402" value="1uF"/>
 <part name="GND74" library="Supply Symbol" deviceset="GND" device=""/>
@@ -6588,15 +6557,11 @@ Source: &lt;a href="http://www.littelfuse.com/~/media/electronics/datasheets/tvs
 <part name="GND127" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND130" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="C8" library="Capacitor" deviceset="CAPACITOR" device="-0402" value="1uF"/>
-<part name="TC1" library="TagConnect" deviceset="TC2050-IDC" device="" value="TC2050-IDC">
-<variant name="jlcpcb_assembly" populate="no"/>
-</part>
+<part name="TC1" library="TagConnect" deviceset="TC2050-IDC" device="" value="TC2050-IDC"/>
 <part name="GND132" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="3V3114" library="Supply Symbol" deviceset="3V3" device=""/>
 <part name="GND123" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="CON4" library="Generic Connector" deviceset="2EDG-2P" device="-5MM">
-<variant name="jlcpcb_assembly" populate="no"/>
-</part>
+<part name="CON4" library="Generic Connector" deviceset="2EDG-2P" device="-5MM"/>
 <part name="R58" library="Resistor" deviceset="RESISTOR" device="-0402" value="10K Ohms"/>
 <part name="R57" library="Resistor" deviceset="RESISTOR" device="-0402" value="100K Ohms"/>
 <part name="GND124" library="Supply Symbol" deviceset="GND" device=""/>
@@ -6616,20 +6581,14 @@ Source: &lt;a href="http://www.littelfuse.com/~/media/electronics/datasheets/tvs
 <part name="C17" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="10uF"/>
 <part name="D10" library="LED" deviceset="LED" device="TH3MM" value="LEDTH3MM">
 <attribute name="COLOR" value="GREEN"/>
-<variant name="jlcpcb_assembly" populate="no"/>
 </part>
 <part name="GND61" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="D2" library="LED" deviceset="LED" device="TH3MM" value="LEDTH3MM">
 <attribute name="COLOR" value="BLUE"/>
-<variant name="jlcpcb_assembly" populate="no"/>
 </part>
 <part name="GND62" library="Supply Symbol" deviceset="GND" device=""/>
-<part name="CON2" library="JST" deviceset="4P" device="-SH-TOP">
-<variant name="jlcpcb_assembly" populate="no"/>
-</part>
-<part name="CON1" library="JST" deviceset="3P" device="-SH-SIDE" value="3P-SH-SIDE">
-<variant name="jlcpcb_assembly" populate="no"/>
-</part>
+<part name="CON2" library="JST" deviceset="4P" device="-SH-TOP"/>
+<part name="CON1" library="JST" deviceset="3P" device="-SH-SIDE" value="3P-SH-SIDE"/>
 <part name="GND65" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="R2" library="Resistor" deviceset="RESISTOR" device="-0402" value="100 Ohms"/>
 <part name="R3" library="Resistor" deviceset="RESISTOR" device="-0402" value="100 Ohms"/>
