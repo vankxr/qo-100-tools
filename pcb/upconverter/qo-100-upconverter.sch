@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="9.6.1">
+<eagle version="9.6.2">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -136,6 +136,8 @@
 <layer number="154" name="FabDoc2" color="2" fill="1" visible="no" active="no"/>
 <layer number="155" name="FabDoc3" color="7" fill="15" visible="no" active="no"/>
 <layer number="160" name="O_Dim" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="166" name="AntennaArea" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="168" name="4mmHeightArea" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="191" name="mNets" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="192" name="mBusses" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="193" name="mPins" color="7" fill="1" visible="yes" active="yes"/>
@@ -6429,6 +6431,7 @@ Logo</text>
 <part name="C11" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="100nF"/>
 <part name="GND8" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="GND1" library="Supply Symbol" deviceset="GND" device=""/>
+<part name="FRAME7" library="Frame" deviceset="A2-LANDSCAPE" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -11097,6 +11100,136 @@ to R36</text>
 <junction x="378.46" y="111.76"/>
 </segment>
 </net>
+</nets>
+</sheet>
+<sheet>
+<description>Power tree</description>
+<plain>
+<wire x1="271.78" y1="200.66" x2="297.18" y2="200.66" width="0.1524" layer="97"/>
+<wire x1="271.78" y1="210.82" x2="271.78" y2="200.66" width="0.1524" layer="97"/>
+<text x="284.48" y="205.74" size="1.778" layer="97" align="center">ADP150/ADP7142
+3.3V @ 150mA</text>
+<wire x1="271.78" y1="210.82" x2="297.18" y2="210.82" width="0.1524" layer="97"/>
+<wire x1="297.18" y1="210.82" x2="297.18" y2="200.66" width="0.1524" layer="97"/>
+<wire x1="259.08" y1="205.74" x2="271.78" y2="205.74" width="0.1524" layer="97"/>
+<wire x1="264.16" y1="203.2" x2="266.7" y2="205.74" width="0.1524" layer="97"/>
+<wire x1="266.7" y1="205.74" x2="264.16" y2="208.28" width="0.1524" layer="97"/>
+<wire x1="297.18" y1="205.74" x2="309.88" y2="205.74" width="0.1524" layer="97"/>
+<wire x1="302.26" y1="203.2" x2="304.8" y2="205.74" width="0.1524" layer="97"/>
+<wire x1="304.8" y1="205.74" x2="302.26" y2="208.28" width="0.1524" layer="97"/>
+<wire x1="259.08" y1="231.14" x2="271.78" y2="231.14" width="0.1524" layer="97"/>
+<wire x1="264.16" y1="228.6" x2="266.7" y2="231.14" width="0.1524" layer="97"/>
+<wire x1="266.7" y1="231.14" x2="264.16" y2="233.68" width="0.1524" layer="97"/>
+<wire x1="180.34" y1="226.06" x2="205.74" y2="226.06" width="0.1524" layer="97"/>
+<wire x1="205.74" y1="226.06" x2="205.74" y2="231.14" width="0.1524" layer="97"/>
+<wire x1="205.74" y1="231.14" x2="205.74" y2="236.22" width="0.1524" layer="97"/>
+<wire x1="205.74" y1="236.22" x2="180.34" y2="236.22" width="0.1524" layer="97"/>
+<wire x1="180.34" y1="236.22" x2="180.34" y2="226.06" width="0.1524" layer="97"/>
+<text x="193.04" y="231.14" size="1.778" layer="97" align="center">VIN
+7 to 24V</text>
+<wire x1="205.74" y1="231.14" x2="213.36" y2="231.14" width="0.1524" layer="97"/>
+<wire x1="210.82" y1="228.6" x2="213.36" y2="231.14" width="0.1524" layer="97"/>
+<wire x1="213.36" y1="231.14" x2="210.82" y2="233.68" width="0.1524" layer="97"/>
+<wire x1="218.44" y1="231.14" x2="213.36" y2="231.14" width="0.1524" layer="97"/>
+<wire x1="218.44" y1="226.06" x2="243.84" y2="226.06" width="0.1524" layer="97"/>
+<wire x1="243.84" y1="226.06" x2="243.84" y2="236.22" width="0.1524" layer="97"/>
+<wire x1="243.84" y1="236.22" x2="218.44" y2="236.22" width="0.1524" layer="97"/>
+<wire x1="218.44" y1="236.22" x2="218.44" y2="226.06" width="0.1524" layer="97"/>
+<text x="231.14" y="231.14" size="1.778" layer="97" align="center">LT8636
+5.2V @ 3A</text>
+<wire x1="243.84" y1="231.14" x2="251.46" y2="231.14" width="0.1524" layer="97"/>
+<wire x1="248.92" y1="228.6" x2="251.46" y2="231.14" width="0.1524" layer="97"/>
+<wire x1="251.46" y1="231.14" x2="248.92" y2="233.68" width="0.1524" layer="97"/>
+<wire x1="271.78" y1="226.06" x2="297.18" y2="226.06" width="0.1524" layer="97"/>
+<wire x1="271.78" y1="236.22" x2="271.78" y2="226.06" width="0.1524" layer="97"/>
+<text x="284.48" y="231.14" size="1.778" layer="97" align="center">MCP1700
+3.3V @ 200mA</text>
+<wire x1="271.78" y1="236.22" x2="297.18" y2="236.22" width="0.1524" layer="97"/>
+<wire x1="297.18" y1="236.22" x2="297.18" y2="226.06" width="0.1524" layer="97"/>
+<wire x1="297.18" y1="231.14" x2="309.88" y2="231.14" width="0.1524" layer="97"/>
+<wire x1="302.26" y1="228.6" x2="304.8" y2="231.14" width="0.1524" layer="97"/>
+<wire x1="304.8" y1="231.14" x2="302.26" y2="233.68" width="0.1524" layer="97"/>
+<text x="312.42" y="231.14" size="1.778" layer="97" align="center-left">Digital Rail
+MCU, ADC, ...</text>
+<text x="312.42" y="205.74" size="1.778" layer="97" align="center-left">Analog Rail
+LO Synthesizer</text>
+<wire x1="271.78" y1="185.42" x2="297.18" y2="185.42" width="0.1524" layer="97"/>
+<wire x1="271.78" y1="195.58" x2="271.78" y2="185.42" width="0.1524" layer="97"/>
+<text x="284.48" y="190.5" size="1.778" layer="97" align="center">ADP150/ADP7142
+3.3V @ 150mA</text>
+<wire x1="271.78" y1="195.58" x2="297.18" y2="195.58" width="0.1524" layer="97"/>
+<wire x1="297.18" y1="195.58" x2="297.18" y2="185.42" width="0.1524" layer="97"/>
+<wire x1="259.08" y1="190.5" x2="271.78" y2="190.5" width="0.1524" layer="97"/>
+<wire x1="264.16" y1="187.96" x2="266.7" y2="190.5" width="0.1524" layer="97"/>
+<wire x1="266.7" y1="190.5" x2="264.16" y2="193.04" width="0.1524" layer="97"/>
+<wire x1="297.18" y1="190.5" x2="309.88" y2="190.5" width="0.1524" layer="97"/>
+<wire x1="302.26" y1="187.96" x2="304.8" y2="190.5" width="0.1524" layer="97"/>
+<wire x1="304.8" y1="190.5" x2="302.26" y2="193.04" width="0.1524" layer="97"/>
+<text x="312.42" y="190.5" size="1.778" layer="97" align="center-left">Analog Rail
+RF Attenuators, Power detector</text>
+<wire x1="259.08" y1="175.26" x2="271.78" y2="175.26" width="0.1524" layer="97"/>
+<wire x1="264.16" y1="172.72" x2="266.7" y2="175.26" width="0.1524" layer="97"/>
+<wire x1="266.7" y1="175.26" x2="264.16" y2="177.8" width="0.1524" layer="97"/>
+<wire x1="271.78" y1="170.18" x2="297.18" y2="170.18" width="0.1524" layer="97"/>
+<wire x1="271.78" y1="180.34" x2="271.78" y2="170.18" width="0.1524" layer="97"/>
+<text x="284.48" y="175.26" size="1.778" layer="97" align="center">ADP150/ADP7142
+3.3V @ 150mA</text>
+<wire x1="271.78" y1="180.34" x2="297.18" y2="180.34" width="0.1524" layer="97"/>
+<wire x1="297.18" y1="180.34" x2="297.18" y2="170.18" width="0.1524" layer="97"/>
+<wire x1="297.18" y1="175.26" x2="309.88" y2="175.26" width="0.1524" layer="97"/>
+<wire x1="302.26" y1="172.72" x2="304.8" y2="175.26" width="0.1524" layer="97"/>
+<wire x1="304.8" y1="175.26" x2="302.26" y2="177.8" width="0.1524" layer="97"/>
+<text x="312.42" y="175.26" size="1.778" layer="97" align="center-left">Analog Rail
+IF Attenuator, Mixer</text>
+<wire x1="259.08" y1="160.02" x2="271.78" y2="160.02" width="0.1524" layer="97"/>
+<wire x1="264.16" y1="157.48" x2="266.7" y2="160.02" width="0.1524" layer="97"/>
+<wire x1="266.7" y1="160.02" x2="264.16" y2="162.56" width="0.1524" layer="97"/>
+<wire x1="271.78" y1="154.94" x2="297.18" y2="154.94" width="0.1524" layer="97"/>
+<wire x1="271.78" y1="165.1" x2="271.78" y2="154.94" width="0.1524" layer="97"/>
+<text x="284.48" y="160.02" size="1.778" layer="97" align="center">ADM7171
+5.0V @ 1A</text>
+<wire x1="271.78" y1="165.1" x2="297.18" y2="165.1" width="0.1524" layer="97"/>
+<wire x1="297.18" y1="165.1" x2="297.18" y2="154.94" width="0.1524" layer="97"/>
+<wire x1="297.18" y1="160.02" x2="309.88" y2="160.02" width="0.1524" layer="97"/>
+<wire x1="302.26" y1="157.48" x2="304.8" y2="160.02" width="0.1524" layer="97"/>
+<wire x1="304.8" y1="160.02" x2="302.26" y2="162.56" width="0.1524" layer="97"/>
+<text x="312.42" y="160.02" size="1.778" layer="97" align="center-left">Analog Rail
+1st and 2nd RF Amplifiers</text>
+<wire x1="259.08" y1="144.78" x2="271.78" y2="144.78" width="0.1524" layer="97"/>
+<wire x1="264.16" y1="142.24" x2="266.7" y2="144.78" width="0.1524" layer="97"/>
+<wire x1="266.7" y1="144.78" x2="264.16" y2="147.32" width="0.1524" layer="97"/>
+<wire x1="271.78" y1="139.7" x2="297.18" y2="139.7" width="0.1524" layer="97"/>
+<wire x1="271.78" y1="149.86" x2="271.78" y2="139.7" width="0.1524" layer="97"/>
+<text x="284.48" y="144.78" size="1.778" layer="97" align="center">ADM7171
+5.0V @ 1A</text>
+<wire x1="271.78" y1="149.86" x2="297.18" y2="149.86" width="0.1524" layer="97"/>
+<wire x1="297.18" y1="149.86" x2="297.18" y2="139.7" width="0.1524" layer="97"/>
+<wire x1="297.18" y1="144.78" x2="309.88" y2="144.78" width="0.1524" layer="97"/>
+<wire x1="302.26" y1="142.24" x2="304.8" y2="144.78" width="0.1524" layer="97"/>
+<wire x1="304.8" y1="144.78" x2="302.26" y2="147.32" width="0.1524" layer="97"/>
+<text x="312.42" y="144.78" size="1.778" layer="97" align="center-left">Analog Rail
+Final RF Amplifier</text>
+<wire x1="259.08" y1="231.14" x2="259.08" y2="144.78" width="0.1524" layer="97"/>
+<wire x1="251.46" y1="231.14" x2="259.08" y2="231.14" width="0.1524" layer="97"/>
+<circle x="259.08" y="218.44" radius="2.54" width="0.1524" layer="97"/>
+<wire x1="256.54" y1="218.44" x2="246.38" y2="218.44" width="0.1524" layer="97"/>
+<text x="238.76" y="218.44" size="1.778" layer="97" align="center">Current
+sensing</text>
+</plain>
+<instances>
+<instance part="FRAME7" gate="G$1" x="0" y="0" smashed="yes">
+<attribute name="DRAWING_NAME" x="447.04" y="20.574" size="2.54" layer="94" font="vector"/>
+<attribute name="LAST_DATE_TIME" x="458.47" y="5.334" size="2.286" layer="94" font="vector"/>
+<attribute name="SHEET" x="458.47" y="10.414" size="2.54" layer="94" font="vector"/>
+<attribute name="CNAME" x="447.04" y="25.654" size="2.54" layer="94" font="vector"/>
+<attribute name="DESIGNER" x="447.04" y="15.494" size="2.54" layer="94" font="vector"/>
+<attribute name="CREVISION" x="500.35" y="5.234" size="2.54" layer="94" font="vector"/>
+<attribute name="SHEET_HEADLINE" x="491.69" y="10.414" size="2.54" layer="94" font="vector"/>
+</instance>
+</instances>
+<busses>
+</busses>
+<nets>
 </nets>
 </sheet>
 </sheets>
