@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="9.6.1">
+<eagle version="9.6.2">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -3676,6 +3676,12 @@ Logo</text>
 <plain>
 <text x="233.68" y="66.04" size="1.778" layer="98">Install R4 for F2914
 Do not install R4 for F2915</text>
+<text x="213.36" y="210.82" size="1.778" layer="98">PWR_SENSE = 0 -&gt; Not powered
+PWR_SENSE = 1 -&gt; Powered</text>
+<text x="274.32" y="187.96" size="1.778" layer="98" align="center">Always check PWR_SENSE before asserting PWR_FILTER_EN.
+If PWR_SENSE = 1 and PWR_FILTER_EN = 0, external power is
+applied and PWR_FILTER_EN should NOT be asserted if this is the
+case. Doing so will short out both supplies!</text>
 </plain>
 <instances>
 <instance part="RFCON1" gate="G$1" x="139.7" y="93.98" smashed="yes">
