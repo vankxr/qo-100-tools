@@ -3,7 +3,7 @@
 
 void trace_stack(uint32_t *pulFaultStackAddress);
 
-void __attribute__ ((naked)) _hardfault_isr()
+void __attribute__ ((naked, aligned(8))) _hardfault_isr()
 {
     __asm__ volatile
     (
