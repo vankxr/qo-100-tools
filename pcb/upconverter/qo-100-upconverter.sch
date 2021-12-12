@@ -9884,7 +9884,7 @@ Logo</text>
 DS. Eq. 3 &amp; Table 1</text>
 <text x="203.962" y="300.482" size="1.27" layer="98" rot="R180">Vout = ((R24/R25) + 1) * 0.97</text>
 <text x="173.482" y="186.182" size="1.27" layer="98" rot="R180">Kelvin connection
-to R36</text>
+to R50</text>
 </plain>
 <instances>
 <instance part="FRAME5" gate="G$1" x="0" y="0" smashed="yes">
