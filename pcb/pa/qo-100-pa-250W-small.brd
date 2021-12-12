@@ -30,7 +30,7 @@
 <layer number="20" name="Dimension" color="24" fill="1" visible="yes" active="yes"/>
 <layer number="21" name="tPlace" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="22" name="bPlace" color="7" fill="1" visible="yes" active="yes"/>
-<layer number="23" name="tOrigins" color="15" fill="1" visible="no" active="yes"/>
+<layer number="23" name="tOrigins" color="15" fill="1" visible="yes" active="yes"/>
 <layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="yes"/>
 <layer number="25" name="tNames" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="26" name="bNames" color="7" fill="1" visible="yes" active="yes"/>
@@ -52,7 +52,7 @@
 <layer number="42" name="bRestrict" color="1" fill="10" visible="yes" active="yes"/>
 <layer number="43" name="vRestrict" color="2" fill="10" visible="yes" active="yes"/>
 <layer number="44" name="Drills" color="7" fill="1" visible="no" active="yes"/>
-<layer number="45" name="Holes" color="7" fill="1" visible="no" active="yes"/>
+<layer number="45" name="Holes" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="46" name="Milling" color="3" fill="1" visible="no" active="yes"/>
 <layer number="47" name="Measures" color="7" fill="1" visible="no" active="yes"/>
 <layer number="48" name="Document" color="7" fill="1" visible="yes" active="yes"/>
@@ -186,165 +186,126 @@
 </layers>
 <board>
 <plain>
-<wire x1="-70" y1="-50" x2="-70" y2="50" width="0" layer="20"/>
-<wire x1="-70" y1="50" x2="-5" y2="50" width="0" layer="20"/>
-<wire x1="-5" y1="50" x2="-5" y2="-50" width="0" layer="20"/>
-<wire x1="-5" y1="-50" x2="-70" y2="-50" width="0" layer="20"/>
-<hole x="-65" y="-25" drill="3"/>
-<hole x="-30" y="-25" drill="3"/>
-<hole x="-20" y="-25" drill="3"/>
-<hole x="-10" y="-25" drill="3"/>
-<hole x="-65" y="25" drill="3"/>
-<hole x="-30" y="25" drill="3"/>
-<hole x="-20" y="25" drill="3"/>
+<wire x1="-50" y1="-40" x2="-50" y2="40" width="0" layer="20"/>
+<wire x1="-50" y1="40" x2="-5" y2="40" width="0" layer="20"/>
+<wire x1="-5" y1="40" x2="-5" y2="-40" width="0" layer="20"/>
+<wire x1="-5" y1="-40" x2="-50" y2="-40" width="0" layer="20"/>
+<hole x="-45" y="25" drill="3"/>
 <hole x="-10" y="25" drill="3"/>
 <hole x="-19" y="11" drill="3"/>
 <hole x="-19" y="-11" drill="3"/>
-<wire x1="5" y1="-50" x2="5" y2="50" width="0" layer="20"/>
-<wire x1="5" y1="50" x2="80" y2="50" width="0" layer="20"/>
-<wire x1="80" y1="50" x2="80" y2="-50" width="0" layer="20"/>
-<wire x1="80" y1="-50" x2="5" y2="-50" width="0" layer="20"/>
+<wire x1="5" y1="-40" x2="5" y2="40" width="0" layer="20"/>
+<wire x1="5" y1="40" x2="50" y2="40" width="0" layer="20"/>
+<wire x1="50" y1="40" x2="50" y2="-40" width="0" layer="20"/>
+<wire x1="50" y1="-40" x2="5" y2="-40" width="0" layer="20"/>
 <hole x="10" y="25" drill="3"/>
-<hole x="20" y="25" drill="3"/>
-<hole x="30" y="25" drill="3"/>
-<hole x="40" y="25" drill="3"/>
-<hole x="10" y="-25" drill="3"/>
-<hole x="20" y="-25" drill="3"/>
-<hole x="30" y="-25" drill="3"/>
-<hole x="40" y="-25" drill="3"/>
-<hole x="40" y="10" drill="3"/>
-<hole x="40" y="-10" drill="3"/>
+<hole x="45" y="25" drill="3"/>
+<hole x="40" y="15" drill="3"/>
+<hole x="40" y="-15" drill="3"/>
 <hole x="19" y="-11" drill="3"/>
 <hole x="19" y="11" drill="3"/>
-<hole x="75" y="25" drill="3"/>
-<hole x="65" y="-47.5" drill="4"/>
-<hole x="75" y="8" drill="4"/>
-<hole x="75" y="-8" drill="4"/>
-<hole x="60" y="-25" drill="3"/>
-<hole x="50" y="25" drill="3"/>
-<hole x="60" y="25" drill="3"/>
-<hole x="60" y="-15" drill="3"/>
-<hole x="60" y="15" drill="3"/>
-<hole x="-40" y="-25" drill="3"/>
-<hole x="-52.5" y="-25" drill="3"/>
-<hole x="-40" y="10" drill="3"/>
-<hole x="-65" y="8" drill="4"/>
-<hole x="-65" y="-8" drill="4"/>
-<hole x="-52.5" y="-10" drill="3"/>
-<hole x="-40" y="-10" drill="3"/>
-<hole x="-52.5" y="10" drill="3"/>
-<hole x="-52.5" y="25" drill="3"/>
-<hole x="-40" y="25" drill="3"/>
-<circle x="-65" y="-25" radius="1.5" width="0" layer="20"/>
-<circle x="-52.5" y="-25" radius="1.5" width="0" layer="20"/>
-<circle x="-40" y="-25" radius="1.5" width="0" layer="20"/>
-<circle x="-30" y="-25" radius="1.5" width="0" layer="20"/>
-<circle x="-20" y="-25" radius="1.5" width="0" layer="20"/>
-<circle x="-10" y="-25" radius="1.5" width="0" layer="20"/>
 <circle x="-19" y="-11" radius="1.5" width="0" layer="20"/>
-<circle x="-40" y="-10" radius="1.5" width="0" layer="20"/>
-<circle x="-52.5" y="-10" radius="1.5" width="0" layer="20"/>
-<circle x="-65" y="-8" radius="2" width="0" layer="20"/>
-<circle x="-65" y="8" radius="2" width="0" layer="20"/>
-<circle x="-52.5" y="10" radius="1.5" width="0" layer="20"/>
-<circle x="-65" y="25" radius="1.5" width="0" layer="20"/>
-<circle x="-52.5" y="25" radius="1.5" width="0" layer="20"/>
-<circle x="-40" y="25" radius="1.5" width="0" layer="20"/>
-<circle x="-30" y="25" radius="1.5" width="0" layer="20"/>
-<circle x="-40" y="10" radius="1.5" width="0" layer="20"/>
+<circle x="-45" y="25" radius="1.5" width="0" layer="20"/>
 <circle x="-19" y="11" radius="1.5" width="0" layer="20"/>
-<circle x="-20" y="25" radius="1.5" width="0" layer="20"/>
 <circle x="-10" y="25" radius="1.5" width="0" layer="20"/>
 <circle x="10" y="25" radius="1.5" width="0" layer="20"/>
-<circle x="20" y="25" radius="1.5" width="0" layer="20"/>
-<circle x="30" y="25" radius="1.5" width="0" layer="20"/>
 <circle x="19" y="11" radius="1.5" width="0" layer="20"/>
-<circle x="40" y="25" radius="1.5" width="0" layer="20"/>
-<circle x="40" y="10" radius="1.5" width="0" layer="20"/>
-<circle x="50" y="25" radius="1.5" width="0" layer="20"/>
-<circle x="60" y="25" radius="1.5" width="0" layer="20"/>
-<circle x="75" y="25" radius="1.5" width="0" layer="20"/>
-<circle x="75" y="8" radius="2" width="0" layer="20"/>
-<circle x="60" y="15" radius="1.5" width="0" layer="20"/>
-<circle x="75" y="-8" radius="2" width="0" layer="20"/>
-<circle x="60" y="-25" radius="1.5" width="0" layer="20"/>
-<circle x="60" y="-15" radius="1.5" width="0" layer="20"/>
-<circle x="40" y="-10" radius="1.5" width="0" layer="20"/>
+<circle x="45" y="25" radius="1.5" width="0" layer="20"/>
+<circle x="40" y="15" radius="1.5" width="0" layer="20"/>
+<circle x="40" y="-15" radius="1.5" width="0" layer="20"/>
 <circle x="19" y="-11" radius="1.5" width="0" layer="20"/>
-<circle x="40" y="-25" radius="1.5" width="0" layer="20"/>
-<circle x="30" y="-25" radius="1.5" width="0" layer="20"/>
-<circle x="20" y="-25" radius="1.5" width="0" layer="20"/>
-<circle x="10" y="-25" radius="1.5" width="0" layer="20"/>
-<hole x="75" y="-25" drill="3"/>
-<hole x="25" y="-47.5" drill="4"/>
-<hole x="-55" y="-47.5" drill="4"/>
-<hole x="-15" y="-47.5" drill="4"/>
-<hole x="-65" y="-35" drill="3"/>
-<hole x="-30" y="-35" drill="3"/>
-<hole x="-20" y="-35" drill="3"/>
-<hole x="-10" y="-35" drill="3"/>
-<hole x="-40" y="-35" drill="3"/>
-<hole x="-52.5" y="-35" drill="3"/>
-<circle x="-65" y="-35" radius="1.5" width="0" layer="20"/>
-<circle x="-52.5" y="-35" radius="1.5" width="0" layer="20"/>
-<circle x="-40" y="-35" radius="1.5" width="0" layer="20"/>
-<circle x="-30" y="-35" radius="1.5" width="0" layer="20"/>
-<circle x="-20" y="-35" radius="1.5" width="0" layer="20"/>
-<circle x="-10" y="-35" radius="1.5" width="0" layer="20"/>
-<hole x="-65" y="35" drill="3"/>
-<hole x="-30" y="35" drill="3"/>
-<hole x="-20" y="35" drill="3"/>
+<hole x="-45" y="35" drill="3"/>
 <hole x="-10" y="35" drill="3"/>
-<hole x="-52.5" y="35" drill="3"/>
-<hole x="-40" y="35" drill="3"/>
-<circle x="-65" y="35" radius="1.5" width="0" layer="20"/>
-<circle x="-52.5" y="35" radius="1.5" width="0" layer="20"/>
-<circle x="-40" y="35" radius="1.5" width="0" layer="20"/>
-<circle x="-30" y="35" radius="1.5" width="0" layer="20"/>
-<circle x="-20" y="35" radius="1.5" width="0" layer="20"/>
+<circle x="-45" y="35" radius="1.5" width="0" layer="20"/>
 <circle x="-10" y="35" radius="1.5" width="0" layer="20"/>
 <hole x="10" y="35" drill="3"/>
-<hole x="20" y="35" drill="3"/>
-<hole x="30" y="35" drill="3"/>
-<hole x="40" y="35" drill="3"/>
-<hole x="75" y="35" drill="3"/>
-<hole x="50" y="35" drill="3"/>
-<hole x="60" y="35" drill="3"/>
+<hole x="45" y="35" drill="3"/>
 <circle x="10" y="35" radius="1.5" width="0" layer="20"/>
-<circle x="20" y="35" radius="1.5" width="0" layer="20"/>
-<circle x="30" y="35" radius="1.5" width="0" layer="20"/>
-<circle x="40" y="35" radius="1.5" width="0" layer="20"/>
-<circle x="50" y="35" radius="1.5" width="0" layer="20"/>
-<circle x="60" y="35" radius="1.5" width="0" layer="20"/>
-<circle x="75" y="35" radius="1.5" width="0" layer="20"/>
+<circle x="45" y="35" radius="1.5" width="0" layer="20"/>
+<hole x="-36.25" y="25" drill="3"/>
+<hole x="-27.5" y="25" drill="3"/>
+<hole x="-18.75" y="25" drill="3"/>
+<hole x="-36.25" y="35" drill="3"/>
+<hole x="-27.5" y="35" drill="3"/>
+<hole x="-18.75" y="35" drill="3"/>
+<circle x="-36.25" y="35" radius="1.5" width="0" layer="20"/>
+<circle x="-27.5" y="35" radius="1.5" width="0" layer="20"/>
+<circle x="-18.75" y="35" radius="1.5" width="0" layer="20"/>
+<circle x="-36.25" y="25" radius="1.5" width="0" layer="20"/>
+<circle x="-27.5" y="25" radius="1.5" width="0" layer="20"/>
+<circle x="-18.75" y="25" radius="1.5" width="0" layer="20"/>
+<hole x="36.25" y="25" drill="3"/>
+<circle x="36.25" y="25" radius="1.5" width="0" layer="20"/>
+<hole x="36.25" y="35" drill="3"/>
+<circle x="36.25" y="35" radius="1.5" width="0" layer="20"/>
+<hole x="27.5" y="25" drill="3"/>
+<circle x="27.5" y="25" radius="1.5" width="0" layer="20"/>
+<hole x="27.5" y="35" drill="3"/>
+<circle x="27.5" y="35" radius="1.5" width="0" layer="20"/>
+<hole x="18.75" y="25" drill="3"/>
+<circle x="18.75" y="25" radius="1.5" width="0" layer="20"/>
+<hole x="18.75" y="35" drill="3"/>
+<circle x="18.75" y="35" radius="1.5" width="0" layer="20"/>
+<hole x="-45" y="-35" drill="3"/>
+<hole x="-10" y="-35" drill="3"/>
 <hole x="10" y="-35" drill="3"/>
-<hole x="20" y="-35" drill="3"/>
-<hole x="30" y="-35" drill="3"/>
-<hole x="40" y="-35" drill="3"/>
-<hole x="60" y="-35" drill="3"/>
-<circle x="60" y="-35" radius="1.5" width="0" layer="20"/>
-<circle x="40" y="-35" radius="1.5" width="0" layer="20"/>
-<circle x="30" y="-35" radius="1.5" width="0" layer="20"/>
-<circle x="20" y="-35" radius="1.5" width="0" layer="20"/>
+<hole x="45" y="-35" drill="3"/>
+<circle x="-45" y="-35" radius="1.5" width="0" layer="20"/>
+<circle x="-10" y="-35" radius="1.5" width="0" layer="20"/>
 <circle x="10" y="-35" radius="1.5" width="0" layer="20"/>
-<hole x="75" y="-35" drill="3"/>
-<circle x="65" y="-47.5" radius="2" width="0" layer="20"/>
-<circle x="25" y="-47.5" radius="2" width="0" layer="20"/>
-<circle x="-15" y="-47.5" radius="2" width="0" layer="20"/>
-<circle x="-55" y="-47.5" radius="2" width="0" layer="20"/>
-<hole x="65" y="47.5" drill="4"/>
-<hole x="25" y="47.5" drill="4"/>
-<hole x="-55" y="47.5" drill="4"/>
-<hole x="-15" y="47.5" drill="4"/>
-<circle x="65" y="47.5" radius="2" width="0" layer="20"/>
-<circle x="25" y="47.5" radius="2" width="0" layer="20"/>
-<circle x="-15" y="47.5" radius="2" width="0" layer="20"/>
-<circle x="-55" y="47.5" radius="2" width="0" layer="20"/>
-<text x="-35" y="-43" locked="yes" size="2.1844" layer="21" font="vector" ratio="20" align="center">2.4 GHz 250W PA
-Feb 2022</text>
-<circle x="75" y="-25" radius="1.5" width="0" layer="20"/>
-<circle x="75" y="-25" radius="1.5" width="0" layer="20"/>
-<circle x="75" y="-35" radius="1.5" width="0" layer="20"/>
+<circle x="45" y="-35" radius="1.5" width="0" layer="20"/>
+<hole x="-45" y="-25" drill="3"/>
+<hole x="-10" y="-25" drill="3"/>
+<circle x="-45" y="-25" radius="1.5" width="0" layer="20"/>
+<circle x="-10" y="-25" radius="1.5" width="0" layer="20"/>
+<hole x="10" y="-25" drill="3"/>
+<hole x="45" y="-25" drill="3"/>
+<circle x="10" y="-25" radius="1.5" width="0" layer="20"/>
+<circle x="45" y="-25" radius="1.5" width="0" layer="20"/>
+<hole x="-36.25" y="-35" drill="3"/>
+<hole x="-27.5" y="-35" drill="3"/>
+<hole x="-18.75" y="-35" drill="3"/>
+<hole x="-36.25" y="-25" drill="3"/>
+<hole x="-27.5" y="-25" drill="3"/>
+<hole x="-18.75" y="-25" drill="3"/>
+<circle x="-36.25" y="-25" radius="1.5" width="0" layer="20"/>
+<circle x="-27.5" y="-25" radius="1.5" width="0" layer="20"/>
+<circle x="-18.75" y="-25" radius="1.5" width="0" layer="20"/>
+<circle x="-36.25" y="-35" radius="1.5" width="0" layer="20"/>
+<circle x="-27.5" y="-35" radius="1.5" width="0" layer="20"/>
+<circle x="-18.75" y="-35" radius="1.5" width="0" layer="20"/>
+<hole x="36.25" y="-35" drill="3"/>
+<circle x="36.25" y="-35" radius="1.5" width="0" layer="20"/>
+<hole x="36.25" y="-25" drill="3"/>
+<circle x="36.25" y="-25" radius="1.5" width="0" layer="20"/>
+<hole x="27.5" y="-35" drill="3"/>
+<circle x="27.5" y="-35" radius="1.5" width="0" layer="20"/>
+<hole x="27.5" y="-25" drill="3"/>
+<circle x="27.5" y="-25" radius="1.5" width="0" layer="20"/>
+<hole x="18.75" y="-35" drill="3"/>
+<circle x="18.75" y="-35" radius="1.5" width="0" layer="20"/>
+<hole x="18.75" y="-25" drill="3"/>
+<circle x="18.75" y="-25" radius="1.5" width="0" layer="20"/>
+<hole x="-45" y="-15" drill="3"/>
+<circle x="-45" y="-15" radius="1.5" width="0" layer="20"/>
+<hole x="-45" y="-7.5" drill="3"/>
+<circle x="-45" y="-7.5" radius="1.5" width="0" layer="20"/>
+<hole x="-36.25" y="-15" drill="3"/>
+<hole x="-36.25" y="-7.5" drill="3"/>
+<circle x="-36.25" y="-7.5" radius="1.5" width="0" layer="20"/>
+<circle x="-36.25" y="-15" radius="1.5" width="0" layer="20"/>
+<hole x="-45" y="7.5" drill="3"/>
+<circle x="-45" y="7.5" radius="1.5" width="0" layer="20"/>
+<hole x="-45" y="15" drill="3"/>
+<circle x="-45" y="15" radius="1.5" width="0" layer="20"/>
+<hole x="-36.25" y="7.5" drill="3"/>
+<hole x="-36.25" y="15" drill="3"/>
+<circle x="-36.25" y="15" radius="1.5" width="0" layer="20"/>
+<circle x="-36.25" y="7.5" radius="1.5" width="0" layer="20"/>
+<hole x="40" y="-7.5" drill="3"/>
+<circle x="40" y="-7.5" radius="1.5" width="0" layer="20"/>
+<hole x="40" y="7.5" drill="3"/>
+<circle x="40" y="7.5" radius="1.5" width="0" layer="20"/>
 </plain>
 <libraries>
 <library name="Silkscreen">
@@ -1053,15 +1014,15 @@ design rules under a new name.
 </pass>
 </autorouter>
 <elements>
-<element name="E$1" library="Silkscreen" package="JS_5MM" value="" x="47.5" y="46.5" smashed="yes"/>
-<element name="E$2" library="Silkscreen" package="JS_5MM" value="" x="-32.5" y="46.5" smashed="yes"/>
+<element name="E$1" library="Silkscreen" package="JS_5MM" value="" x="43.5" y="33" smashed="yes"/>
+<element name="E$2" library="Silkscreen" package="JS_5MM" value="" x="-37.5" y="32.5" smashed="yes"/>
 </elements>
 <signals>
 <signal name="GND">
 <polygon width="0" layer="1" pour="cutout">
-<vertex x="-70" y="2.5135"/>
-<vertex x="-70" y="50"/>
-<vertex x="-5" y="50"/>
+<vertex x="-50" y="2.5135"/>
+<vertex x="-50" y="40"/>
+<vertex x="-5" y="40"/>
 <vertex x="-5" y="21.8125"/>
 <vertex x="-32.434" y="21.8125"/>
 <vertex x="-32.434" y="10.5895"/>
@@ -1078,9 +1039,9 @@ design rules under a new name.
 <vertex x="-24.75" y="2.5135"/>
 </polygon>
 <polygon width="0" layer="1" pour="cutout">
-<vertex x="-70" y="-2.5135"/>
-<vertex x="-70" y="-50"/>
-<vertex x="-5" y="-50"/>
+<vertex x="-50" y="-2.5135"/>
+<vertex x="-50" y="-40"/>
+<vertex x="-5" y="-40"/>
 <vertex x="-5" y="-21.8125"/>
 <vertex x="-32.434" y="-21.8125"/>
 <vertex x="-32.434" y="-10.5895"/>
@@ -1097,9 +1058,9 @@ design rules under a new name.
 <vertex x="-24.75" y="-2.5135"/>
 </polygon>
 <polygon width="0" layer="1" pour="cutout">
-<vertex x="5" y="-50"/>
-<vertex x="45" y="-50"/>
-<vertex x="45" y="-2.5"/>
+<vertex x="5" y="-40"/>
+<vertex x="50" y="-40"/>
+<vertex x="50" y="-2.5"/>
 <vertex x="25.829" y="-2.5"/>
 <vertex x="25.829" y="-4.15575"/>
 <vertex x="20.955" y="-4.15575"/>
@@ -1115,27 +1076,11 @@ design rules under a new name.
 <vertex x="34.7959" y="-20.21875"/>
 <vertex x="5" y="-20.21875"/>
 </polygon>
-<polygon width="0" layer="1" pour="cutout">
-<vertex x="50" y="-50"/>
-<vertex x="50" y="-8.179"/>
-<vertex x="66.715" y="-8.179"/>
-<vertex x="66.715" y="-19"/>
-<vertex x="71.715" y="-19"/>
-<vertex x="71.715" y="-2.5"/>
-<vertex x="80" y="-2.5"/>
-<vertex x="80" y="-50"/>
-</polygon>
-<polygon width="0" layer="1" pour="cutout">
-<vertex x="80" y="2.5"/>
-<vertex x="71.715" y="2.5"/>
-<vertex x="71.715" y="50"/>
-<vertex x="80" y="50"/>
-</polygon>
 </signal>
 <signal name="IN">
 <polygon width="0" layer="1" pour="cutout">
-<vertex x="-47.5" y="0.8395"/>
-<vertex x="-47.5" y="-0.8395"/>
+<vertex x="-37.5" y="0.8395"/>
+<vertex x="-37.5" y="-0.8395"/>
 <vertex x="-25.38" y="-0.8395"/>
 <vertex x="-25.38" y="0.8395"/>
 </polygon>
@@ -1202,35 +1147,31 @@ design rules under a new name.
 </signal>
 <signal name="NEGATIVE">
 <polygon width="0" layer="1">
-<vertex x="-70" y="-50"/>
-<vertex x="-5" y="-50"/>
-<vertex x="-5" y="50"/>
-<vertex x="-70" y="50"/>
+<vertex x="-50" y="-40"/>
+<vertex x="-5" y="-40"/>
+<vertex x="-5" y="40"/>
+<vertex x="-50" y="40"/>
 </polygon>
 <polygon width="0" layer="1">
-<vertex x="5" y="-50"/>
-<vertex x="5" y="50"/>
-<vertex x="80" y="50"/>
-<vertex x="80" y="-50"/>
+<vertex x="5" y="-40"/>
+<vertex x="5" y="40"/>
+<vertex x="50" y="40"/>
+<vertex x="50" y="-40"/>
 </polygon>
 </signal>
 <signal name="IN1">
 <polygon width="0" layer="1" pour="cutout">
-<vertex x="80" y="-0.8395"/>
-<vertex x="80" y="0.8395"/>
+<vertex x="50" y="-0.8395"/>
+<vertex x="50" y="0.8395"/>
 <vertex x="29.36" y="0.8395"/>
 <vertex x="29.36" y="-0.8395"/>
 </polygon>
 </signal>
 <signal name="GND1">
 <polygon width="0" layer="1" pour="cutout">
-<vertex x="5" y="50"/>
-<vertex x="66.715" y="50"/>
-<vertex x="66.715" y="8.179"/>
-<vertex x="50" y="8.179"/>
-<vertex x="50" y="19"/>
-<vertex x="45" y="19"/>
-<vertex x="45" y="2.5"/>
+<vertex x="5" y="40"/>
+<vertex x="50" y="40"/>
+<vertex x="50" y="2.5"/>
 <vertex x="25.829" y="2.5"/>
 <vertex x="25.829" y="4.15575"/>
 <vertex x="20.955" y="4.15575"/>
@@ -1281,40 +1222,12 @@ design rules under a new name.
 <vertex x="6.7" y="-6.8555"/>
 </polygon>
 </signal>
-<signal name="FWD">
-<polygon width="0" layer="1" pour="cutout">
-<vertex x="46.6605" y="-50"/>
-<vertex x="46.6605" y="-6.697"/>
-<vertex x="48.518" y="-4.8395"/>
-<vertex x="68.518" y="-4.8395"/>
-<vertex x="70.0545" y="-6.697"/>
-<vertex x="70.0545" y="-17.3395"/>
-<vertex x="68.3755" y="-17.3395"/>
-<vertex x="68.3755" y="-6.5185"/>
-<vertex x="48.3395" y="-6.5185"/>
-<vertex x="48.3395" y="-50"/>
-</polygon>
-</signal>
-<signal name="FWD1">
-<polygon width="0" layer="1" pour="cutout">
-<vertex x="70.0545" y="50"/>
-<vertex x="70.0545" y="6.697"/>
-<vertex x="68.197" y="4.8395"/>
-<vertex x="48.197" y="4.8395"/>
-<vertex x="46.6605" y="6.697"/>
-<vertex x="46.6605" y="17.3395"/>
-<vertex x="48.3395" y="17.3395"/>
-<vertex x="48.3395" y="6.5185"/>
-<vertex x="68.3755" y="6.5185"/>
-<vertex x="68.3755" y="50"/>
-</polygon>
-</signal>
 <signal name="IN2">
 <polygon width="0" layer="1" pour="cutout">
-<vertex x="-70" y="0.8395"/>
-<vertex x="-70" y="-0.8395"/>
-<vertex x="-48.5" y="-0.8395"/>
-<vertex x="-48.5" y="0.8395"/>
+<vertex x="-50" y="0.8395"/>
+<vertex x="-50" y="-0.8395"/>
+<vertex x="-38.5" y="-0.8395"/>
+<vertex x="-38.5" y="0.8395"/>
 </polygon>
 </signal>
 </signals>
@@ -1327,10 +1240,4 @@ design rules under a new name.
 </mfgpreviewcolors>
 </board>
 </drawing>
-<compatibility>
-<note version="6.3" minversion="6.2.2" severity="warning">
-Since Version 6.2.2 text objects can contain more than one line,
-which will not be processed correctly with this version.
-</note>
-</compatibility>
 </eagle>
