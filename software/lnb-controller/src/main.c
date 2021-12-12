@@ -536,6 +536,9 @@ int init()
 
     get_device_name(szDeviceName, 32);
 
+    printf("\x1B[2J"); // Clear the screen
+    printf("\x1B[H"); // Move cursor to top left corner
+
     DBGPRINTLN_CTX("IcyRadio LNB Controller v%lu (%s %s)!", BUILD_VERSION, __DATE__, __TIME__);
     DBGPRINTLN_CTX("Device: %s", szDeviceName);
     DBGPRINTLN_CTX("Device Revision: 0x%04X", get_device_revision());

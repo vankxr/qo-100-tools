@@ -413,6 +413,9 @@ int init()
 
     get_device_name(szDeviceName, 32);
 
+    printf("\x1B[2J"); // Clear the screen
+    printf("\x1B[H"); // Move cursor to top left corner
+
     DBGPRINTLN_CTX("IcyRadio Upconverter v%lu (%s %s)!", BUILD_VERSION, __DATE__, __TIME__);
     DBGPRINTLN_CTX("Device: %s", szDeviceName);
     DBGPRINTLN_CTX("Device Revision: 0x%04X", get_device_revision());
@@ -516,15 +519,15 @@ int main()
     mcp3421_write_config(MCP3421_RESOLUTION_16BIT | MCP3421_ONE_SHOT);
 
     // Attenuators
-    f1958_set_attenuation(F1958_IF_ATT_ID, 16.0f);
+    f1958_set_attenuation(F1958_IF_ATT_ID, 12.00f);
     DBGPRINTLN_CTX("IF Attenuator value: -%.3f dB", (float)F1958_ATTENUATION[F1958_IF_ATT_ID]);
-    f1958_set_attenuation(F1958_RF1_ATT_ID, 16.f);
+    f1958_set_attenuation(F1958_RF1_ATT_ID, 23.00f);
     DBGPRINTLN_CTX("RF Attenuator value: -%.3f dB", (float)F1958_ATTENUATION[F1958_RF1_ATT_ID]);
-    f1958_set_attenuation(F1958_RF2_ATT_ID, 3.0f);
+    f1958_set_attenuation(F1958_RF2_ATT_ID, 8.00f);
     DBGPRINTLN_CTX("RF Attenuator value: -%.3f dB", (float)F1958_ATTENUATION[F1958_RF2_ATT_ID]);
 
     // PLL
-    adf4351_pfd_config(26000000, 1, 0, 1, 0);
+    adf4351_pfd_config(26000000, 1, 0, 13, 0);
     DBGPRINTLN_CTX("PLL Reference frequency: %.3f MHz", (float)ADF4351_REF_FREQ / 1000000);
     DBGPRINTLN_CTX("PLL PFD frequency: %.3f MHz", (float)ADF4351_PFD_FREQ / 1000000);
 
