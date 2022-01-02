@@ -3,7 +3,8 @@ Various tools for transmission and reception on the QO-100 satellite amateur tra
 
 ## Included tools
  - Upconverter - Converts the VHF/UHF IF signal to the uplink frequency of the satellite (2.4 GHz)
- - PA - Boosts the output power to 20 W (v1) and 250 W (v2) maximum, there is also a 10 W driver for the v2 that can be used for some QRP experiments
+ - PA - Boosts the output power to 20 W (v1) and 250 W (v2) maximum
+ - PA Driver - Amplifier to drive the main 250W PA
  - Directional Couplers - Experimental, manually constructed with simple scalpel cut traces on some Rogers RO4350B substrate
  - GPSDO - GPS Disciplined Oscillator to generate different precise reference frequencies
  - LNB Controller - LNB Bias and reference injection controller
@@ -13,6 +14,14 @@ Various tools for transmission and reception on the QO-100 satellite amateur tra
  - Orange Pi Dock - Main board to house an OPi that will be the main brain of the system
  - Relay Controller - Module to provide relay coil switching capabilities
  - RF Switch - Implements a 5PST or 4PST RF switch for routing purposes
+ - PSU Interface - Interface board for HP Common Slot Power supplies
+ - SAW Filter adapter - Footprints for various SAW filter packages
+ - PA Bias controller - Bias generator and monitor for the Power Amplifiers
+ - PA TEC controller - Peltier cooler controller for the big PA
+ - I2C Buffer - I2C bus signal buffer
+ - Environment sensors - Sensor carrier board
+ - LoRa Transceiver - SX1276 breakout for LoRa experiments
+
 
 ## Dependencies
  - [icyradio](https://github.com/vankxr/icyradio/tree/qo100) - IcyRadio Software Defined Radio to transmit and receive IF signals to the roof RF frontend
