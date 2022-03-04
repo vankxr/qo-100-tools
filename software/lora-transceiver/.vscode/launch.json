@@ -7,7 +7,7 @@
         {
             "name": "Debug",
             "cwd": "${workspaceRoot}",
-            "executable": "./bin/v1.icyradio-relay-controller.elf",
+            "executable": "./bin/v1.icyradio-lora-transceiver.elf",
             "request": "launch",
             "type": "cortex-debug",
             "preLaunchTask": "Build",
