@@ -320,6 +320,11 @@ class HPPSU
         // write 0xXXXX to 0x4A - set byte_DATA_A4 bit 4, signal that output OV threshold has changed
     }
 
+    async get_efficiency()
+    {
+        return await this.get_input_power() / await this.get_output_power();
+    }
+
     async get_intake_temperature()
     {
         return await this.mcu.read(0x1A) / 64;
@@ -381,11 +386,25 @@ class HPPSU
 
     async is_main_output_enabled()
     {
-        return (await this.get_status_flags() & 0x05) === 0x05;
+        return (await this.get_status_flags() & 0x0005) === 0x0005;
     }
     async is_input_present()
     {
-        return (await this.get_status_flags() & 0x02) === 0x02;
+        return (await this.get_status_flags() & 0x0002) === 0x0002;
+    }
+    async get_nominal_input_voltage()
+    {
+        switch(await this.get_status_flags() & 0x0300)
+        {
+            case 0x0000:
+                return 0;
+            case 0x0100:
+                return 100;
+            case 0x0200:
+                return 120;
+            case 0x0300:
+                return 230;
+        }
     }
 
     /*

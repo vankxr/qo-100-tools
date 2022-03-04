@@ -167,7 +167,7 @@ async function ssh_server_init()
                         this.tprintln(null, "HPPSU", "Name: %s", await device.get_name());
                         this.tprintln(null, "HPPSU", "CT: %s", await device.get_ct());
                         this.tprintln(null, "HPPSU", "Input Present: %s", await device.is_input_present());
-                        this.tprintln(null, "HPPSU", "Input Voltage: %d V", await device.get_input_voltage());
+                        this.tprintln(null, "HPPSU", "Input Voltage: %d V (%d V nom.)", await device.get_input_voltage(), await device.get_nominal_input_voltage());
                         this.tprintln(null, "HPPSU", "Input Undervoltage threshold: %d V", await device.get_input_undervoltage_threshold());
                         this.tprintln(null, "HPPSU", "Input Overvoltage threshold: %d V", await device.get_input_overvoltage_threshold());
                         this.tprintln(null, "HPPSU", "Input Current: %d A (max. %d A)", await device.get_input_current(), await device.get_peak_input_current());
@@ -179,6 +179,7 @@ async function ssh_server_init()
                         this.tprintln(null, "HPPSU", "Output Overvoltage threshold: %d V", await device.get_output_overvoltage_threshold());
                         this.tprintln(null, "HPPSU", "Output Current: %d A (max. %d A)", await device.get_output_current(), await device.get_peak_output_current());
                         this.tprintln(null, "HPPSU", "Output Power: %d W", await device.get_output_power());
+                        this.tprintln(null, "HPPSU", "Efficiency: %d %%", (await device.get_efficiency() * 100));
                         this.tprintln(null, "HPPSU", "Intake Temperature: %d C", await device.get_intake_temperature());
                         this.tprintln(null, "HPPSU", "Internal Temperature: %d C", await device.get_internal_temperature());
                         this.tprintln(null, "HPPSU", "Fan speed: %d RPM", await device.get_fan_speed());
@@ -207,7 +208,7 @@ async function ssh_server_init()
                     case "input":
                     {
                         this.tprintln(null, "HPPSU", "Input Present: %s", await device.is_input_present());
-                        this.tprintln(null, "HPPSU", "Input Voltage: %d V", await device.get_input_voltage());
+                        this.tprintln(null, "HPPSU", "Input Voltage: %d V (%d V nom.)", await device.get_input_voltage(), await device.get_nominal_input_voltage());
                         this.tprintln(null, "HPPSU", "Input Undervoltage threshold: %d V", await device.get_input_undervoltage_threshold());
                         this.tprintln(null, "HPPSU", "Input Overvoltage threshold: %d V", await device.get_input_overvoltage_threshold());
                         this.tprintln(null, "HPPSU", "Input Current: %d A (max. %d A)", await device.get_input_current(), await device.get_peak_input_current());
@@ -223,6 +224,7 @@ async function ssh_server_init()
                         this.tprintln(null, "HPPSU", "Output Overvoltage threshold: %d V", await device.get_output_overvoltage_threshold());
                         this.tprintln(null, "HPPSU", "Output Current: %d A (max. %d A)", await device.get_output_current(), await device.get_peak_output_current());
                         this.tprintln(null, "HPPSU", "Output Power: %d W", await device.get_output_power());
+                        this.tprintln(null, "HPPSU", "Efficiency: %d %%", (await device.get_efficiency() * 100));
                     }
                     break;
                     case "temperature":
@@ -1276,6 +1278,18 @@ function ssh_server_client_session_shell_request_handler(accept, reject)
         }
     );
 
+    this.shell.write(
+        "\r" +
+        "   ____  _____ _   _____  ______   __  __                                   \n" +
+        "  / __ \|  __ (_) |  __ \|  ____| |  \/  |                                  \n" +
+        " | |  | | |__) |  | |__) | |__    | \  / | __ _ _ __   __ _  __ _  ___ _ __ \n" +
+        " | |  | |  ___/ | |  _  /|  __|   | |\/| |/ _` | '_ \ / _` |/ _` |/ _ \ '__|\n" +
+        " | |__| | |   | | | | \ \| |      | |  | | (_| | | | | (_| | (_| |  __/ |   \n" +
+        "  \____/|_|   |_| |_|  \_\_|      |_|  |_|\__,_|_| |_|\__,_|\__, |\___|_|   \n" +
+        "                                                             __/ |          \n" +
+        "                                                            |___/           \n"
+    );
+
     this.shell.prompt();
 
     this.shell.on(
@@ -1647,7 +1661,7 @@ async function main()
         cl.tprintln(null, "HPPSU", "  Name: %s", await psu.get_name());
         cl.tprintln(null, "HPPSU", "  CT: %s", await psu.get_ct());
         cl.tprintln(null, "HPPSU", "  Input Present: %s", await psu.is_input_present());
-        cl.tprintln(null, "HPPSU", "  Input Voltage: %d V", await psu.get_input_voltage());
+        cl.tprintln(null, "HPPSU", "  Input Voltage: %d V (%d V nom.)", await psu.get_input_voltage(), await psu.get_nominal_input_voltage());
         cl.tprintln(null, "HPPSU", "  Input Undervoltage threshold: %d V", await psu.get_input_undervoltage_threshold());
         cl.tprintln(null, "HPPSU", "  Input Overvoltage threshold: %d V", await psu.get_input_overvoltage_threshold());
         cl.tprintln(null, "HPPSU", "  Input Current: %d A (max. %d A)", await psu.get_input_current(), await psu.get_peak_input_current());
@@ -1659,6 +1673,7 @@ async function main()
         cl.tprintln(null, "HPPSU", "  Output Overvoltage threshold: %d V", await psu.get_output_overvoltage_threshold());
         cl.tprintln(null, "HPPSU", "  Output Current: %d A (max. %d A)", await psu.get_output_current(), await psu.get_peak_output_current());
         cl.tprintln(null, "HPPSU", "  Output Power: %d W", await psu.get_output_power());
+        cl.tprintln(null, "HPPSU", "  Efficiency: %d %%", (await psu.get_efficiency() * 100));
         cl.tprintln(null, "HPPSU", "  Intake Temperature: %d C", await psu.get_intake_temperature());
         cl.tprintln(null, "HPPSU", "  Internal Temperature: %d C", await psu.get_internal_temperature());
         cl.tprintln(null, "HPPSU", "  Fan speed: %d RPM", await psu.get_fan_speed());
