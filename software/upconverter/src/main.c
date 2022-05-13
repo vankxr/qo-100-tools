@@ -48,6 +48,7 @@ static void sleep();
 
 static uint32_t get_free_ram();
 
+static void get_device_core_name(char *pszDeviceCoreName, uint32_t ulDeviceCoreNameSize);
 static void get_device_name(char *pszDeviceName, uint32_t ulDeviceNameSize);
 static uint16_t get_device_revision();
 
@@ -120,6 +121,36 @@ uint32_t get_free_ram()
     }
 }
 
+void get_device_core_name(char *pszDeviceCoreName, uint32_t ulDeviceCoreNameSize)
+{
+    uint8_t ubImplementer = (SCB->CPUID & SCB_CPUID_IMPLEMENTER_Msk) >> SCB_CPUID_IMPLEMENTER_Pos;
+    const char* szImplementer = "?";
+
+    switch(ubImplementer)
+    {
+        case 0x41: szImplementer = "ARM"; break;
+    }
+
+    uint16_t usPartNo = (SCB->CPUID & SCB_CPUID_PARTNO_Msk) >> SCB_CPUID_PARTNO_Pos;
+    const char* szPartNo = "?";
+
+    switch(usPartNo)
+    {
+        case 0xC20: szPartNo = "Cortex-M0"; break;
+        case 0xC60: szPartNo = "Cortex-M0+"; break;
+        case 0xC21: szPartNo = "Cortex-M1"; break;
+        case 0xD20: szPartNo = "Cortex-M23"; break;
+        case 0xC23: szPartNo = "Cortex-M3"; break;
+        case 0xD21: szPartNo = "Cortex-M33"; break;
+        case 0xC24: szPartNo = "Cortex-M4"; break;
+        case 0xC27: szPartNo = "Cortex-M7"; break;
+    }
+
+    uint8_t ubVariant = (SCB->CPUID & SCB_CPUID_VARIANT_Msk) >> SCB_CPUID_VARIANT_Pos;
+    uint8_t ubRevision = (SCB->CPUID & SCB_CPUID_REVISION_Msk) >> SCB_CPUID_REVISION_Pos;
+
+    snprintf(pszDeviceCoreName, ulDeviceCoreNameSize, "%s %s r%hhup%hhu", szImplementer, szPartNo, ubVariant, ubRevision);
+}
 void get_device_name(char *pszDeviceName, uint32_t ulDeviceNameSize)
 {
     uint8_t ubFamily = (DEVINFO->PART & _DEVINFO_PART_DEVICE_FAMILY_MASK) >> _DEVINFO_PART_DEVICE_FAMILY_SHIFT;
@@ -409,14 +440,17 @@ int init()
     i2c0_set_slave_rx_data_isr(i2c_slave_rx_data_isr);
     i2c1_init(I2C_FAST, 3, 3);
 
+    char szDeviceCoreName[32];
     char szDeviceName[32];
 
+    get_device_core_name(szDeviceCoreName, 32);
     get_device_name(szDeviceName, 32);
 
     printf("\x1B[2J"); // Clear the screen
     printf("\x1B[H"); // Move cursor to top left corner
 
     DBGPRINTLN_CTX("IcyRadio Upconverter v%lu (%s %s)!", BUILD_VERSION, __DATE__, __TIME__);
+    DBGPRINTLN_CTX("Core: %s", szDeviceCoreName);
     DBGPRINTLN_CTX("Device: %s", szDeviceName);
     DBGPRINTLN_CTX("Device Revision: 0x%04X", get_device_revision());
     DBGPRINTLN_CTX("Calibration temperature: %hhu C", (DEVINFO->CAL & _DEVINFO_CAL_TEMP_MASK) >> _DEVINFO_CAL_TEMP_SHIFT);
@@ -519,11 +553,11 @@ int main()
     mcp3421_write_config(MCP3421_RESOLUTION_16BIT | MCP3421_ONE_SHOT);
 
     // Attenuators
-    f1958_set_attenuation(F1958_IF_ATT_ID, 12.00f);
+    f1958_set_attenuation(F1958_IF_ATT_ID, 12.f);
     DBGPRINTLN_CTX("IF Attenuator value: -%.3f dB", (float)F1958_ATTENUATION[F1958_IF_ATT_ID]);
-    f1958_set_attenuation(F1958_RF1_ATT_ID, 23.00f);
+    f1958_set_attenuation(F1958_RF1_ATT_ID, 15.f);
     DBGPRINTLN_CTX("RF Attenuator value: -%.3f dB", (float)F1958_ATTENUATION[F1958_RF1_ATT_ID]);
-    f1958_set_attenuation(F1958_RF2_ATT_ID, 8.00f);
+    f1958_set_attenuation(F1958_RF2_ATT_ID, 1.f);
     DBGPRINTLN_CTX("RF Attenuator value: -%.3f dB", (float)F1958_ATTENUATION[F1958_RF2_ATT_ID]);
 
     // PLL

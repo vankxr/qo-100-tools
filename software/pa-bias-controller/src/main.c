@@ -71,6 +71,7 @@ static void sleep();
 
 static uint32_t get_free_ram();
 
+static void get_device_core_name(char *pszDeviceCoreName, uint32_t ulDeviceCoreNameSize);
 static void get_device_name(char *pszDeviceName, uint32_t ulDeviceNameSize);
 static uint16_t get_device_revision();
 
@@ -152,6 +153,36 @@ uint32_t get_free_ram()
     }
 }
 
+void get_device_core_name(char *pszDeviceCoreName, uint32_t ulDeviceCoreNameSize)
+{
+    uint8_t ubImplementer = (SCB->CPUID & SCB_CPUID_IMPLEMENTER_Msk) >> SCB_CPUID_IMPLEMENTER_Pos;
+    const char* szImplementer = "?";
+
+    switch(ubImplementer)
+    {
+        case 0x41: szImplementer = "ARM"; break;
+    }
+
+    uint16_t usPartNo = (SCB->CPUID & SCB_CPUID_PARTNO_Msk) >> SCB_CPUID_PARTNO_Pos;
+    const char* szPartNo = "?";
+
+    switch(usPartNo)
+    {
+        case 0xC20: szPartNo = "Cortex-M0"; break;
+        case 0xC60: szPartNo = "Cortex-M0+"; break;
+        case 0xC21: szPartNo = "Cortex-M1"; break;
+        case 0xD20: szPartNo = "Cortex-M23"; break;
+        case 0xC23: szPartNo = "Cortex-M3"; break;
+        case 0xD21: szPartNo = "Cortex-M33"; break;
+        case 0xC24: szPartNo = "Cortex-M4"; break;
+        case 0xC27: szPartNo = "Cortex-M7"; break;
+    }
+
+    uint8_t ubVariant = (SCB->CPUID & SCB_CPUID_VARIANT_Msk) >> SCB_CPUID_VARIANT_Pos;
+    uint8_t ubRevision = (SCB->CPUID & SCB_CPUID_REVISION_Msk) >> SCB_CPUID_REVISION_Pos;
+
+    snprintf(pszDeviceCoreName, ulDeviceCoreNameSize, "%s %s r%hhup%hhu", szImplementer, szPartNo, ubVariant, ubRevision);
+}
 void get_device_name(char *pszDeviceName, uint32_t ulDeviceNameSize)
 {
     uint8_t ubFamily = (DEVINFO->PART & _DEVINFO_PART_DEVICE_FAMILY_MASK) >> _DEVINFO_PART_DEVICE_FAMILY_SHIFT;
@@ -429,7 +460,7 @@ uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
 void afe_init()
 {
     // Config
-    max11300_config(MAX11300_REG_DEVICE_CTRL_RS_CANCEL | MAX11300_REG_DEVICE_CTRL_THSHDN | MAX11300_REG_DEVICE_CTRL_DACREF_INTERNAL | MAX11300_REG_DEVICE_CTRL_ADCCONV_200KSPS | MAX11300_REG_DEVICE_CTRL_DACCTL_IMMEDIATE | MAX11300_REG_DEVICE_CTRL_ADCCTL_CONTINUOUS);
+    max11300_config(MAX11300_REG_DEVICE_CTRL_RS_CANCEL | MAX11300_REG_DEVICE_CTRL_TMPPER_EXTENDED | MAX11300_REG_DEVICE_CTRL_THSHDN | MAX11300_REG_DEVICE_CTRL_DACREF_INTERNAL | MAX11300_REG_DEVICE_CTRL_ADCCONV_200KSPS | MAX11300_REG_DEVICE_CTRL_DACCTL_IMMEDIATE | MAX11300_REG_DEVICE_CTRL_ADCCTL_CONTINUOUS);
 
     // Temperatures
     max11300_int_temp_config(1, MAX11300_REG_TEMP_MON_CONFIG_TMPINTMONCFG_32_SAMPLES, 0, 80);
@@ -643,14 +674,17 @@ int init()
     i2c0_set_slave_rx_data_isr(i2c_slave_rx_data_isr);
     i2c1_init(I2C_FAST, 3, 3);
 
+    char szDeviceCoreName[32];
     char szDeviceName[32];
 
+    get_device_core_name(szDeviceCoreName, 32);
     get_device_name(szDeviceName, 32);
 
     printf("\x1B[2J"); // Clear the screen
     printf("\x1B[H"); // Move cursor to top left corner
 
     DBGPRINTLN_CTX("IcyRadio PA Bias Controller v%lu (%s %s)!", BUILD_VERSION, __DATE__, __TIME__);
+    DBGPRINTLN_CTX("Core: %s", szDeviceCoreName);
     DBGPRINTLN_CTX("Device: %s", szDeviceName);
     DBGPRINTLN_CTX("Device Revision: 0x%04X", get_device_revision());
     DBGPRINTLN_CTX("Calibration temperature: %hhu C", (DEVINFO->CAL & _DEVINFO_CAL_TEMP_MASK) >> _DEVINFO_CAL_TEMP_SHIFT);
@@ -739,6 +773,14 @@ int main()
 
     // TEC
     tec_init();
+
+    afe_pa_set_raw_vgg(PA1_INDEX, 2250.f);
+    //PA1_ENABLE();
+    afe_pa_set_raw_vgg(PA2_INDEX, 2250.f);
+    //PA2_ENABLE();
+
+    //afe_pa_set_raw_vgg(PA2_INDEX, 2100.f);
+    //PA2_ENABLE();
 
     while(1)
     {
