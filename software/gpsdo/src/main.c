@@ -22,6 +22,9 @@
 #include "usart.h"
 #include "i2c.h"
 #include "wdog.h"
+#include "ocxo.h"
+#include "ad9544.h"
+#include "ssd1306.h"
 
 // Structs
 
@@ -465,10 +468,20 @@ int init()
         if(i2c2_write(a, NULL, 0, I2C_STOP))
             DBGPRINTLN_CTX("  Address 0x%02X ACKed!", a);
 
-    /*if(ad5541a_init())
-        DBGPRINTLN_CTX("AD5541A init OK!");
+    if(ssd1306_init())
+        DBGPRINTLN_CTX("SSD1306 init OK!");
     else
-        DBGPRINTLN_CTX("AD5541A init NOK!");*/
+        DBGPRINTLN_CTX("SSD1306 init NOK!");
+
+    if(ocxo_init())
+        DBGPRINTLN_CTX("OCXO init OK!");
+    else
+        DBGPRINTLN_CTX("OCXO init NOK!");
+
+    if(ad9544_init())
+        DBGPRINTLN_CTX("AD9544 init OK!");
+    else
+        DBGPRINTLN_CTX("AD9544 init NOK!");
 
     return 0;
 }
@@ -477,7 +490,7 @@ int main()
     // I2C Slave Register block
     i2c_slave_register_init();
 
-    PWR_OCXO_ENABLE();
+	ssd1306_draw_string(1, 0, "IcyRadio GPSDO", 1, 1);
 
     while(1)
     {
@@ -544,3 +557,81 @@ int main()
 
     return 0;
 }
+
+/*
+
+void updateDisplay()
+{
+	// Signal level
+	uint8_t signalLevel = 0;
+
+	if(LastGatewayRSSI < -110)
+		signalLevel = 0;
+	else if(LastGatewayRSSI < -95)
+		signalLevel = 1;
+	else if(LastGatewayRSSI < -75)
+		signalLevel = 2;
+	else if(LastGatewayRSSI < -55)
+		signalLevel = 3;
+	else if(LastGatewayRSSI < 0)
+		signalLevel = 4;
+
+	for (uint8_t b = 1; b <= 4; b++)
+		OLED::DrawRect(110 + b * 3, 8 - b * 2, 1, b * 2, 1, (b <= signalLevel) ? 1 : 0);
+
+	// Node ID
+	char buf[24];
+
+	snprintf_P(buf, 5, PSTR("#%03d"), RFM69::NodeID);
+	OLED::DrawString(86, 0, buf);
+
+	// Current screen info
+	double bat = getBatteryVoltage();
+	double vbg = getBandgapVoltage();
+	double temp = 0.f;
+	double humid = 0.f;
+	double press = 0.f;
+
+	while(temp == 0.f || humid == 0.f || press == 0.f)
+	{
+		BME280::TakeForcedMeasurement();
+
+		temp = BME280::ReadTemperature();
+		humid = BME280::ReadHumidity();
+		press = BME280::ReadPressure();
+	}
+
+	DBGPRINTLN_CTX("Gateway RSSI [R %d]", LastGatewayRSSI);
+	DBGPRINTLN_CTX("Voltage readings [BAT %.3f] [VBG %.3f]", bat, vbg);
+	DBGPRINTLN_CTX("BME280 readings [T %.2f] [H %.3f] [P %.2f]", temp, humid, press);
+
+	switch(DISPLAY_STATUS & 0x7F)
+	{
+		case 0:
+		{
+			snprintf_P(buf, 24, PSTR("Battery: %.1f mV"), bat);
+			OLED::DrawString(1, 8, buf);
+
+			snprintf_P(buf, 24, PSTR("Temp: %.2f ºC"), temp);
+			OLED::DrawString(1, 16, buf);
+
+			snprintf_P(buf, 24, PSTR("Humid: %.3f %%RH"), humid);
+			OLED::DrawString(1, 24, buf);
+		}
+		break;
+		case 1:
+		{
+			snprintf_P(buf, 24, PSTR("Bandgap: %.1f mV"), vbg);
+			OLED::DrawString(1, 8, buf);
+
+			snprintf_P(buf, 24, PSTR("Press: %.2f hPa"), press);
+			OLED::DrawString(1, 16, buf);
+		}
+		break;
+	}
+}
+
+
+	OLED::DrawString(1, 0, "cMotion Node");
+
+*/

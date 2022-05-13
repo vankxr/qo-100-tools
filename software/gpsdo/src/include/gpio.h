@@ -19,6 +19,15 @@
 #define PWR_1V8_PLL_DISABLE()   PERI_REG_BIT_CLEAR(&(GPIO->P[0].DOUT)) = BIT(6)
 #define PWR_OCXO_ENABLE()       PERI_REG_BIT_SET(&(GPIO->P[4].DOUT)) = BIT(11)
 #define PWR_OCXO_DISABLE()      PERI_REG_BIT_CLEAR(&(GPIO->P[4].DOUT)) = BIT(11)
+#define PWR_OCXO_STATUS()       PERI_REG_BIT(&(GPIO->P[4].DIN), 11)
+
+// DAC MACROS
+#define DAC_SELECT()            PERI_REG_BIT_CLEAR(&(GPIO->P[4].DOUT)) = BIT(13)
+#define DAC_UNSELECT()          PERI_REG_BIT_SET(&(GPIO->P[4].DOUT)) = BIT(13)
+
+// PLL MACROS
+#define PLL_RESET()             PERI_REG_BIT_CLEAR(&(GPIO->P[5].DOUT)) = BIT(7)
+#define PLL_UNRESET()           PERI_REG_BIT_SET(&(GPIO->P[5].DOUT)) = BIT(7)
 
 void gpio_init();
 
