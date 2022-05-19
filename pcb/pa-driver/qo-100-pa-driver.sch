@@ -2726,6 +2726,201 @@ Logo</text>
 </deviceset>
 </devicesets>
 </library>
+<library name="Generic BJT">
+<packages>
+<package name="SOT23">
+<smd name="1" x="-1.0668" y="0.9398" dx="1.2192" dy="0.5334" layer="1"/>
+<smd name="2" x="-1.0668" y="-0.9398" dx="1.2192" dy="0.5334" layer="1"/>
+<smd name="3" x="1.0668" y="0" dx="1.2192" dy="0.5334" layer="1"/>
+<wire x1="0.6604" y1="0.5842" x2="0.6604" y2="1.4478" width="0.127" layer="21"/>
+<wire x1="-0.2286" y1="-1.4478" x2="0.6604" y2="-1.4478" width="0.127" layer="21"/>
+<wire x1="0.6604" y1="-1.4478" x2="0.6604" y2="-0.5842" width="0.127" layer="21"/>
+<wire x1="0.6604" y1="1.4478" x2="-0.2286" y2="1.4478" width="0.127" layer="21"/>
+<wire x1="-0.6604" y1="0.3556" x2="-0.6604" y2="-0.3556" width="0.127" layer="21"/>
+<wire x1="-0.6604" y1="-1.4478" x2="0.6604" y2="-1.4478" width="0.127" layer="51"/>
+<wire x1="0.6604" y1="-1.4478" x2="0.6604" y2="-0.2286" width="0.127" layer="51"/>
+<wire x1="0.6604" y1="-0.2286" x2="0.6604" y2="0.2286" width="0.127" layer="51"/>
+<wire x1="0.6604" y1="0.2286" x2="0.6604" y2="1.4478" width="0.127" layer="51"/>
+<wire x1="0.6604" y1="1.4478" x2="-0.6604" y2="1.4478" width="0.127" layer="51"/>
+<wire x1="-0.6604" y1="1.4478" x2="-0.6604" y2="-1.1938" width="0.127" layer="51"/>
+<wire x1="-0.6604" y1="-1.4478" x2="-0.6604" y2="-1.1938" width="0.127" layer="51"/>
+<text x="-3.0988" y="1.5748" size="1.016" layer="25" ratio="10" rot="SR0">&gt;NAME</text>
+<text x="-3.1242" y="-3.048" size="1.016" layer="27" ratio="10" rot="SR0">&gt;VALUE</text>
+</package>
+</packages>
+<symbols>
+<symbol name="NPN">
+<pin name="B" x="-2.54" y="0" visible="off" length="short" direction="pas"/>
+<pin name="E" x="2.54" y="-5.08" visible="off" length="short" direction="pas" rot="R90"/>
+<pin name="C" x="2.54" y="5.08" visible="off" length="short" direction="pas" rot="R270"/>
+<polygon width="0.1524" layer="94">
+<vertex x="1.778" y="-1.524"/>
+<vertex x="1.27" y="-2.54"/>
+<vertex x="2.54" y="-2.54"/>
+</polygon>
+<wire x1="2.54" y1="2.54" x2="0" y2="1.27" width="0.1524" layer="94"/>
+<wire x1="2.54" y1="-2.54" x2="0" y2="-1.27" width="0.1524" layer="94"/>
+<wire x1="0" y1="2.54" x2="0" y2="-2.54" width="0.1524" layer="94"/>
+<text x="3.7846" y="0.7874" size="1.27" layer="95">&gt;NAME</text>
+<text x="3.7592" y="-1.8542" size="1.27" layer="96">&gt;VALUE</text>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="2N3904" prefix="T">
+<gates>
+<gate name="G$1" symbol="NPN" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="SOT23">
+<connects>
+<connect gate="G$1" pin="B" pad="1"/>
+<connect gate="G$1" pin="C" pad="3"/>
+<connect gate="G$1" pin="E" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
+<library name="JST">
+<packages>
+<package name="SH-02-SIDE">
+<description>&lt;b&gt;Shrouded Header, side entry type&lt;/b&gt;</description>
+<wire x1="-1.873" y1="-1.473" x2="-1.873" y2="2.523" width="0.254" layer="51"/>
+<wire x1="-1.873" y1="2.523" x2="1.873" y2="2.523" width="0.254" layer="51"/>
+<wire x1="1.873" y1="2.523" x2="1.873" y2="-1.473" width="0.254" layer="51"/>
+<wire x1="1.873" y1="-1.473" x2="-1.873" y2="-1.473" width="0.254" layer="51"/>
+<wire x1="-1.873" y1="0.5" x2="-1.873" y2="2.523" width="0.254" layer="21"/>
+<wire x1="-1.873" y1="2.523" x2="-1.5" y2="2.523" width="0.254" layer="21"/>
+<wire x1="1.873" y1="0.5" x2="1.873" y2="2.523" width="0.254" layer="21"/>
+<wire x1="1.873" y1="2.523" x2="1.5" y2="2.523" width="0.254" layer="21"/>
+<wire x1="-0.5" y1="-1.473" x2="0.5" y2="-1.473" width="0.254" layer="21"/>
+<smd name="1" x="-0.5" y="2.975" dx="0.6" dy="1.55" layer="1"/>
+<smd name="2" x="0.5" y="2.975" dx="0.6" dy="1.55" layer="1"/>
+<smd name="FIT@1" x="-1.8" y="-0.9" dx="1.2" dy="1.8" layer="1"/>
+<smd name="FIT@2" x="1.8" y="-0.9" dx="1.2" dy="1.8" layer="1"/>
+<text x="-3.175" y="-1.905" size="1.27" layer="25" rot="R90">&gt;NAME</text>
+<text x="4.445" y="-1.905" size="1.27" layer="27" rot="R90">&gt;VALUE</text>
+</package>
+<package name="SH-02-TOP">
+<description>&lt;b&gt;Shrouded Header, top entry type&lt;/b&gt;</description>
+<wire x1="-1.873" y1="1.473" x2="-1.873" y2="-1.427" width="0.254" layer="51"/>
+<wire x1="-1.873" y1="-1.427" x2="1.873" y2="-1.427" width="0.254" layer="51"/>
+<wire x1="1.873" y1="-1.427" x2="1.873" y2="1.473" width="0.254" layer="51"/>
+<wire x1="1.873" y1="1.473" x2="-1.873" y2="1.473" width="0.254" layer="51"/>
+<wire x1="-1.873" y1="-0.5" x2="-1.873" y2="-1.427" width="0.254" layer="21"/>
+<wire x1="-1.873" y1="-1.427" x2="-1.5" y2="-1.427" width="0.254" layer="21"/>
+<wire x1="1.873" y1="-0.5" x2="1.873" y2="-1.427" width="0.254" layer="21"/>
+<wire x1="1.873" y1="-1.427" x2="1.5" y2="-1.427" width="0.254" layer="21"/>
+<wire x1="-0.5" y1="1.473" x2="0.5" y2="1.473" width="0.254" layer="21"/>
+<smd name="2" x="-0.5" y="-1.625" dx="0.6" dy="1.55" layer="1"/>
+<smd name="1" x="0.5" y="-1.625" dx="0.6" dy="1.55" layer="1"/>
+<smd name="FIT@1" x="1.8" y="0.9" dx="1.2" dy="1.8" layer="1"/>
+<smd name="FIT@2" x="-1.8" y="0.9" dx="1.2" dy="1.8" layer="1"/>
+<text x="-4.445" y="1.905" size="1.27" layer="25" rot="R270">&gt;NAME</text>
+<text x="3.175" y="1.905" size="1.27" layer="27" rot="R270">&gt;VALUE</text>
+</package>
+<package name="PH-02-TOP">
+<wire x1="-4.1" y1="2.97" x2="4.2" y2="2.97" width="0.2032" layer="51"/>
+<wire x1="4.2" y1="2.97" x2="4.2" y2="-2.13" width="0.2032" layer="51"/>
+<wire x1="4.2" y1="-2.13" x2="-4.1" y2="-2.13" width="0.2032" layer="51"/>
+<wire x1="-4.1" y1="-2.13" x2="-4.1" y2="2.97" width="0.2032" layer="51"/>
+<wire x1="-4.1" y1="3" x2="4.2" y2="3" width="0.2032" layer="21"/>
+<wire x1="4.2" y1="3" x2="4.2" y2="2.3" width="0.2032" layer="21"/>
+<wire x1="-4.1" y1="3" x2="-4.1" y2="2.3" width="0.2032" layer="21"/>
+<wire x1="2" y1="-2.1" x2="4.2" y2="-2.1" width="0.2032" layer="21"/>
+<wire x1="4.2" y1="-2.1" x2="4.2" y2="-1.7" width="0.2032" layer="21"/>
+<wire x1="-2" y1="-2.1" x2="-4.1" y2="-2.1" width="0.2032" layer="21"/>
+<wire x1="-4.1" y1="-2.1" x2="-4.1" y2="-1.8" width="0.2032" layer="21"/>
+<smd name="P$1" x="-3.4" y="0.27" dx="3" dy="1.6" layer="1" rot="R90"/>
+<smd name="P$2" x="3.4" y="0.27" dx="3" dy="1.6" layer="1" rot="R90"/>
+<smd name="1" x="-1" y="-2" dx="1" dy="5.5" layer="1"/>
+<smd name="2" x="1" y="-2" dx="1" dy="5.5" layer="1"/>
+<text x="2.54" y="-5.08" size="1.27" layer="25">&gt;Name</text>
+<text x="2.24" y="3.48" size="1.27" layer="27">&gt;Value</text>
+</package>
+<package name="XH-02-TOP-TH">
+<pad name="2" x="-1.25" y="0" drill="1" diameter="2"/>
+<pad name="1" x="1.25" y="0" drill="1" diameter="2"/>
+<wire x1="3.7" y1="-2.35" x2="3.7" y2="3.4" width="0.127" layer="21"/>
+<wire x1="-3.7" y1="-2.35" x2="-2.05" y2="-2.35" width="0.127" layer="21"/>
+<wire x1="-0.45" y1="-2.35" x2="0.45" y2="-2.35" width="0.127" layer="21"/>
+<wire x1="2.05" y1="-2.35" x2="3.7" y2="-2.35" width="0.127" layer="21"/>
+<wire x1="-3.7" y1="-2.35" x2="-3.7" y2="3.4" width="0.127" layer="21"/>
+<wire x1="-3.7" y1="3.4" x2="3.7" y2="3.4" width="0.127" layer="21"/>
+<wire x1="-2.05" y1="-2.35" x2="-2.05" y2="-1.6" width="0.127" layer="21"/>
+<wire x1="-2.05" y1="-1.6" x2="-0.45" y2="-1.6" width="0.127" layer="21"/>
+<wire x1="-0.45" y1="-1.6" x2="-0.45" y2="-2.35" width="0.127" layer="21"/>
+<wire x1="0.45" y1="-2.35" x2="0.45" y2="-1.6" width="0.127" layer="21"/>
+<wire x1="0.45" y1="-1.6" x2="2.05" y2="-1.6" width="0.127" layer="21"/>
+<wire x1="2.05" y1="-1.6" x2="2.05" y2="-2.35" width="0.127" layer="21"/>
+<text x="-3.7" y="3.7" size="1.27" layer="25">&gt;NAME</text>
+</package>
+</packages>
+<symbols>
+<symbol name="KV">
+<wire x1="1.27" y1="0" x2="0" y2="0" width="0.6096" layer="94"/>
+<text x="2.54" y="-0.762" size="1.524" layer="95">&gt;NAME</text>
+<text x="-0.762" y="1.397" size="1.524" layer="96">&gt;VALUE</text>
+<pin name="S" x="-2.54" y="0" visible="off" length="short" direction="pas"/>
+</symbol>
+<symbol name="K">
+<wire x1="1.27" y1="0" x2="0" y2="0" width="0.6096" layer="94"/>
+<text x="2.54" y="-0.762" size="1.524" layer="95">&gt;NAME</text>
+<pin name="S" x="-2.54" y="0" visible="off" length="short" direction="pas"/>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="2P" prefix="CON">
+<description>&lt;b&gt;Disconnectable Crimp style connector, 1.0mm pitch&lt;/b&gt;&lt;br&gt;2 contacts</description>
+<gates>
+<gate name="-1" symbol="KV" x="0" y="2.54" addlevel="always" swaplevel="1"/>
+<gate name="-2" symbol="K" x="0" y="0" addlevel="always" swaplevel="1"/>
+</gates>
+<devices>
+<device name="-SH-SIDE" package="SH-02-SIDE">
+<connects>
+<connect gate="-1" pin="S" pad="1"/>
+<connect gate="-2" pin="S" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="-SH-TOP" package="SH-02-TOP">
+<connects>
+<connect gate="-1" pin="S" pad="1"/>
+<connect gate="-2" pin="S" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="-PH-TOP" package="PH-02-TOP">
+<connects>
+<connect gate="-1" pin="S" pad="1"/>
+<connect gate="-2" pin="S" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="-XH-TOP-TH" package="XH-02-TOP-TH">
+<connects>
+<connect gate="-1" pin="S" pad="1"/>
+<connect gate="-2" pin="S" pad="2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
 </libraries>
 <attributes>
 <attribute name="CNAME" value=""/>
@@ -2783,6 +2978,8 @@ Logo</text>
 <part name="GND3" library="Supply Symbol" deviceset="GND" device=""/>
 <part name="C2" library="Capacitor" deviceset="CAPACITOR" device="-0603" value="10uF"/>
 <part name="GND7" library="Supply Symbol" deviceset="GND" device=""/>
+<part name="T1" library="Generic BJT" deviceset="2N3904" device=""/>
+<part name="CON1" library="JST" deviceset="2P" device="-SH-SIDE"/>
 </parts>
 <sheets>
 <sheet>
@@ -2950,6 +3147,17 @@ Logo</text>
 </instance>
 <instance part="GND7" gate="G$1" x="132.08" y="160.02" smashed="yes">
 <attribute name="VALUE" x="132.08" y="154.94" size="1.778" layer="96" align="bottom-center"/>
+</instance>
+<instance part="T1" gate="G$1" x="358.14" y="63.5" smashed="yes">
+<attribute name="NAME" x="361.9246" y="64.2874" size="1.27" layer="95"/>
+<attribute name="VALUE" x="361.8992" y="61.6458" size="1.27" layer="96"/>
+</instance>
+<instance part="CON1" gate="-1" x="360.68" y="81.28" smashed="yes" rot="R90">
+<attribute name="NAME" x="361.442" y="83.82" size="1.524" layer="95" rot="R90"/>
+<attribute name="VALUE" x="359.283" y="80.518" size="1.524" layer="96" rot="R90"/>
+</instance>
+<instance part="CON1" gate="-2" x="360.68" y="50.8" smashed="yes" rot="R270">
+<attribute name="NAME" x="359.918" y="48.26" size="1.524" layer="95" rot="R270"/>
 </instance>
 </instances>
 <busses>
@@ -3149,6 +3357,26 @@ Logo</text>
 <pinref part="C1" gate="G$1" pin="C2"/>
 <pinref part="U1" gate="G$1" pin="RFIN"/>
 <wire x1="104.14" y1="129.54" x2="111.76" y2="129.54" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$1" class="0">
+<segment>
+<pinref part="CON1" gate="-2" pin="S"/>
+<pinref part="T1" gate="G$1" pin="E"/>
+<wire x1="360.68" y1="53.34" x2="360.68" y2="58.42" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$3" class="0">
+<segment>
+<pinref part="T1" gate="G$1" pin="B"/>
+<wire x1="355.6" y1="63.5" x2="350.52" y2="63.5" width="0.1524" layer="91"/>
+<wire x1="350.52" y1="63.5" x2="350.52" y2="73.66" width="0.1524" layer="91"/>
+<wire x1="350.52" y1="73.66" x2="360.68" y2="73.66" width="0.1524" layer="91"/>
+<pinref part="CON1" gate="-1" pin="S"/>
+<wire x1="360.68" y1="73.66" x2="360.68" y2="78.74" width="0.1524" layer="91"/>
+<pinref part="T1" gate="G$1" pin="C"/>
+<wire x1="360.68" y1="68.58" x2="360.68" y2="73.66" width="0.1524" layer="91"/>
+<junction x="360.68" y="73.66"/>
 </segment>
 </net>
 </nets>
