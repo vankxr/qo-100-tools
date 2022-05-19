@@ -987,6 +987,51 @@ Mar 2022</text>
 </package>
 </packages>
 </library>
+<library name="Generic BJT">
+<packages>
+<package name="SOT23">
+<smd name="1" x="-1.0668" y="0.9398" dx="1.2192" dy="0.5334" layer="1"/>
+<smd name="2" x="-1.0668" y="-0.9398" dx="1.2192" dy="0.5334" layer="1"/>
+<smd name="3" x="1.0668" y="0" dx="1.2192" dy="0.5334" layer="1"/>
+<wire x1="0.6604" y1="0.5842" x2="0.6604" y2="1.4478" width="0.127" layer="21"/>
+<wire x1="-0.2286" y1="-1.4478" x2="0.6604" y2="-1.4478" width="0.127" layer="21"/>
+<wire x1="0.6604" y1="-1.4478" x2="0.6604" y2="-0.5842" width="0.127" layer="21"/>
+<wire x1="0.6604" y1="1.4478" x2="-0.2286" y2="1.4478" width="0.127" layer="21"/>
+<wire x1="-0.6604" y1="0.3556" x2="-0.6604" y2="-0.3556" width="0.127" layer="21"/>
+<wire x1="-0.6604" y1="-1.4478" x2="0.6604" y2="-1.4478" width="0.127" layer="51"/>
+<wire x1="0.6604" y1="-1.4478" x2="0.6604" y2="-0.2286" width="0.127" layer="51"/>
+<wire x1="0.6604" y1="-0.2286" x2="0.6604" y2="0.2286" width="0.127" layer="51"/>
+<wire x1="0.6604" y1="0.2286" x2="0.6604" y2="1.4478" width="0.127" layer="51"/>
+<wire x1="0.6604" y1="1.4478" x2="-0.6604" y2="1.4478" width="0.127" layer="51"/>
+<wire x1="-0.6604" y1="1.4478" x2="-0.6604" y2="-1.1938" width="0.127" layer="51"/>
+<wire x1="-0.6604" y1="-1.4478" x2="-0.6604" y2="-1.1938" width="0.127" layer="51"/>
+<text x="-3.0988" y="1.5748" size="1.016" layer="25" ratio="10" rot="SR0">&gt;NAME</text>
+<text x="-3.1242" y="-3.048" size="1.016" layer="27" ratio="10" rot="SR0">&gt;VALUE</text>
+</package>
+</packages>
+</library>
+<library name="JST">
+<packages>
+<package name="SH-02-SIDE">
+<description>&lt;b&gt;Shrouded Header, side entry type&lt;/b&gt;</description>
+<wire x1="-1.873" y1="-1.473" x2="-1.873" y2="2.523" width="0.254" layer="51"/>
+<wire x1="-1.873" y1="2.523" x2="1.873" y2="2.523" width="0.254" layer="51"/>
+<wire x1="1.873" y1="2.523" x2="1.873" y2="-1.473" width="0.254" layer="51"/>
+<wire x1="1.873" y1="-1.473" x2="-1.873" y2="-1.473" width="0.254" layer="51"/>
+<wire x1="-1.873" y1="0.5" x2="-1.873" y2="2.523" width="0.254" layer="21"/>
+<wire x1="-1.873" y1="2.523" x2="-1.5" y2="2.523" width="0.254" layer="21"/>
+<wire x1="1.873" y1="0.5" x2="1.873" y2="2.523" width="0.254" layer="21"/>
+<wire x1="1.873" y1="2.523" x2="1.5" y2="2.523" width="0.254" layer="21"/>
+<wire x1="-0.5" y1="-1.473" x2="0.5" y2="-1.473" width="0.254" layer="21"/>
+<smd name="1" x="-0.5" y="2.975" dx="0.6" dy="1.55" layer="1"/>
+<smd name="2" x="0.5" y="2.975" dx="0.6" dy="1.55" layer="1"/>
+<smd name="FIT@1" x="-1.8" y="-0.9" dx="1.2" dy="1.8" layer="1"/>
+<smd name="FIT@2" x="1.8" y="-0.9" dx="1.2" dy="1.8" layer="1"/>
+<text x="-3.175" y="-1.905" size="1.27" layer="25" rot="R90">&gt;NAME</text>
+<text x="4.445" y="-1.905" size="1.27" layer="27" rot="R90">&gt;VALUE</text>
+</package>
+</packages>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -1274,6 +1319,14 @@ design rules under a new name.</description>
 <element name="C2" library="Capacitor" package="CAP0603" value="10uF" x="33.5" y="31.5" smashed="yes">
 <attribute name="NAME" x="35.7456" y="31.516" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
 <attribute name="VOLTAGE" value="" x="33.5" y="31.7" size="1.778" layer="27" display="off"/>
+</element>
+<element name="T1" library="Generic BJT" package="SOT23" value="2N3904" x="54.1" y="4.3" smashed="yes">
+<attribute name="NAME" x="53.6012" y="2.2748" size="0.8" layer="25" font="vector" ratio="10" rot="SR0" align="center-left"/>
+<attribute name="VALUE" x="50.9758" y="1.252" size="1.016" layer="27" ratio="10" rot="SR0"/>
+</element>
+<element name="CON1" library="JST" package="SH-02-SIDE" value="2P-SH-SIDE" x="58.2" y="2" smashed="yes">
+<attribute name="NAME" x="60.825" y="2.195" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="center-left"/>
+<attribute name="VALUE" x="62.645" y="0.095" size="1.27" layer="27" rot="R90"/>
 </element>
 </elements>
 <signals>
@@ -2235,6 +2288,22 @@ design rules under a new name.</description>
 </signal>
 <signal name="S$99">
 </signal>
+<signal name="N$1">
+<contactref element="CON1" pad="2"/>
+<contactref element="T1" pad="2"/>
+<wire x1="53.0332" y1="3.3602" x2="58.2602" y2="3.3602" width="0.254" layer="1"/>
+<wire x1="58.7" y1="3.8" x2="58.7" y2="4.975" width="0.254" layer="1"/>
+<wire x1="58.2602" y1="3.3602" x2="58.7" y2="3.8" width="0.254" layer="1"/>
+</signal>
+<signal name="N$3">
+<contactref element="T1" pad="1"/>
+<contactref element="CON1" pad="1"/>
+<contactref element="T1" pad="3"/>
+<wire x1="57.7" y1="4.975" x2="57.025" y2="4.3" width="0.254" layer="1"/>
+<wire x1="57.025" y1="4.3" x2="55.1668" y2="4.3" width="0.254" layer="1"/>
+<wire x1="53.0332" y1="5.2398" x2="54.227" y2="5.2398" width="0.254" layer="1"/>
+<wire x1="54.227" y1="5.2398" x2="55.1668" y2="4.3" width="0.254" layer="1"/>
+</signal>
 </signals>
 <mfgpreviewcolors>
 <mfgpreviewcolor name="soldermaskcolor" color="0xC8008000"/>
@@ -2341,6 +2410,12 @@ design rules under a new name.</description>
 <approved hash="5,1,c37bfe4d60207940"/>
 <approved hash="5,1,533a3377a0b9a39f"/>
 <approved hash="5,1,53bf9925e95209f5"/>
+<approved hash="19,1,a9aa2616d0c01a9b"/>
+<approved hash="19,1,4ac90d7bf9f831fe"/>
+<approved hash="19,1,6c706d0cf530f44c"/>
+<approved hash="19,1,a077a10efd32fc4b"/>
+<approved hash="19,1,00d1940a69f335f3"/>
+<approved hash="19,1,9a0cc6b6231b877c"/>
 </errors>
 </board>
 </drawing>
