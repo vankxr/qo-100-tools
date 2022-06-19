@@ -42,6 +42,28 @@
 #define I2C_SLAVE_REGISTER_DEV_UIDL             0xF8 // 32-bit
 #define I2C_SLAVE_REGISTER_DEV_UIDH             0xFC // 32-bit
 
+//// Power meter calibration tables
+// CW
+#define MOD_CW                      fPData_CW, fVData_CW, (sizeof(fPData_CW) / sizeof(float))
+static const float fPData_CW[]      = {-10.50, -9.70, -8.60, -7.57, -6.50, -5.50, -0.80, 3.80, 8.75, 13.70, 18.25, 21.90, 22.70, 22.90, 23.37, 23.80};
+static const float fVData_CW[]      = {1.52, 22.68, 59.00, 93.10, 126.50, 160.23, 303.73, 439.65, 581.63, 719.60, 853.53, 990.86, 1014.28, 1043.68, 1067.15, 1071.76};
+// QPSK
+#define MOD_QPSK                    fPData_QPSK, fVData_QPSK, (sizeof(fPData_QPSK) / sizeof(float))
+static const float fPData_QPSK[]    = {-10.50, -9.70, -8.60, -7.57, -6.50, -5.50, -0.80, 3.80, 8.75, 13.70, 18.25, 21.90, 22.70, 22.90, 23.37, 23.80};
+static const float fVData_QPSK[]    = {1.52, 22.68, 59.00, 93.10, 126.50, 160.23, 303.73, 439.65, 581.63, 719.60, 853.53, 990.86, 1014.28, 1043.68, 1067.15, 1071.76};
+// 8PSK,
+#define MOD_8PSK                    fPData_8PSK, fVData_8PSK, (sizeof(fPData_8PSK) / sizeof(float))
+static const float fPData_8PSK[]    = {-10.65, -9.73, -8.65, -7.38, -6.31, -5.93, -1.20, 3.42, 8.41, 13.30, 17.77, 21.53, 22.16, 22.80, 23.15, 23.67};
+static const float fVData_8PSK[]    = {1.47, 20.89, 55.34, 89.95, 122.35, 156.76, 299.89, 435.51, 578.40, 716.68, 850.36, 986.79, 1011.46, 1041.43, 1064.18, 1071.47};
+// 16APSK
+#define MOD_16APSK                  fPData_16APSK, fVData_16APSK, (sizeof(fPData_16APSK) / sizeof(float))
+static const float fPData_16APSK[]  = {-10.68, -9.97, -8.83, -7.77, -6.77, -5.73, -1.06, 3.45, 8.45, 13.51, 17.97, 21.61, 22.15, 22.67, 22.93, 23.90};
+static const float fVData_16APSK[]  = {1.43, 25.62, 61.63, 95.87, 128.30, 159.84, 302.70, 436.33, 579.06, 717.97, 850.71, 988.16, 1011.32, 1036.59, 1059.04, 1070.22};
+// 32APSK
+#define MOD_32APSK                  fPData_32APSK, fVData_32APSK, (sizeof(fPData_32APSK) / sizeof(float))
+static const float fPData_32APSK[]  = {-10.56, -10.00, -8.80, -7.90, -6.66, -5.53, -0.88, 3.81, 8.75, 13.70, 18.13, 21.85, 22.30, 22.86, 23.35, 23.90};
+static const float fVData_32APSK[]  = {1.41, 16.76, 52.18, 84.60, 126.12, 159.64, 302.23, 438.64, 581.43, 720.25, 853.64, 898.74, 1013.76, 1041.22, 1063.64, 1071.27};
+
 // Forward declarations
 static void reset() __attribute__((noreturn));
 static void sleep();
@@ -61,7 +83,7 @@ static uint8_t i2c_slave_rx_data_isr(uint8_t ubData);
 
 static float ext_adc_get_5v0_current(uint32_t ulSamples);
 
-static float get_rf_out_power(uint32_t ulSamples);
+static float get_rf_out_power(uint32_t ulSamples, const float *pfPData, const float *pfVData, uint32_t ulDataSize);
 
 // Variables
 volatile uint8_t ubI2CRegister[I2C_SLAVE_REGISTER_COUNT];
@@ -357,12 +379,8 @@ float ext_adc_get_5v0_current(uint32_t ulSamples)
     return fShuntVoltage / 0.03f; // 0.03 Ohm current shunt resistor
 }
 
-float get_rf_out_power(uint32_t ulSamples)
+float get_rf_out_power(uint32_t ulSamples, const float *pfPData, const float *pfVData, uint32_t ulDataSize)
 {
-    // Calibration tables
-    static const float fPData[] = {-40, -35,    -30,    -25,    -20,    -15,    -10,    -5,     0,      5};
-    static const float fVData[] = {1,   120.7,  263.2,  405.7,  548.2,  690.7,  833.2,  975.7,  1118.2, 1260.7};
-
     float fVoltage = 0.f;
 
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
@@ -380,12 +398,12 @@ float get_rf_out_power(uint32_t ulSamples)
     float fV1;
     float fP1;
 
-    for(uint8_t i = 1; i < sizeof(fPData) / sizeof(float); i++)
+    for(uint8_t i = 1; i < ulDataSize; i++)
     {
-        fV0 = fVData[i - 1];
-        fP0 = fPData[i - 1];
-        fV1 = fVData[i];
-        fP1 = fPData[i];
+        fV0 = pfVData[i - 1];
+        fP0 = pfPData[i - 1];
+        fV1 = pfVData[i];
+        fP1 = pfPData[i];
 
         if(fV0 <= fVoltage && fV1 > fVoltage)
             break;
@@ -396,7 +414,7 @@ float get_rf_out_power(uint32_t ulSamples)
     float fSlope = fDeltaP / fDeltaV;
     float fInterp = fP0 + (fVoltage - fV0) * fSlope;
 
-    return fInterp + 33.4; // ~10 dB coupling, ~20 dB last stage gain, calibrated
+    return fInterp;
 }
 
 int init()
@@ -553,11 +571,11 @@ int main()
     mcp3421_write_config(MCP3421_RESOLUTION_16BIT | MCP3421_ONE_SHOT);
 
     // Attenuators
-    f1958_set_attenuation(F1958_IF_ATT_ID, 12.f);
+    f1958_set_attenuation(F1958_IF_ATT_ID, 15.f);
     DBGPRINTLN_CTX("IF Attenuator value: -%.3f dB", (float)F1958_ATTENUATION[F1958_IF_ATT_ID]);
-    f1958_set_attenuation(F1958_RF1_ATT_ID, 15.f);
+    f1958_set_attenuation(F1958_RF1_ATT_ID, 30.f);
     DBGPRINTLN_CTX("RF Attenuator value: -%.3f dB", (float)F1958_ATTENUATION[F1958_RF1_ATT_ID]);
-    f1958_set_attenuation(F1958_RF2_ATT_ID, 1.f);
+    f1958_set_attenuation(F1958_RF2_ATT_ID, 15.f);
     DBGPRINTLN_CTX("RF Attenuator value: -%.3f dB", (float)F1958_ATTENUATION[F1958_RF2_ATT_ID]);
 
     // PLL
@@ -574,12 +592,13 @@ int main()
     adf4351_set_frequency(1875000000U);
     DBGPRINTLN_CTX("PLL output frequency: %.3f MHz", (float)ADF4351_FREQ / 1000000);
 
-    //PLL_UNMUTE();
     delay_ms(100);
-    //MIXER_ENABLE();
-    delay_ms(500);
+    PLL_UNMUTE();
+    delay_ms(10);
+    MIXER_ENABLE();
+    delay_ms(100);
     //PA_STG3_ENABLE();
-    delay_ms(200);
+    delay_ms(50);
     //PA_STG1_2_ENABLE();
 
     while(1)
@@ -647,7 +666,7 @@ int main()
             DBGPRINTLN_CTX("5V0 Current: %.2f mA", f5V0I);
 
             // Output Power
-            float fOutputPower = get_rf_out_power(10);
+            float fOutputPower = get_rf_out_power(10, MOD_CW);
 
             DBGPRINTLN_CTX("RF Output Power: %.2f dBm", fOutputPower);
         }
