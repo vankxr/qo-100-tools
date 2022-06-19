@@ -1,0 +1,21 @@
+# QucsTranscalc 0.0.19  /home/joao/dir
+#   Generated on seg Nov 29 2021 at 18:53:22.
+#   It is not suggested to edit the file, use QucsTranscalc instead.
+
+<CoupledMicrostrip>
+  Er 3.5 NA
+  Mur 1 NA
+  H 0.762 mm
+  H_t 15 mm
+  T 35 um
+  Cond 4.1e+07 NA
+  Tand 0.0013 NA
+  Rough 0 mil
+  Freq 2400 MHz
+  W 1.679 mm
+  S 4 mm
+  L 20 mm
+  Z0e 51.6391 Ohm
+  Z0o 49.7607 Ohm
+  Ang_l 95.7557 Deg
+</CoupledMicrostrip>
