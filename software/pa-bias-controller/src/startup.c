@@ -79,8 +79,8 @@ void _systick_isr()                       __attribute__ ((weak,  alias (DEFAULT_
 void _emu_isr()                           __attribute__ ((weak,  alias (DEFAULT_ISR)));
 void _wdog0_isr()                         __attribute__ ((weak,  alias (DEFAULT_ISR)));
 void _ldma_isr()                          __attribute__ ((weak,  alias (DEFAULT_ISR)));
-void _smu_isr()                           __attribute__ ((weak,  alias (DEFAULT_ISR)));
 void _gpio_even_isr()                     __attribute__ ((weak,  alias (DEFAULT_ISR)));
+void _smu_isr()                           __attribute__ ((weak,  alias (DEFAULT_ISR)));
 void _timer0_isr()                        __attribute__ ((weak,  alias (DEFAULT_ISR)));
 void _usart0_isr()                        __attribute__ ((weak,  alias (DEFAULT_ISR)));
 void _acmp0_1_isr()                       __attribute__ ((weak,  alias (DEFAULT_ISR)));
@@ -129,8 +129,8 @@ __attribute__ ((section(".isr_vector"))) void (* const g_pfnVectors[])() = {
     _emu_isr,
     _wdog0_isr,
     _ldma_isr,
-    _smu_isr,
     _gpio_even_isr,
+    _smu_isr,
     _timer0_isr,
     _usart0_isr,
     _acmp0_1_isr,
