@@ -204,7 +204,7 @@ uint8_t adf4351_set_frequency(uint64_t ullFrequency)
     if(usPhase >= usMOD)
         usPhase = usMOD - 1;
 
-    ADF4351_FREQ = (uint64_t)(ADF4351_PFD_FREQ * (usINT + (float)usFRAC / usMOD)) >> ubRFDivider;
+    ADF4351_FREQ = (uint64_t)(ADF4351_PFD_FREQ * (usINT + (double)usFRAC / usMOD)) >> ubRFDivider;
 
     if(!usFRAC)
         adf4351_rmw_register(2, ~ADF4351_R2_LDF_INT, ADF4351_R2_LDF_INT);
@@ -215,7 +215,7 @@ uint8_t adf4351_set_frequency(uint64_t ullFrequency)
     adf4351_rmw_register(1, ~(ADF4351_R1_PRESCALER_8_9 | (0xFFF << 15) | (0xFFF << 3)), (usINT < 75 ? ADF4351_R1_PRESCALER_4_5 : ADF4351_R1_PRESCALER_8_9) | ((uint32_t)usPhase << 15) | ((uint32_t)usMOD << 3));
     adf4351_write_register(0, ((uint32_t)usINT << 15) | ((uint32_t)usFRAC << 3));
 
-    while(!PLL_LOCKED());
+    //while(!PLL_LOCKED());
 
     return 1;
 }
