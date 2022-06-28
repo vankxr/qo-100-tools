@@ -23,23 +23,31 @@
 // Structs
 
 // Helper macros
-#define I2C_SLAVE_ADDRESS                       0x3C
-#define I2C_SLAVE_REGISTER_COUNT                256
-#define I2C_SLAVE_REGISTER(t, a)                (*(t *)&ubI2CRegister[(a)])
-#define I2C_SLAVE_REGISTER_WRITE_MASK(t, a)     (*(t *)&ubI2CRegisterWriteMask[(a)])
-#define I2C_SLAVE_REGISTER_READ_MASK(t, a)      (*(t *)&ubI2CRegisterReadMask[(a)])
-#define I2C_SLAVE_REGISTER_VIN_VOLTAGE          0xC0 // 32-bit
-#define I2C_SLAVE_REGISTER_5V0_VOLTAGE          0xC4 // 32-bit
-#define I2C_SLAVE_REGISTER_AVDD_VOLTAGE         0xD0 // 32-bit
-#define I2C_SLAVE_REGISTER_DVDD_VOLTAGE         0xD4 // 32-bit
-#define I2C_SLAVE_REGISTER_IOVDD_VOLTAGE        0xD8 // 32-bit
-#define I2C_SLAVE_REGISTER_CORE_VOLTAGE         0xDC // 32-bit
-#define I2C_SLAVE_REGISTER_EMU_TEMP             0xE0 // 32-bit
-#define I2C_SLAVE_REGISTER_ADC_TEMP             0xE4 // 32-bit
-#define I2C_SLAVE_REGISTER_BIAS_REG_TEMP        0xE8 // 32-bit
-#define I2C_SLAVE_REGISTER_SW_VERSION           0xF4 // 16-bit
-#define I2C_SLAVE_REGISTER_DEV_UIDL             0xF8 // 32-bit
-#define I2C_SLAVE_REGISTER_DEV_UIDH             0xFC // 32-bit
+#define I2C_SLAVE_ADDRESS                           0x3C
+#define I2C_SLAVE_REGISTER_COUNT                    256
+#define I2C_SLAVE_REGISTER(t, a)                    (*(t *)&ubI2CRegister[(a)])
+#define I2C_SLAVE_REGISTER_WRITE_MASK(t, a)         (*(t *)&ubI2CRegisterWriteMask[(a)])
+#define I2C_SLAVE_REGISTER_READ_MASK(t, a)          (*(t *)&ubI2CRegisterReadMask[(a)])
+#define I2C_SLAVE_REGISTER_STATUS                   0x00 // 8-bit
+#define I2C_SLAVE_REGISTER_CONFIG                   0x01 // 8-bit
+#define I2C_SLAVE_REGISTER_LNB1_BIAS_VOLTAGE_SET    0x10 // 32-bit
+#define I2C_SLAVE_REGISTER_LNB1_BIAS_VOLTAGE        0x14 // 32-bit
+#define I2C_SLAVE_REGISTER_LNB2_BIAS_VOLTAGE_SET    0x18 // 32-bit
+#define I2C_SLAVE_REGISTER_LNB2_BIAS_VOLTAGE        0x1C // 32-bit
+#define I2C_SLAVE_REGISTER_LNB1_REF_FREQ            0x30 // 32-bit
+#define I2C_SLAVE_REGISTER_LNB2_REF_FREQ            0x34 // 32-bit
+#define I2C_SLAVE_REGISTER_VIN_VOLTAGE              0xC0 // 32-bit
+#define I2C_SLAVE_REGISTER_5V0_VOLTAGE              0xC4 // 32-bit
+#define I2C_SLAVE_REGISTER_AVDD_VOLTAGE             0xD0 // 32-bit
+#define I2C_SLAVE_REGISTER_DVDD_VOLTAGE             0xD4 // 32-bit
+#define I2C_SLAVE_REGISTER_IOVDD_VOLTAGE            0xD8 // 32-bit
+#define I2C_SLAVE_REGISTER_CORE_VOLTAGE             0xDC // 32-bit
+#define I2C_SLAVE_REGISTER_EMU_TEMP                 0xE0 // 32-bit
+#define I2C_SLAVE_REGISTER_ADC_TEMP                 0xE4 // 32-bit
+#define I2C_SLAVE_REGISTER_BIAS_REG_TEMP            0xE8 // 32-bit
+#define I2C_SLAVE_REGISTER_SW_VERSION               0xF4 // 16-bit
+#define I2C_SLAVE_REGISTER_DEV_UIDL                 0xF8 // 32-bit
+#define I2C_SLAVE_REGISTER_DEV_UIDH                 0xFC // 32-bit
 
 #define LNB1_INDEX  0
 #define LNB2_INDEX  1
@@ -74,6 +82,8 @@ volatile uint8_t ubI2CRegisterWriteMask[I2C_SLAVE_REGISTER_COUNT];
 volatile uint8_t ubI2CRegisterReadMask[I2C_SLAVE_REGISTER_COUNT];
 volatile uint8_t ubI2CRegisterPointer = 0x00;
 volatile uint8_t ubI2CByteCount = 0;
+volatile uint8_t ubBiasVoltageChanged = 0;
+volatile uint8_t ubRefFrequencyChanged = 0;
 
 // ISRs
 
@@ -272,42 +282,66 @@ void i2c_slave_register_init()
 {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_VIN_VOLTAGE)      = -1.f;
-        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_VIN_VOLTAGE)      = 0x00000000;
-        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_VIN_VOLTAGE)      = 0xFFFFFFFF;
-        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_5V0_VOLTAGE)      = -1.f;
-        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_5V0_VOLTAGE)      = 0x00000000;
-        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_5V0_VOLTAGE)      = 0xFFFFFFFF;
-        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_AVDD_VOLTAGE)     = -1.f;
-        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_AVDD_VOLTAGE)     = 0x00000000;
-        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_AVDD_VOLTAGE)     = 0xFFFFFFFF;
-        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_DVDD_VOLTAGE)     = -1.f;
-        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_DVDD_VOLTAGE)     = 0x00000000;
-        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_DVDD_VOLTAGE)     = 0xFFFFFFFF;
-        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_IOVDD_VOLTAGE)    = -1.f;
-        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_IOVDD_VOLTAGE)    = 0x00000000;
-        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_IOVDD_VOLTAGE)    = 0xFFFFFFFF;
-        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_CORE_VOLTAGE)     = -1.f;
-        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_CORE_VOLTAGE)     = 0x00000000;
-        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_CORE_VOLTAGE)     = 0xFFFFFFFF;
-        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_EMU_TEMP)         = -1.f;
-        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_EMU_TEMP)         = 0x00000000;
-        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_EMU_TEMP)         = 0xFFFFFFFF;
-        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_ADC_TEMP)         = -1.f;
-        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_ADC_TEMP)         = 0x00000000;
-        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_ADC_TEMP)         = 0xFFFFFFFF;
-        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_BIAS_REG_TEMP)    = -1.f;
-        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_BIAS_REG_TEMP)    = 0x00000000;
-        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_BIAS_REG_TEMP)    = 0xFFFFFFFF;
-        I2C_SLAVE_REGISTER              (uint16_t, I2C_SLAVE_REGISTER_SW_VERSION)       = BUILD_VERSION;
-        I2C_SLAVE_REGISTER_WRITE_MASK   (uint16_t, I2C_SLAVE_REGISTER_SW_VERSION)       = 0x0000;
-        I2C_SLAVE_REGISTER_READ_MASK    (uint16_t, I2C_SLAVE_REGISTER_SW_VERSION)       = 0xFFFF;
-        I2C_SLAVE_REGISTER              (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDL)         = DEVINFO->UNIQUEL;
-        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDL)         = 0x00000000;
-        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDL)         = 0xFFFFFFFF;
-        I2C_SLAVE_REGISTER              (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDH)         = DEVINFO->UNIQUEH;
-        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDH)         = 0x00000000;
-        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDH)         = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (uint8_t,  I2C_SLAVE_REGISTER_STATUS)                   = 0x00;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint8_t,  I2C_SLAVE_REGISTER_STATUS)                   = 0x00;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint8_t,  I2C_SLAVE_REGISTER_STATUS)                   = 0xFF;
+        I2C_SLAVE_REGISTER              (uint8_t,  I2C_SLAVE_REGISTER_CONFIG)                   = 0x00;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint8_t,  I2C_SLAVE_REGISTER_CONFIG)                   = 0xFF;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint8_t,  I2C_SLAVE_REGISTER_CONFIG)                   = 0xFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_LNB1_BIAS_VOLTAGE_SET)    = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_LNB1_BIAS_VOLTAGE_SET)    = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_LNB1_BIAS_VOLTAGE_SET)    = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_LNB1_BIAS_VOLTAGE)        = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_LNB1_BIAS_VOLTAGE)        = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_LNB1_BIAS_VOLTAGE)        = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_LNB2_BIAS_VOLTAGE_SET)    = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_LNB2_BIAS_VOLTAGE_SET)    = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_LNB2_BIAS_VOLTAGE_SET)    = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_LNB2_BIAS_VOLTAGE)        = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_LNB2_BIAS_VOLTAGE)        = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_LNB2_BIAS_VOLTAGE)        = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (uint32_t, I2C_SLAVE_REGISTER_LNB1_REF_FREQ)            = 25000000;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_LNB1_REF_FREQ)            = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_LNB1_REF_FREQ)            = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (uint32_t, I2C_SLAVE_REGISTER_LNB2_REF_FREQ)            = 25000000;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_LNB2_REF_FREQ)            = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_LNB2_REF_FREQ)            = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_VIN_VOLTAGE)              = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_VIN_VOLTAGE)              = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_VIN_VOLTAGE)              = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_5V0_VOLTAGE)              = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_5V0_VOLTAGE)              = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_5V0_VOLTAGE)              = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_AVDD_VOLTAGE)             = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_AVDD_VOLTAGE)             = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_AVDD_VOLTAGE)             = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_DVDD_VOLTAGE)             = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_DVDD_VOLTAGE)             = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_DVDD_VOLTAGE)             = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_IOVDD_VOLTAGE)            = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_IOVDD_VOLTAGE)            = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_IOVDD_VOLTAGE)            = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_CORE_VOLTAGE)             = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_CORE_VOLTAGE)             = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_CORE_VOLTAGE)             = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_EMU_TEMP)                 = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_EMU_TEMP)                 = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_EMU_TEMP)                 = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_ADC_TEMP)                 = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_ADC_TEMP)                 = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_ADC_TEMP)                 = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_BIAS_REG_TEMP)            = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_BIAS_REG_TEMP)            = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_BIAS_REG_TEMP)            = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (uint16_t, I2C_SLAVE_REGISTER_SW_VERSION)               = BUILD_VERSION;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint16_t, I2C_SLAVE_REGISTER_SW_VERSION)               = 0x0000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint16_t, I2C_SLAVE_REGISTER_SW_VERSION)               = 0xFFFF;
+        I2C_SLAVE_REGISTER              (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDL)                 = DEVINFO->UNIQUEL;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDL)                 = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDL)                 = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDH)                 = DEVINFO->UNIQUEH;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDH)                 = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_DEV_UIDH)                 = 0xFFFFFFFF;
     }
 }
 uint8_t i2c_slave_addr_isr(uint8_t ubAddress)
@@ -342,6 +376,42 @@ uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
 
     ubI2CRegister[ubI2CRegisterPointer] = (ubI2CRegister[ubI2CRegisterPointer] & ~ubI2CRegisterWriteMask[ubI2CRegisterPointer]) | (ubData & ubI2CRegisterWriteMask[ubI2CRegisterPointer]);
     ubI2CRegisterPointer++;
+
+    switch(ubI2CRegisterPointer)
+    {
+        case I2C_SLAVE_REGISTER_LNB1_BIAS_VOLTAGE_SET + sizeof(float):
+        {
+            if((ubI2CByteCount - 1) < sizeof(float))
+                break;
+
+            ubBiasVoltageChanged |= BIT(0);
+        }
+        break;
+        case I2C_SLAVE_REGISTER_LNB2_BIAS_VOLTAGE_SET + sizeof(float):
+        {
+            if((ubI2CByteCount - 1) < sizeof(float))
+                break;
+
+            ubBiasVoltageChanged |= BIT(1);
+        }
+        break;
+        case I2C_SLAVE_REGISTER_LNB1_REF_FREQ + sizeof(uint32_t):
+        {
+            if((ubI2CByteCount - 1) < sizeof(uint32_t))
+                break;
+
+            ubRefFrequencyChanged |= BIT(0);
+        }
+        break;
+        case I2C_SLAVE_REGISTER_LNB2_REF_FREQ + sizeof(uint32_t):
+        {
+            if((ubI2CByteCount - 1) < sizeof(uint32_t))
+                break;
+
+            ubRefFrequencyChanged |= BIT(1);
+        }
+        break;
+    }
 
     return 1; // ACK
 }
@@ -432,9 +502,9 @@ void lnb_ref_clk_synth_init()
     si5351_clock_enable(SI5351_EXT_REF); // Software enable the clock output
 
     //// Global output enable
-    REF_SYNTH_OUT_EN();
+    //REF_SYNTH_OUT_EN();
 }
-void lnb_set_ref_frequency(uint8_t ubChannel, uint32_t ulFrequency)
+void lnb_set_ref_output_enable(uint8_t ubChannel, uint8_t ubEnable)
 {
     if(ubChannel > 1)
         return;
@@ -443,29 +513,37 @@ void lnb_set_ref_frequency(uint8_t ubChannel, uint32_t ulFrequency)
     {
         case LNB1_INDEX:
         {
-            if(!ulFrequency)
-            {
+            if(ubEnable)
+                si5351_clock_enable(SI5351_LNB1_REF);
+            else
                 si5351_clock_disable(SI5351_LNB1_REF);
-
-                break;
-            }
-
-            si5351_multisynth_set_freq(SI5351_LNB1_REF, ulFrequency);
-            si5351_clock_enable(SI5351_LNB1_REF);
         }
         break;
         case LNB2_INDEX:
         {
-            if(!ulFrequency)
-            {
+            if(ubEnable)
+                si5351_clock_enable(SI5351_LNB2_REF);
+            else
                 si5351_clock_disable(SI5351_LNB2_REF);
-
-                break;
-            }
-
-            si5351_multisynth_set_freq(SI5351_LNB2_REF, ulFrequency);
-            si5351_clock_enable(SI5351_LNB2_REF);
         }
+        break;
+    }
+}
+void lnb_set_ref_frequency(uint8_t ubChannel, uint32_t ulFrequency)
+{
+    if(ubChannel > 1)
+        return;
+
+    if(!ulFrequency)
+        return;
+
+    switch(ubChannel)
+    {
+        case LNB1_INDEX:
+            si5351_multisynth_set_freq(SI5351_LNB1_REF, ulFrequency);
+        break;
+        case LNB2_INDEX:
+            si5351_multisynth_set_freq(SI5351_LNB2_REF, ulFrequency);
         break;
     }
 }
@@ -485,6 +563,14 @@ uint32_t lnb_get_ref_frequency(uint8_t ubChannel)
     return 0;
 }
 
+void lnb_bias_init()
+{
+    VBIAS1_DISABLE();
+    VBIAS2_DISABLE();
+
+    mcp4728_channel_write(0, MCP4728_CHAN_VREF_INTERNAL | MCP4728_CHAN_PD_NORMAL | MCP4728_CHAN_GAIN_X1 | 0x0FFF);
+    mcp4728_channel_write(1, MCP4728_CHAN_VREF_INTERNAL | MCP4728_CHAN_PD_NORMAL | MCP4728_CHAN_GAIN_X1 | 0x0FFF);
+}
 void lnb_set_bias_voltage(uint8_t ubChannel, float fVoltage)
 {
     if(ubChannel > 1)
@@ -657,25 +743,134 @@ int main()
     // I2C Slave Register block
     i2c_slave_register_init();
 
+    // LNB Bias
+    lnb_bias_init();
+
     // LNB Reference synthesizer
     lnb_ref_clk_synth_init();
 
-
-    lnb_set_ref_frequency(LNB1_INDEX, 25800000);
+    //lnb_set_ref_frequency(LNB1_INDEX, 25800000);
+    //lnb_set_ref_output_enable(LNB1_INDEX, 1);
     //lnb_set_ref_frequency(LNB2_INDEX, 25000000);
-    lnb_set_bias_voltage(LNB1_INDEX, 13500);
-    VBIAS1_ENABLE();
-    lnb_set_bias_voltage(LNB2_INDEX, 13500);
-    VBIAS2_ENABLE();
+    //lnb_set_ref_output_enable(LNB2_INDEX, 1);
+    //lnb_set_bias_voltage(LNB1_INDEX, 13500);
+    //VBIAS1_ENABLE();
+    //lnb_set_bias_voltage(LNB2_INDEX, 13500);
+    //VBIAS2_ENABLE();
 
     while(1)
     {
         wdog_feed();
 
+        if(I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_CONFIG) & BIT(7))
+        {
+            delay_ms(20);
+
+            reset();
+        }
+
+        volatile uint8_t ubStatus = 0x00;
+        volatile uint8_t ubConfig = 0x00;
+
+        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+        {
+            ubStatus = I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_STATUS) & (BIT(4) | BIT(5));
+            ubConfig = I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_CONFIG);
+        }
+
+        if(ubConfig & BIT(0))
+            VBIAS1_ENABLE();
+        else
+            VBIAS1_DISABLE();
+        if(ubConfig & BIT(1))
+            VBIAS2_ENABLE();
+        else
+            VBIAS2_DISABLE();
+
+        if(VBIAS1_STATUS())
+            ubStatus |= BIT(0);
+        if(VBIAS2_STATUS())
+            ubStatus |= BIT(1);
+        if(VBIAS1_POWER_GOOD())
+            ubStatus |= BIT(2);
+        if(VBIAS2_POWER_GOOD())
+            ubStatus |= BIT(3);
+
+        if((ubConfig & BIT(4)) && !(ubStatus & BIT(4)))
+        {
+            lnb_set_ref_output_enable(LNB1_INDEX, 1);
+
+            ubStatus |= BIT(4);
+        }
+        else if(!(ubConfig & BIT(4)) && (ubStatus & BIT(4)))
+        {
+            lnb_set_ref_output_enable(LNB1_INDEX, 0);
+
+            ubStatus &= ~BIT(4);
+        }
+
+        if((ubConfig & BIT(5)) && !(ubStatus & BIT(5)))
+        {
+            lnb_set_ref_output_enable(LNB2_INDEX, 1);
+
+            ubStatus |= BIT(5);
+        }
+        else if(!(ubConfig & BIT(5)) && (ubStatus & BIT(5)))
+        {
+            lnb_set_ref_output_enable(LNB2_INDEX, 0);
+
+            ubStatus &= ~BIT(5);
+        }
+
+        if(ubConfig & BIT(6))
+            REF_SYNTH_OUT_EN();
+        else
+            REF_SYNTH_OUT_DIS();
+
+        if(REF_SYNTH_OUT_STAT())
+            ubStatus |= BIT(6);
+
+        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+            I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_STATUS) = ubStatus;
+
+        if(ubBiasVoltageChanged)
+        {
+            for(uint8_t i = 0; i < 2; i++)
+            {
+                ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+                {
+                    if(!(ubBiasVoltageChanged & BIT(i)))
+                        continue;
+
+                    lnb_set_bias_voltage(i, I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_LNB1_BIAS_VOLTAGE_SET + 2 * i * sizeof(float)));
+                    I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_LNB1_BIAS_VOLTAGE_SET + 2 * i * sizeof(float)) = lnb_get_bias_voltage(i);
+
+                    ubBiasVoltageChanged &= ~BIT(i);
+                }
+            }
+        }
+
+        if(ubRefFrequencyChanged)
+        {
+            for(uint8_t i = 0; i < 2; i++)
+            {
+                ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+                {
+                    if(!(ubRefFrequencyChanged & BIT(i)))
+                        continue;
+
+                    lnb_set_ref_frequency(i, I2C_SLAVE_REGISTER(uint32_t, I2C_SLAVE_REGISTER_LNB1_REF_FREQ + i * sizeof(uint32_t)));
+                    I2C_SLAVE_REGISTER(uint32_t, I2C_SLAVE_REGISTER_LNB1_REF_FREQ + i * sizeof(uint32_t)) = lnb_get_ref_frequency(i);
+
+                    ubRefFrequencyChanged &= ~BIT(i);
+                }
+            }
+        }
+
         static uint64_t ullLastHeartBeat = 0;
         static uint64_t ullLastTelemetryUpdate = 0;
 
-        if(g_ullSystemTick - ullLastHeartBeat > 2000)
+        if((g_ullSystemTick > 0 && ullLastHeartBeat == 0) || g_ullSystemTick - ullLastHeartBeat > 2000)
         {
             ullLastHeartBeat = g_ullSystemTick;
 
@@ -685,7 +880,7 @@ int main()
                 ullLastHeartBeat -= 1900;
         }
 
-        if(g_ullSystemTick - ullLastTelemetryUpdate > 5000)
+        if((g_ullSystemTick > 0 && ullLastTelemetryUpdate == 0) || g_ullSystemTick - ullLastTelemetryUpdate > 5000)
         {
             ullLastTelemetryUpdate = g_ullSystemTick;
 
@@ -738,15 +933,25 @@ int main()
             float fVBiasSet2 = lnb_get_bias_voltage(LNB2_INDEX);
             float fVBias2 = adc_get_vbias2();
 
+            ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+            {
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_LNB1_BIAS_VOLTAGE_SET) = fVBiasSet1;
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_LNB1_BIAS_VOLTAGE) = fVBias1;
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_LNB2_BIAS_VOLTAGE_SET) = fVBiasSet2;
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_LNB2_BIAS_VOLTAGE) = fVBias2;
+            }
+
             DBGPRINTLN_CTX("----------------------------------");
             DBGPRINTLN_CTX("LNB #1 Enable status: %s", VBIAS1_STATUS() ? "ON" : "OFF");
             DBGPRINTLN_CTX("LNB #1 Power status: %s", VBIAS1_POWER_GOOD() ? "POWER GOOD" : "POWER NOT GOOD");
             DBGPRINTLN_CTX("LNB #1 Set Bias Voltage: %.2f mV", fVBiasSet1);
             DBGPRINTLN_CTX("LNB #1 Bias Voltage: %.2f mV", fVBias1);
+            DBGPRINTLN_CTX("LNB #1 Reference Frequency: %lu Hz", lnb_get_ref_frequency(LNB1_INDEX));
             DBGPRINTLN_CTX("LNB #2 Enable status: %s", VBIAS2_STATUS() ? "ON" : "OFF");
             DBGPRINTLN_CTX("LNB #2 Power status: %s", VBIAS2_POWER_GOOD() ? "POWER GOOD" : "POWER NOT GOOD");
             DBGPRINTLN_CTX("LNB #2 Set Bias Voltage: %.2f mV", fVBiasSet2);
             DBGPRINTLN_CTX("LNB #2 Bias Voltage: %.2f mV", fVBias2);
+            DBGPRINTLN_CTX("LNB #2 Reference Frequency: %lu Hz", lnb_get_ref_frequency(LNB2_INDEX));
         }
     }
 
