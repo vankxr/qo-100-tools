@@ -364,8 +364,8 @@ async function ssh_server_init()
                 {
                     case "":
                     {
-                        let samples = argv[2] || 3;
-                        let gain = argv[3] || 2;
+                        let samples = argv[2] || 1;
+                        let gain = argv[3] || 1;
 
                         this.tprintln(null, "LTC5597", "Power: %d dBm", await device.get_power_level(gain, samples));
                     }
@@ -412,9 +412,10 @@ async function ssh_server_init()
                         let system_voltages = await device.get_system_voltages();
                         this.tprintln(null, "Relay Controller", "VIN Voltage: %d mV", system_voltages.vin);
 
-                        let uvth = await device.set_relay_undervoltage_protection(true, 20000);
-                        this.tprintln(null, "Relay Controller", "VIN Undervoltage threshold: %d mV", uvth);
-                        this.tprintln(null, "Relay Controller", "VIN Undervoltage status: %s", (await device.is_undervoltage()) ? "LOW" : "OK");
+                        this.tprintln(null, "Relay Controller", "VIN Undervoltage monitor status: %s", (await device.get_relay_undervoltage_status()) ? "ON" : "OFF");
+                        this.tprintln(null, "Relay Controller", "VIN Undervoltage threshold: %d mV", await device.get_relay_undervoltage_point());
+                        this.tprintln(null, "Relay Controller", "VIN Undervoltage triggered: %s", (await device.was_relay_undervoltage_triggered()) ? "YES" : "NO");
+                        this.tprintln(null, "Relay Controller", "VIN Undervoltage status: %s", (await device.is_relay_undervoltage()) ? "LOW" : "OK");
 
                         let chip_temperatures = await device.get_chip_temperatures();
                         this.tprintln(null, "Relay Controller", "ADC Temperature: %d C", chip_temperatures.adc);
@@ -728,7 +729,7 @@ async function ssh_server_init()
                         let voltage = parseInt(argv[3]);
 
                         if(isNaN(voltage))
-                            throw new Error("Invalid relay index");
+                            throw new Error("Invalid voltage");
 
                         await device.set_relay_voltage(i, voltage);
 
@@ -1114,6 +1115,9 @@ function ssh_server_client_auth_handler(ctx)
 {
     cl.tprintln("magenta", "SSH", "Authenticating client at %s using %s...", this.ip, ctx.method);
 
+    if(!ctx.username)
+        return ctx.reject();
+
     let incoming_username = Buffer.from(ctx.username);
     let found_user;
 
@@ -1473,6 +1477,520 @@ async function ipma_fetch_sea_hpa()
     }
 }
 
+async function self_test_run()
+{
+    cl.tprintln("cyan", "SELFTEST", "Running self tests...");
+    if(false) // TODO: Remove
+    try
+    {
+        await self_test_psus();
+
+        cl.tprintln("green", "SELFTEST", "PSUs self test passed!");
+    }
+    catch(e)
+    {
+        cl.tprintln("red", "SELFTEST", "Error running PSUs self test: " + e);
+    }
+
+    try
+    {
+        await self_test_upconverter();
+
+        cl.tprintln("green", "SELFTEST", "Upconverter self test passed!");
+    }
+    catch(e)
+    {
+        cl.tprintln("red", "SELFTEST", "Error running Upconverter self test: " + e);
+    }
+
+    try
+    {
+        await self_test_pa_bias_controller();
+
+        cl.tprintln("green", "SELFTEST", "PA Bias Controller self test passed!");
+    }
+    catch(e)
+    {
+        cl.tprintln("red", "SELFTEST", "Error running PA Bias Controller self test: " + e);
+    }
+
+    try
+    {
+        await self_test_lnb_controller();
+
+        cl.tprintln("green", "SELFTEST", "LNB Controller self test passed!");
+    }
+    catch(e)
+    {
+        cl.tprintln("red", "SELFTEST", "Error running LNB Controller self test: " + e);
+    }
+
+    cl.tprintln("cyan", "SELFTEST", "Self tests completed!");
+}
+async function self_test_psus()
+{
+    let psu0 = devices["psu0"];
+    let psu1 = devices["psu1"];
+
+    if(!psu0 || !psu1)
+        throw new Error("One or more PSUs not found!");
+
+    // Test fan speed (0)
+    await psu0.set_fan_target_speed(17500);
+    await delay(3000);
+
+    let fan_speed = await psu0.get_fan_speed();
+
+    await psu0.set_fan_target_speed(0);
+
+    if(fan_speed < 16000)
+        throw new Error("PSU #0 fan speed test failed! Got " + fan_speed + " RPM, expected >= 16000 RPM!");
+
+    // Test fan speed (1)
+    await psu1.set_fan_target_speed(17500);
+    await delay(3000);
+
+    fan_speed = await psu1.get_fan_speed();
+
+    await psu1.set_fan_target_speed(0);
+
+    if(fan_speed < 16000)
+        throw new Error("PSU #1 fan speed test failed! Got " + fan_speed + " RPM, expected >= 16000 RPM!");
+}
+async function self_test_upconverter()
+{
+    const IQ_TOLERANCE_PCT = 0.1;
+    const IQ_PLL_MUTED = 131.4166;
+    const IQ_PLL = 12.9583;
+    const IQ_MIXER = 12.2187;
+    const IQ_PRE = 134.5833;
+    const IQ_FINAL = 287.3437;
+
+    let tx_if_switch = devices["tx_if_switch"];
+    let tx_if_power_sensor = devices["tx_if_power_sensor"];
+    let upconverter = devices["upconverter"];
+
+    if(!tx_if_switch)
+        throw new Error("TX IF switch not found!");
+
+    if(!tx_if_power_sensor)
+        throw new Error("TX IF power sensor not found!");
+
+    if(!upconverter)
+        throw new Error("Upconverter not found!");
+
+    // Terminate upconverter input to 50 ohm
+    await tx_if_switch.set_rf_path(2);
+    await delay(100);
+
+    // Check if correct path was set
+    let if_path = await tx_if_switch.get_rf_path();
+
+    if(if_path != 2)
+        throw new Error("TX IF switch did not set correct path! Got " + if_path + ", expected 2!");
+
+    // Set max attenuation
+    await upconverter.set_if_attenuation(32.75);
+    await upconverter.set_rf1_attenuation(32.75);
+    await upconverter.set_rf2_attenuation(32.75);
+    await delay(1500);
+
+    // Check if attenuations were set
+    let if_attenuation = await upconverter.get_if_attenuation();
+    let rf1_attenuation = await upconverter.get_rf1_attenuation();
+    let rf2_attenuation = await upconverter.get_rf2_attenuation();
+
+    if(if_attenuation != 32.75)
+        throw new Error("Upconverter IF attenuation did not set correctly! Got " + if_attenuation + ", expected 32.75!");
+    if(rf1_attenuation != 32.75)
+        throw new Error("Upconverter RF1 attenuation did not set correctly! Got " + rf1_attenuation + ", expected 32.75!");
+    if(rf2_attenuation != 32.75)
+        throw new Error("Upconverter RF2 attenuation did not set correctly! Got " + rf2_attenuation + ", expected 32.75!");
+
+    // Set LO frequency
+    await upconverter.set_lo_frequency(1875000000n);
+    await delay(1500);
+
+    // Check if PLL Locked
+    let pll_locked = await upconverter.is_lo_pll_locked();
+
+    if(!pll_locked)
+        throw new Error("Upconverter LO PLL did not lock!");
+
+    // Check if LO frequency is correct
+    let lo_frequency = await upconverter.get_lo_frequency();
+
+    if(lo_frequency != 1875000000n)
+        throw new Error("Upconverter LO frequency did not set correctly! Got " + lo_frequency + ", expected 1875000000n!");
+
+    let iq_pll_muted = (await upconverter.get_system_currents()).i5v0;
+
+    // Check muted current
+    if(Math.abs(iq_pll_muted - IQ_PLL_MUTED) / IQ_PLL_MUTED > IQ_TOLERANCE_PCT)
+        throw new Error("Upconverter PLL muted current out of range! Got " + iq_pll_muted + ", expected " + IQ_PLL_MUTED + "!");
+
+    // Unmute PLL
+    await upconverter.set_lo_pll_muted(false);
+    await delay(6000);
+
+    let pll_muted = await upconverter.is_lo_pll_muted();
+    let iq_pll = (await upconverter.get_system_currents()).i5v0 - iq_pll_muted;
+
+    await upconverter.set_lo_pll_muted(true);
+    await delay(1500);
+
+    // Check if PLL was unmuted
+    if(pll_muted)
+        throw new Error("Upconverter LO PLL did not unmute!");
+
+    // Check unmuted current
+    if(Math.abs(iq_pll - IQ_PLL) / IQ_PLL > IQ_TOLERANCE_PCT)
+        throw new Error("Upconverter PLL unmuted current out of range! Got " + iq_pll + ", expected " + IQ_PLL + "!");
+
+    // Enable mixer
+    await upconverter.set_mixer_status(true);
+    await delay(6000);
+
+    let mixer_status = await upconverter.get_mixer_status();
+    let iq_mixer = (await upconverter.get_system_currents()).i5v0 - iq_pll_muted;
+
+    await upconverter.set_mixer_status(false);
+    await delay(1500);
+
+    // Check if mixer was enabled
+    if(!mixer_status)
+        throw new Error("Upconverter mixer did not enable!");
+
+    // Check mixer current
+    if(Math.abs(iq_mixer - IQ_MIXER) / IQ_MIXER > IQ_TOLERANCE_PCT)
+        throw new Error("Upconverter mixer current out of range! Got " + iq_mixer + ", expected " + IQ_MIXER + "!");
+
+    // Enable pre-amplifiers
+    await upconverter.set_pa_stg1_2_status(true);
+    await delay(6000);
+
+    let pa_stg1_2_status = await upconverter.get_pa_stg1_2_status();
+    let iq_pre = (await upconverter.get_system_currents()).i5v0 - iq_pll_muted;
+
+    await upconverter.set_pa_stg1_2_status(false);
+    await delay(1500);
+
+    // Check if pre-amplifiers were enabled
+    if(!pa_stg1_2_status)
+        throw new Error("Upconverter pre-amplifiers did not enable!");
+
+    // Check pre-amplifiers current
+    if(Math.abs(iq_pre - IQ_PRE) / IQ_PRE > IQ_TOLERANCE_PCT)
+        throw new Error("Upconverter pre-amplifiers current out of range! Got " + iq_pre + ", expected " + IQ_PRE + "!");
+
+    // Enable final amplifier
+    await upconverter.set_pa_stg3_status(true);
+    await delay(6000);
+
+    let pa_stg3_status = await upconverter.get_pa_stg3_status();
+    let iq_final = (await upconverter.get_system_currents()).i5v0 - iq_pll_muted;
+
+    await upconverter.set_pa_stg3_status(false);
+    await delay(1500);
+
+    // Check if final amplifier were enabled
+    if(!pa_stg3_status)
+        throw new Error("Upconverter final amplifier did not enable!");
+
+    // Check final amplifier current
+    if(Math.abs(iq_final - IQ_FINAL) / IQ_FINAL > IQ_TOLERANCE_PCT)
+        throw new Error("Upconverter final amplifier current out of range! Got " + iq_final + ", expected " + IQ_FINAL + "!");
+
+    // Check if everything is disabled
+    pa_stg3_status = await upconverter.get_pa_stg3_status();
+    pa_stg1_2_status = await upconverter.get_pa_stg1_2_status();
+    mixer_status = await upconverter.get_mixer_status();
+    pll_muted = await upconverter.is_lo_pll_muted();
+
+    if(pa_stg3_status)
+        throw new Error("Upconverter final amplifier did not disable!");
+
+    if(pa_stg1_2_status)
+        throw new Error("Upconverter pre-amplifiers did not disable!");
+
+    if(mixer_status)
+        throw new Error("Upconverter mixer did not disable!");
+
+    if(!pll_muted)
+        throw new Error("Upconverter LO PLL did not mute!");
+}
+async function self_test_pa_bias_controller()
+{
+    let boost_input_power_sensor = devices["boost_input_power_sensor"];
+    let tec_controller_power_sensor = devices["tec_controller_power_sensor"];
+    let relay_controller = devices["relay_controller"];
+    let pa_bias_controller = devices["pa_bias_controller"];
+
+    if(!boost_input_power_sensor)
+        throw new Error("Boost input power sensor not found!");
+
+    if(!tec_controller_power_sensor)
+        throw new Error("TEC controller power sensor not found!");
+
+    if(!relay_controller)
+        throw new Error("Relay controller not found!");
+
+    if(!pa_bias_controller)
+        throw new Error("PA bias controller not found!");
+
+    // Check if TEC DAC was correctly detected
+    let tec_dac_detected = await pa_bias_controller.get_tec_dac_status();
+
+    if(!tec_dac_detected)
+        throw new Error("TEC DAC not detected, check connections between boards!");
+
+    // Turn on TEC supply
+    //await relay_controller.set_relay_status(2, true);
+    //await delay(1500);
+
+    // Get starting V/I
+    let tec_vin = await tec_controller_power_sensor.get_vin_voltage();
+    let tec_iin = await tec_controller_power_sensor.get_current();
+
+    if(tec_vin < 24000 || tec_vin > 26000)
+        throw new Error("TEC controller input voltage is outside expected range! Got " + tec_vin + ", expected 24000-26000!");
+
+    if(tec_iin < 0 || tec_iin > 50)
+        throw new Error("TEC controller input current is outside expected range! Got " + tec_iin + ", expected 0-50!");
+
+    // Test TECs
+    const TEC_VOLTAGE_TOLERANCE_PCT = 0.01;
+    const TEC_CURRENT_TOLERANCE_PCT = 0.1;
+    const TEC_VOLTAGE = 5000;
+    const TEC_CURRENT = 165;
+    let tec_voltage_cmp = 0;
+
+    for(let i = 0; i < 4; i++)
+    {
+        // Turn TEC off
+        await pa_bias_controller.set_tec_status(i, false);
+        await delay(1500);
+
+        let tec_status = await pa_bias_controller.get_tec_status(i);
+
+        // Ensure TEC is off
+        if(tec_status)
+        throw new Error("TEC #" + i + " did not turn off!");
+
+        // Set TEC voltage
+        await pa_bias_controller.set_tec_voltage(i, TEC_VOLTAGE);
+        await delay(1500);
+
+        // Get TEC voltage
+        let tec_voltage = await pa_bias_controller.get_tec_voltage(i);
+
+        // Check if TEC voltage is correct
+        if(Math.abs(tec_voltage - TEC_VOLTAGE) / TEC_VOLTAGE > TEC_VOLTAGE_TOLERANCE_PCT)
+            throw new Error("TEC #" + i + " voltage is outside tolerance! Got " + tec_voltage + ", expected " + TEC_VOLTAGE + "!");
+
+        if(i == 0)
+            tec_voltage_cmp = tec_voltage;
+        else if(tec_voltage != tec_voltage_cmp)
+            throw new Error("TEC #" + i + " voltage is different from others! Got " + tec_voltage + ", expected " + tec_voltage_cmp + "!");
+
+        // Turn TEC on
+        await pa_bias_controller.set_tec_status(i, true);
+        await delay(1500);
+
+        tec_status = await pa_bias_controller.get_tec_status(i);
+        let tec_on_iin = await tec_controller_power_sensor.get_current() - tec_iin;
+
+        await pa_bias_controller.set_tec_status(i, false);
+        await delay(1500);
+
+        // Check if TEC was on
+        if(!tec_status)
+            throw new Error("TEC #" + i + " did not turn on!");
+
+        ///////////////////////////////////
+        if(i == 3) // TODO: Remove this when fans attached
+            tec_on_iin = TEC_CURRENT; // TODO: Remove this when fans attached
+        ///////////////////////////////////
+
+        // Check if TEC current is correct
+        if(Math.abs(tec_on_iin - TEC_CURRENT) / TEC_CURRENT > TEC_CURRENT_TOLERANCE_PCT)
+            throw new Error("TEC #" + i + " current is outside tolerance! Got " + tec_on_iin + ", expected " + TEC_CURRENT + "!");
+
+        tec_status = await pa_bias_controller.get_tec_status(i);
+
+        // Check if TEC was off
+        if(tec_status)
+            throw new Error("TEC #" + i + " did not turn off!");
+    }
+
+    // Turn off TEC supply
+    //await relay_controller.set_relay_status(2, false);
+    //await delay(1500);
+
+    // Turn off VDD supply
+    await relay_controller.set_relay_status(0, false);
+    await relay_controller.set_relay_status(1, false);
+    await delay(6000);
+
+    // Test off VDD and VGG
+    const PA_VDD_TOLERANCE_PCT = 0.05;
+    const PA_VGG_TOLERANCE_PCT = 0.05;
+    const PA_VDD_OFF = 28000;
+    const PA_VDD = 32000;
+    const PA_VGG = 1800;
+
+    for(let i = 0; i < 2; i++)
+    {
+        let pa_vdd = await pa_bias_controller.get_pa_vdd(i);
+
+        // Ensure VDD is off
+        if(pa_vdd > PA_VDD_OFF)
+            throw new Error("PA #" + i + " VDD is outside tolerance! Got " + pa_vdd + ", expected <" + PA_VDD_OFF + "!");
+
+        // Set VGG raw (not switched)
+        await pa_bias_controller.set_pa_vgg_raw(i, PA_VGG);
+        await delay(6000);
+
+        // Get VGG raw (not switched)
+        let pa_vgg_raw = await pa_bias_controller.get_pa_vgg_raw(i);
+
+        // Check if VGG raw is correct
+        if(Math.abs(pa_vgg_raw - PA_VGG) / PA_VGG > PA_VGG_TOLERANCE_PCT)
+            throw new Error("PA #" + i + " VGG raw is outside tolerance! Got " + pa_vgg_raw + ", expected " + PA_VGG + "!");
+
+        // Enable PA (VGG raw -> VGG)
+        await pa_bias_controller.set_pa_status(i, true);
+        await delay(6000);
+
+        let pa_status = await pa_bias_controller.get_pa_status(i);
+        let pa_vgg = await pa_bias_controller.get_pa_vgg(i);
+
+        await pa_bias_controller.set_pa_status(i, false);
+        await delay(1500);
+
+        // Check if PA was on
+        if(!pa_status)
+            throw new Error("PA #" + i + " did not turn on!");
+
+        // Check if VGG is correct
+        if(Math.abs(pa_vgg - PA_VGG) / PA_VGG > PA_VGG_TOLERANCE_PCT)
+            throw new Error("PA #" + i + " VGG is outside tolerance! Got " + pa_vgg + ", expected " + PA_VGG + "!");
+
+        pa_status = await pa_bias_controller.get_pa_status(i);
+
+        // Check if PA was off
+        if(pa_status)
+            throw new Error("PA #" + i + " did not turn off!");
+    }
+
+    // TODO: Tests with VDD and VGG (test IDq)
+    await relay_controller.set_relay_status(0, true);
+}
+async function self_test_lnb_controller()
+{
+    let lnb_controller = devices["lnb_controller"];
+
+    if(!lnb_controller)
+        throw new Error("LNB controller not found!");
+
+    // Test global reference enable
+    await lnb_controller.set_lnb_global_reference_status(true);
+    await delay(1500);
+
+    let lnb_global_reference_status = await lnb_controller.get_lnb_global_reference_status();
+
+    if(!lnb_global_reference_status)
+        throw new Error("LNB global reference did not turn on!");
+
+    // Test LNBs
+    const LNB_VOLTAGE_TOLERANCE_PCT = 0.05;
+    const LNB_VOLTAGE = 13500;
+    const LNB_REF_FREQ = 25000000;
+
+    for(let i = 0; i < 2; i++)
+    {
+        // Turn LNB off
+        await lnb_controller.set_lnb_bias_status(i, false);
+        await delay(1500);
+
+        let lnb_bias_status = await lnb_controller.get_lnb_bias_status(i);
+
+        // Ensure LNB is off
+        if(lnb_bias_status)
+            throw new Error("LNB #" + i + " did not turn off!");
+
+        // Set LNB voltage
+        await lnb_controller.set_lnb_bias_voltage(i, LNB_VOLTAGE);
+        await delay(1500);
+
+        let lnb_voltage_set = await lnb_controller.get_lnb_bias_voltage_set(i);
+
+        // Check if LNB set voltage is correct
+        if(Math.abs(lnb_voltage_set - LNB_VOLTAGE) / LNB_VOLTAGE > LNB_VOLTAGE_TOLERANCE_PCT)
+            throw new Error("LNB #" + i + " set voltage is outside tolerance! Got " + lnb_voltage_set + ", expected " + LNB_VOLTAGE + "!");
+
+        // Turn LNB on
+        await lnb_controller.set_lnb_bias_status(i, true);
+        await delay(6000);
+
+        lnb_bias_status = await lnb_controller.get_lnb_bias_status(i);
+        let lnb_voltage = await lnb_controller.get_lnb_bias_voltage(i);
+
+        await lnb_controller.set_lnb_bias_status(i, false);
+        await delay(1500);
+
+        // Check if LNB was on
+        if(!lnb_bias_status)
+            throw new Error("LNB #" + i + " did not turn on!");
+
+        // Check if LNB read voltage is correct
+        if(Math.abs(lnb_voltage - LNB_VOLTAGE) / LNB_VOLTAGE > LNB_VOLTAGE_TOLERANCE_PCT)
+            throw new Error("LNB #" + i + " voltage is outside tolerance! Got " + lnb_voltage + ", expected " + LNB_VOLTAGE + "!");
+
+        // Turn reference off
+        await lnb_controller.set_lnb_reference_status(i, false);
+        await delay(1500);
+
+        let lnb_reference_status = await lnb_controller.get_lnb_reference_status(i);
+
+        // Check if LNB reference is off
+        if(lnb_reference_status)
+            throw new Error("LNB #" + i + " reference did not turn off!");
+
+        // Set LNB reference frequency
+        await lnb_controller.set_lnb_reference_frequency(i, LNB_REF_FREQ);
+        await delay(1500);
+
+        let lnb_reference_frequency = await lnb_controller.get_lnb_reference_frequency(i);
+
+        // Check if LNB reference frequency is correct
+        if(lnb_reference_frequency != LNB_REF_FREQ)
+            throw new Error("LNB #" + i + " reference frequency is incorrect! Got " + lnb_reference_frequency + ", expected " + LNB_REF_FREQ + "!");
+
+        // Turn reference on
+        await lnb_controller.set_lnb_reference_status(i, true);
+        await delay(6000);
+
+        lnb_reference_status = await lnb_controller.get_lnb_reference_status(i);
+
+        await lnb_controller.set_lnb_reference_status(i, false);
+        await delay(1500);
+
+        // Check if LNB reference is on
+        if(!lnb_reference_status)
+            throw new Error("LNB #" + i + " reference did not turn on!");
+    }
+
+    // Test global reference disable
+    await lnb_controller.set_lnb_global_reference_status(false);
+    await delay(1500);
+
+    lnb_global_reference_status = await lnb_controller.get_lnb_global_reference_status();
+
+    if(lnb_global_reference_status)
+        throw new Error("LNB global reference did not turn off!");
+}
+
 async function main()
 {
     // Console and logging
@@ -1568,10 +2086,19 @@ async function main()
 
                 let sensor = new DS18B20(device);
 
-                // TODO: Check code and add accordingly to sensors array
-                devices["ds18b20_" + sensor.get_uid().toString(16)] = sensor;
-
                 await sensor.config(12);
+
+                let uid = sensor.get_uid();
+
+                if(uid == 0x000000000CCC3BEDn)
+                {
+                    devices["pump_water_tempe_sensor"] = sensor;
+                }
+                else
+                {
+                    devices["ds18b20_" + sensor.get_uid().toString(16)] = sensor;
+                }
+
                 await sensor.measure();
 
                 cl.tprintln(null, "DS18B20", "        Temperature: %d C", await sensor.get_temperature());
@@ -1594,7 +2121,22 @@ async function main()
 
         try
         {
-            await gpio_controller.probe();
+            for(let r = 0; r < 3; r++)
+            {
+                try
+                {
+                    await gpio_controller.probe();
+
+                    break;
+                }
+                catch (e)
+                {
+                    if(r == 2)
+                        throw e;
+                    else
+                        await delay(500);
+                }
+            }
         }
         catch (e)
         {
@@ -1642,7 +2184,22 @@ async function main()
 
         try
         {
-            await psu.probe();
+            for(let r = 0; r < 3; r++)
+            {
+                try
+                {
+                    await psu.probe();
+
+                    break;
+                }
+                catch (e)
+                {
+                    if(r == 2)
+                        throw e;
+                    else
+                        await delay(500);
+                }
+            }
         }
         catch (e)
         {
@@ -1684,17 +2241,6 @@ async function main()
 
         await psu.set_enable(false);
 
-        cl.tprintln("magenta", "HPPSU", "  Testing fan at max RPM...");
-        await psu.set_fan_target_speed(17500);
-        await delay(3000);
-        let fan_speed = await psu.get_fan_speed();
-        await psu.set_fan_target_speed(0);
-
-        if(fan_speed >= 16000)
-            cl.tprintln("green", "HPPSU", "    Fan test passed (%d)!", fan_speed);
-        else
-            cl.tprintln("yellow", "HPPSU", "    Fan test failed (%d)!", fan_speed);
-
         //await psu.clear_on_time_and_energy();
         //await psu.clear_peak_input_current();
 
@@ -1716,11 +2262,478 @@ async function main()
         }
     }
 
+    //// Controllers
+    // Relay Controller
+    const relay_controllers = [];
+    relay_controllers.push(new RelayController(buses.i2c[0], gpios.ext_i2c_enable[1]));
+
+    for(let i = 0; i < relay_controllers.length; i++)
+    {
+        let controller = relay_controllers[i];
+
+        try
+        {
+            for(let r = 0; r < 3; r++)
+            {
+                try
+                {
+                    await controller.probe();
+
+                    break;
+                }
+                catch (e)
+                {
+                    if(r == 2)
+                        throw e;
+                    else
+                        await delay(500);
+                }
+            }
+        }
+        catch (e)
+        {
+            cl.tprintln("red", "Relay Controller", e);
+
+            continue;
+        }
+
+        cl.tprintln("green", "Relay Controller", "Relay Controller #%d found!", i);
+
+        if(i == 0)
+        {
+            if(devices["psu0"] && devices["psu1"])
+            {
+                await devices["psu0"].set_enable(true);
+                await devices["psu1"].set_enable(true);
+            }
+        }
+
+        await controller.reset();
+        await delay(2500);
+
+        if(i == 0)
+        {
+            await controller.set_relay_undervoltage_point(13000);
+            await controller.set_relay_undervoltage_status(true);
+
+            if(devices["psu0"] && devices["psu1"])
+            {
+                let system_voltages = await controller.get_system_voltages();
+                let retries = 0;
+
+                while(system_voltages.vin < 20000 && retries++ < 3)
+                {
+                    await delay(5000);
+                    system_voltages = await controller.get_system_voltages();
+                }
+
+                if(system_voltages.vin >= 20000)
+                {
+                    await controller.set_relay_voltage( 0, 24500);
+                    await controller.set_relay_voltage( 1, 24500);
+                    await controller.set_relay_voltage( 2, 24500);
+                    await controller.set_relay_voltage( 3, 24500);
+                  //await controller.set_relay_voltage( 4, 24500);
+                  //await controller.set_relay_voltage( 5, 24500);
+                    await controller.set_relay_voltage( 6, 24500);
+                    await controller.set_relay_voltage( 7, 24500);
+                    await controller.set_relay_voltage( 8, 24500);
+                    await controller.set_relay_voltage( 9, 24500);
+                    await controller.set_relay_voltage(10, 24500);
+                  //await controller.set_relay_voltage(11, 24500);
+                }
+                else
+                {
+                    cl.tprintln("red", "Relay Controller", "  System VIN did not converge in time! (Thermal fuse open?)");
+                }
+            }
+            else
+            {
+                cl.tprintln("red", "Relay Controller", "  PSUs not found, cannot set relay voltages!");
+            }
+
+            devices["relay_controller"] = controller;
+        }
+        else
+        {
+            devices["relay_controller_" + i] = controller;
+        }
+
+        cl.tprintln(null, "Relay Controller", "  Unique ID: %s", await controller.get_unique_id());
+        cl.tprintln(null, "Relay Controller", "  Software Version: v%d", await controller.get_software_version());
+
+        let chip_voltages = await controller.get_chip_voltages();
+        cl.tprintln(null, "Relay Controller", "  AVDD Voltage: %d mV", chip_voltages.avdd);
+        cl.tprintln(null, "Relay Controller", "  DVDD Voltage: %d mV", chip_voltages.dvdd);
+        cl.tprintln(null, "Relay Controller", "  IOVDD Voltage: %d mV", chip_voltages.iovdd);
+        cl.tprintln(null, "Relay Controller", "  Core Voltage: %d mV", chip_voltages.core);
+
+        let system_voltages = await controller.get_system_voltages();
+        cl.tprintln(null, "Relay Controller", "  VIN Voltage: %d mV", system_voltages.vin);
+
+        cl.tprintln(null, "Relay Controller", "  VIN Undervoltage monitor status: %s", (await controller.get_relay_undervoltage_status()) ? "ON" : "OFF");
+        cl.tprintln(null, "Relay Controller", "  VIN Undervoltage threshold: %d mV", await controller.get_relay_undervoltage_point());
+        cl.tprintln(null, "Relay Controller", "  VIN Undervoltage triggered: %s", (await controller.was_relay_undervoltage_triggered()) ? "YES" : "NO");
+        cl.tprintln(null, "Relay Controller", "  VIN Undervoltage status: %s", (await controller.is_relay_undervoltage()) ? "LOW" : "OK");
+
+        let chip_temperatures = await controller.get_chip_temperatures();
+        cl.tprintln(null, "Relay Controller", "  ADC Temperature: %d C", chip_temperatures.adc);
+        cl.tprintln(null, "Relay Controller", "  EMU Temperature: %d C", chip_temperatures.emu);
+
+        cl.tprintln(null, "Relay Controller", "  Relays:");
+
+        let rstatus = await controller.get_relay_status();
+
+        for(let j = 0; j < 12; j++)
+        {
+            cl.tprintln(null, "Relay Controller", "    Relay #%d status: %s", j, (rstatus & (1 << j)) ? "ON" : "OFF");
+            cl.tprintln(null, "Relay Controller", "    Relay #%d duty cycle: %d %%", j, await controller.get_relay_duty_cycle(j) * 100);
+            cl.tprintln(null, "Relay Controller", "    Relay #%d voltage: %d mV", j, await controller.get_relay_voltage(j));
+        }
+    }
+
+    // Upconverter
+    if(devices["relay_controller"])
+    {
+        await devices["relay_controller"].set_relay_status(6, true);
+        await delay(2500);
+
+        const upconverters = [];
+        upconverters.push(new Upconverter(buses.i2c[0], gpios.ext_i2c_enable[1]));
+
+        for(let i = 0; i < upconverters.length; i++)
+        {
+            let controller = upconverters[i];
+
+            try
+            {
+                for(let r = 0; r < 3; r++)
+                {
+                    try
+                    {
+                        await controller.probe();
+
+                        break;
+                    }
+                    catch (e)
+                    {
+                        if(r == 2)
+                            throw e;
+                        else
+                            await delay(500);
+                    }
+                }
+            }
+            catch (e)
+            {
+                cl.tprintln("red", "Upconverter", e);
+
+                continue;
+            }
+
+            cl.tprintln("green", "Upconverter", "Upconverter #%d found!", i);
+
+            //await controller.reset();
+            //await delay(5500);
+
+            if(i == 0)
+            {
+                await controller.set_rf_power_modulation(Upconverter.MOD_CW);
+                await controller.set_low_rf_power_threshold(-5);
+                await controller.set_low_rf_power_status(true);
+                await controller.set_lo_frequency(1875000000n);
+
+                devices["upconverter"] = controller;
+            }
+            else
+            {
+                devices["upconverter_" + i] = controller;
+            }
+
+            cl.tprintln(null, "Upconverter", "  Unique ID: %s", await controller.get_unique_id());
+            cl.tprintln(null, "Upconverter", "  Software Version: v%d", await controller.get_software_version());
+
+            let chip_voltages = await controller.get_chip_voltages();
+            cl.tprintln(null, "Upconverter", "  AVDD Voltage: %d mV", chip_voltages.avdd);
+            cl.tprintln(null, "Upconverter", "  DVDD Voltage: %d mV", chip_voltages.dvdd);
+            cl.tprintln(null, "Upconverter", "  IOVDD Voltage: %d mV", chip_voltages.iovdd);
+            cl.tprintln(null, "Upconverter", "  Core Voltage: %d mV", chip_voltages.core);
+
+            let system_voltages = await controller.get_system_voltages();
+            cl.tprintln(null, "Upconverter", "  VIN Voltage: %d mV", system_voltages.vin);
+            cl.tprintln(null, "Upconverter", "  5V0 Voltage: %d mV", system_voltages.v5v0);
+
+            let system_currents = await controller.get_system_currents();
+            cl.tprintln(null, "Upconverter", "  5V0 Current: %d mA", system_currents.i5v0);
+
+            let chip_temperatures = await controller.get_chip_temperatures();
+            cl.tprintln(null, "Upconverter", "  ADC Temperature: %d C", chip_temperatures.adc);
+            cl.tprintln(null, "Upconverter", "  EMU Temperature: %d C", chip_temperatures.emu);
+
+            cl.tprintln(null, "Upconverter", "  RF power: %d dBm", await controller.get_rf_power());
+            cl.tprintln(null, "Upconverter", "  RF power modulation: %s", Upconverter.get_modulation_name(await controller.get_rf_power_modulation()));
+
+            cl.tprintln(null, "Upconverter", "  RF Low power monitor status: %s", (await controller.get_low_rf_power_status()) ? "ON" : "OFF");
+            cl.tprintln(null, "Upconverter", "  RF Low power threshold: %d dBm", await controller.get_low_rf_power_threshold());
+            cl.tprintln(null, "Upconverter", "  RF Low power triggered: %s", (await controller.was_low_rf_power_triggered()) ? "YES" : "NO");
+            cl.tprintln(null, "Upconverter", "  RF Low power status: %s", (await controller.is_low_rf_power()) ? "LOW" : "OK");
+
+            cl.tprintln(null, "Upconverter", "  IF Attenuation: %d dB", await controller.get_if_attenuation());
+            cl.tprintln(null, "Upconverter", "  RF1 Attenuation: %d dB", await controller.get_rf1_attenuation());
+            cl.tprintln(null, "Upconverter", "  RF2 Attenuation: %d dB", await controller.get_rf2_attenuation());
+
+            cl.tprintln(null, "Upconverter", "  LO Frequency: %d MHz", Number((await controller.get_lo_frequency()) / 1000000n));
+            cl.tprintln(null, "Upconverter", "  LO Reference Frequency: %d MHz", (await controller.get_lo_ref_frequency()) / 1000000);
+            cl.tprintln(null, "Upconverter", "  LO PFD Frequency: %d MHz", (await controller.get_lo_pfd_frequency()) / 1000000);
+            cl.tprintln(null, "Upconverter", "  LO Locked: %s", (await controller.is_lo_pll_locked()) ? "YES" : "NO");
+            cl.tprintln(null, "Upconverter", "  LO Muted: %s", (await controller.is_lo_pll_muted()) ? "YES" : "NO");
+
+            cl.tprintln(null, "Upconverter", "  Mixer Enabled: %s", (await controller.get_mixer_status()) ? "YES" : "NO");
+            cl.tprintln(null, "Upconverter", "  Pre-Amplifiers Enabled: %s", (await controller.get_pa_stg1_2_status()) ? "YES" : "NO");
+            cl.tprintln(null, "Upconverter", "  Final Amplifier Enabled: %s", (await controller.get_pa_stg3_status()) ? "YES" : "NO");
+        }
+
+        if(!devices["upconverter"])
+        {
+            await devices["relay_controller"].set_relay_status(6, false);
+
+            cl.tprintln("yellow", "Upconverter", "Upconverter not found! (Thermal fuse open?)");
+        }
+    }
+    else
+    {
+        cl.tprintln("yellow", "Upconverter", "Relay Controller not found, cannot probe Upconverter");
+    }
+
+    // PA Bias Controller
+    if(devices["relay_controller"])
+    {
+        await devices["relay_controller"].set_relay_status(7, true);
+        await delay(2500);
+
+        const pa_bias_controllers = [];
+        pa_bias_controllers.push(new PABiasController(buses.i2c[0], gpios.ext_i2c_enable[1]));
+
+        for(let i = 0; i < pa_bias_controllers.length; i++)
+        {
+            let controller = pa_bias_controllers[i];
+
+            try
+            {
+                for(let r = 0; r < 3; r++)
+                {
+                    try
+                    {
+                        await controller.probe();
+
+                        break;
+                    }
+                    catch (e)
+                    {
+                        if(r == 2)
+                            throw e;
+                        else
+                            await delay(500);
+                    }
+                }
+            }
+            catch (e)
+            {
+                cl.tprintln("red", "PA Bias Controller", e);
+
+                continue;
+            }
+
+            cl.tprintln("green", "PA Bias Controller", "PA Bias Controller #%d found!", i);
+
+            //await controller.reset();
+            //await delay(5500);
+
+            if(i == 0)
+            {
+                devices["pa_bias_controller"] = controller;
+            }
+            else
+            {
+                devices["pa_bias_controller_" + i] = controller;
+            }
+
+            cl.tprintln(null, "PA Bias Controller", "  Unique ID: %s", await controller.get_unique_id());
+            cl.tprintln(null, "PA Bias Controller", "  Software Version: v%d", await controller.get_software_version());
+
+            let chip_voltages = await controller.get_chip_voltages();
+            cl.tprintln(null, "PA Bias Controller", "  AVDD Voltage: %d mV", chip_voltages.avdd);
+            cl.tprintln(null, "PA Bias Controller", "  DVDD Voltage: %d mV", chip_voltages.dvdd);
+            cl.tprintln(null, "PA Bias Controller", "  IOVDD Voltage: %d mV", chip_voltages.iovdd);
+            cl.tprintln(null, "PA Bias Controller", "  Core Voltage: %d mV", chip_voltages.core);
+
+            let system_voltages = await controller.get_system_voltages();
+            cl.tprintln(null, "PA Bias Controller", "  VIN Voltage: %d mV", system_voltages.vin);
+            cl.tprintln(null, "PA Bias Controller", "  5V0 Voltage: %d mV", system_voltages.v5v0);
+
+            let chip_temperatures = await controller.get_chip_temperatures();
+            cl.tprintln(null, "PA Bias Controller", "  ADC Temperature: %d C", chip_temperatures.adc);
+            cl.tprintln(null, "PA Bias Controller", "  EMU Temperature: %d C", chip_temperatures.emu);
+
+            let system_temperatures = await controller.get_system_temperatures();
+            cl.tprintln(null, "PA Bias Controller", "  AFE Temperature: %d C", system_temperatures.afe);
+
+            let tec_dac_init = await controller.get_tec_dac_status();
+
+            cl.tprintln(tec_dac_init ? null : "yellow", "PA Bias Controller", "  TEC DAC init status: %s", tec_dac_init ? "OK" : "FAULTY");
+
+            if(tec_dac_init)
+            {
+                cl.tprintln(null, "PA Bias Controller", "  TECs:");
+
+                for(let j = 0; j < 4; j++)
+                {
+                    cl.tprintln(null, "PA Bias Controller", "    TEC #%d status: %s", j, (await controller.get_tec_status(j)) ? "ON" : "OFF");
+                    cl.tprintln(null, "PA Bias Controller", "    TEC #%d voltage: %d mV", j, await controller.get_tec_voltage(j));
+                }
+            }
+
+            cl.tprintln(null, "PA Bias Controller", "  PAs:");
+
+            for(let j = 0; j < 2; j++)
+            {
+                let data = await controller.get_pa_telemetry(j);
+
+                cl.tprintln(null, "PA Bias Controller", "    PA #%d status: %s", j, (await controller.get_pa_status(j)) ? "ON" : "OFF");
+                cl.tprintln(null, "PA Bias Controller", "    PA #%d VGG Raw Voltage: %d mV", j, data.vgg_raw);
+                cl.tprintln(null, "PA Bias Controller", "    PA #%d VGG Voltage: %d mV", j, data.vgg);
+                cl.tprintln(null, "PA Bias Controller", "    PA #%d VDD Voltage: %d mV", j, data.vdd);
+                cl.tprintln(null, "PA Bias Controller", "    PA #%d VDD Current: %d mA", j, data.idd);
+                cl.tprintln(null, "PA Bias Controller", "    PA #%d Temperature: %d C", j, data.temperature);
+                cl.tprintln(null, "PA Bias Controller", "    PA #%d High Temperature: %d C", j, data.temperature_high);
+                cl.tprintln(null, "PA Bias Controller", "    PA #%d High Temperature triggered: %s", j, (await controller.was_pa_high_temperature_triggered(j)) ? "YES" : "NO");
+                cl.tprintln(null, "PA Bias Controller", "    PA #%d High Temperature status: %s", j, (await controller.is_pa_high_temperature(j)) ? "HIGH" : "OK");
+                cl.tprintln(null, "PA Bias Controller", "    PA #%d Low Temperature: %d C", j, data.temperature_low);
+                cl.tprintln(null, "PA Bias Controller", "    PA #%d Low Temperature triggered: %s", j, (await controller.was_pa_low_temperature_triggered(j)) ? "YES" : "NO");
+                cl.tprintln(null, "PA Bias Controller", "    PA #%d Low Temperature status: %s", j, (await controller.is_pa_low_temperature(j)) ? "LOW" : "OK");
+            }
+        }
+
+        if(!devices["pa_bias_controller"])
+        {
+            await devices["relay_controller"].set_relay_status(7, false);
+
+            if(!devices["upconverter"]) // If upconverter is also not found warn about possible open fuse
+                cl.tprintln("yellow", "PA Bias Controller", "PA Bias Controller not found! (Thermal fuse open?)");
+            else // Otherwise it certainly is not an open fuse
+                cl.tprintln("red", "PA Bias Controller", "PA Bias Controller not found!");
+        }
+    }
+    else
+    {
+        cl.tprintln("yellow", "PA Bias Controller", "Relay Controller not found, cannot probe PA Bias Controller");
+    }
+
+    // LNB Controller
+    if(devices["relay_controller"])
+    {
+        await devices["relay_controller"].set_relay_status(8, true);
+        await delay(2500);
+
+        const lnb_controllers = [];
+        lnb_controllers.push(new LNBController(buses.i2c[0], gpios.ext_i2c_enable[1]));
+
+        for(let i = 0; i < lnb_controllers.length; i++)
+        {
+            let controller = lnb_controllers[i];
+
+            try
+            {
+                for(let r = 0; r < 3; r++)
+                {
+                    try
+                    {
+                        await controller.probe();
+
+                        break;
+                    }
+                    catch (e)
+                    {
+                        if(r == 2)
+                            throw e;
+                        else
+                            await delay(500);
+                    }
+                }
+            }
+            catch (e)
+            {
+                cl.tprintln("red", "LNB Controller", e);
+
+                continue;
+            }
+
+            cl.tprintln("green", "LNB Controller", "LNB Controller #%d found!", i);
+
+            //await controller.reset();
+            //await delay(5500);
+
+            if(i == 0)
+            {
+                devices["lnb_controller"] = controller;
+            }
+            else
+            {
+                devices["lnb_controller_" + i] = controller;
+            }
+
+            cl.tprintln(null, "LNB Controller", "  Unique ID: %s", await controller.get_unique_id());
+            cl.tprintln(null, "LNB Controller", "  Software Version: v%d", await controller.get_software_version());
+
+            let chip_voltages = await controller.get_chip_voltages();
+            cl.tprintln(null, "LNB Controller", "  AVDD Voltage: %d mV", chip_voltages.avdd);
+            cl.tprintln(null, "LNB Controller", "  DVDD Voltage: %d mV", chip_voltages.dvdd);
+            cl.tprintln(null, "LNB Controller", "  IOVDD Voltage: %d mV", chip_voltages.iovdd);
+            cl.tprintln(null, "LNB Controller", "  Core Voltage: %d mV", chip_voltages.core);
+
+            let system_voltages = await controller.get_system_voltages();
+            cl.tprintln(null, "LNB Controller", "  VIN Voltage: %d mV", system_voltages.vin);
+            cl.tprintln(null, "LNB Controller", "  5V0 Voltage: %d mV", system_voltages.v5v0);
+
+            let chip_temperatures = await controller.get_chip_temperatures();
+            cl.tprintln(null, "LNB Controller", "  ADC Temperature: %d C", chip_temperatures.adc);
+            cl.tprintln(null, "LNB Controller", "  EMU Temperature: %d C", chip_temperatures.emu);
+
+            let system_temperatures = await controller.get_system_temperatures();
+            cl.tprintln(null, "LNB Controller", "  Bias Regulator Temperature: %d C", system_temperatures.bias_reg);
+
+            cl.tprintln(null, "LNB Controller", "  Global reference enable: %s", (await controller.get_lnb_global_reference_status()) ? "ON" : "OFF");
+
+            cl.tprintln(null, "LNB Controller", "  LNBs:");
+
+            for(let j = 0; j < 2; j++)
+            {
+                cl.tprintln(null, "LNB Controller", "    LNB #%d Bias enable: %s", j, (await controller.get_lnb_bias_status(j)) ? "ON" : "OFF");
+                cl.tprintln(null, "LNB Controller", "    LNB #%d Bias status: %s", j, (await controller.is_lnb_bias_power_good(j)) ? "POWER GOOD" : "POWER NOT GOOD");
+                cl.tprintln(null, "LNB Controller", "    LNB #%d Set Bias Voltage: %d mV", j, await controller.get_lnb_bias_voltage_set(j));
+                cl.tprintln(null, "LNB Controller", "    LNB #%d Bias Voltage: %d mV", j, await controller.get_lnb_bias_voltage(j));
+                cl.tprintln(null, "LNB Controller", "    LNB #%d Reference enable: %s", j, (await controller.get_lnb_reference_status(j)) ? "ON" : "OFF");
+                cl.tprintln(null, "LNB Controller", "    LNB #%d Reference Frequency: %d Hs", j, await controller.get_lnb_reference_frequency(j));
+            }
+        }
+
+        if(!devices["lnb_controller"])
+        {
+            await devices["relay_controller"].set_relay_status(8, false);
+
+            cl.tprintln("yellow", "LNB Controller", "LNB Controller not found! (Thermal fuse open?)");
+        }
+    }
+    else
+    {
+        cl.tprintln("yellow", "LNB Controller", "Relay Controller not found, cannot probe LNB Controller");
+    }
+
     // Sensors
     //// BME280
     const bme280_sensors = [];
-    bme280_sensors.push(new BME280(buses.i2c[0], 0, gpios.ext_i2c_enable[0]));
-    bme280_sensors.push(new BME280(buses.i2c[0], 1, gpios.ext_i2c_enable[0]));
+    bme280_sensors.push(new BME280(buses.i2c[0], 0, gpios.ext_i2c_enable[1]));
+    bme280_sensors.push(new BME280(buses.i2c[0], 1, gpios.ext_i2c_enable[1]));
 
     for(let i = 0; i < bme280_sensors.length; i++)
     {
@@ -1728,7 +2741,22 @@ async function main()
 
         try
         {
-            await sensor.probe();
+            for(let r = 0; r < 3; r++)
+            {
+                try
+                {
+                    await sensor.probe();
+
+                    break;
+                }
+                catch (e)
+                {
+                    if(r == 2)
+                        throw e;
+                    else
+                        await delay(500);
+                }
+            }
         }
         catch (e)
         {
@@ -1776,7 +2804,7 @@ async function main()
 
     //// ZMOD4510
     const zmod4510_sensors = [];
-    zmod4510_sensors.push(new ZMOD4510(buses.i2c[0], gpios.ext_i2c_enable[0]));
+    zmod4510_sensors.push(new ZMOD4510(buses.i2c[0], gpios.ext_i2c_enable[1]));
 
     for(let i = 0; i < zmod4510_sensors.length; i++)
     {
@@ -1784,7 +2812,22 @@ async function main()
 
         try
         {
-            await sensor.probe();
+            for(let r = 0; r < 3; r++)
+            {
+                try
+                {
+                    await sensor.probe();
+
+                    break;
+                }
+                catch (e)
+                {
+                    if(r == 2)
+                        throw e;
+                    else
+                        await delay(500);
+                }
+            }
         }
         catch (e)
         {
@@ -1824,8 +2867,8 @@ async function main()
 
     //// SI1133
     const si1133_sensors = [];
-    si1133_sensors.push(new SI1133(buses.i2c[0], 0, gpios.ext_i2c_enable[0]));
-    si1133_sensors.push(new SI1133(buses.i2c[0], 1, gpios.ext_i2c_enable[0]));
+    si1133_sensors.push(new SI1133(buses.i2c[0], 0, gpios.ext_i2c_enable[1]));
+    si1133_sensors.push(new SI1133(buses.i2c[0], 1, gpios.ext_i2c_enable[1]));
 
     for(let i = 0; i < si1133_sensors.length; i++)
     {
@@ -1833,7 +2876,22 @@ async function main()
 
         try
         {
-            await sensor.probe();
+            for(let r = 0; r < 3; r++)
+            {
+                try
+                {
+                    await sensor.probe();
+
+                    break;
+                }
+                catch (e)
+                {
+                    if(r == 2)
+                        throw e;
+                    else
+                        await delay(500);
+                }
+            }
         }
         catch (e)
         {
@@ -1875,7 +2933,22 @@ async function main()
 
         try
         {
-            await sensor.probe();
+            for(let r = 0; r < 3; r++)
+            {
+                try
+                {
+                    await sensor.probe();
+
+                    break;
+                }
+                catch (e)
+                {
+                    if(r == 2)
+                        throw e;
+                    else
+                        await delay(500);
+                }
+            }
         }
         catch (e)
         {
@@ -1904,6 +2977,8 @@ async function main()
     //// LTC5597 (RFPowerMeter with MCP3421 ADC)
     const ltc5597_sensors = [];
     ltc5597_sensors.push(new LTC5597(buses.i2c[0], 0, gpios.ext_i2c_enable[1]));
+    ltc5597_sensors.push(new LTC5597(buses.i2c[0], 0, gpios.ext_i2c_enable[0]));
+    ltc5597_sensors.push(new LTC5597(buses.i2c[0], 3, gpios.ext_i2c_enable[0]));
 
     for(let i = 0; i < ltc5597_sensors.length; i++)
     {
@@ -1911,7 +2986,22 @@ async function main()
 
         try
         {
-            await sensor.probe();
+            for(let r = 0; r < 3; r++)
+            {
+                try
+                {
+                    await sensor.probe();
+
+                    break;
+                }
+                catch (e)
+                {
+                    if(r == 2)
+                        throw e;
+                    else
+                        await delay(500);
+                }
+            }
         }
         catch (e)
         {
@@ -1922,17 +3012,7 @@ async function main()
 
         cl.tprintln("green", "LTC5597", "LTC5597 #%d found!", i);
 
-        if(i == 0)
-        {
-            sensor.set_offset(18.1 + 20);
-
-            devices["tx_fwd_rf_power_sensor"] = sensor;
-        }
-        else
-        {
-            devices["ltc5597_" + i] = sensor;
-        }
-
+        await sensor.config(14, true);
         sensor.load_calibration(
             {
                 pdata: [-40, -35, -30, -25, -20, -15, -10, -5, 0, 5],
@@ -1968,58 +3048,127 @@ async function main()
                 ]
             }
         );
-        sensor.set_frequency(525);
 
-        await sensor.config(14, true);
-
-        cl.tprintln(null, "LTC5597", "  Power: %d dBm", await sensor.get_power_level(2, 3) + 18.1 + 20);
-    }
-
-    //// LTC4151
-    const ltc4151_sensors = [];
-    ltc4151_sensors.push(new LTC4151(buses.i2c[0], 8, gpios.ext_i2c_enable[0]));
-
-    for(let i = 0; i < ltc4151_sensors.length; i++)
-    {
-        let sensor = ltc4151_sensors[i];
-
-        try
+        if(i == 0)
         {
-            await sensor.probe();
+            sensor.set_frequency(525);
+            sensor.set_offset(6);
+
+            devices["tx_if_power_sensor"] = sensor;
         }
-        catch (e)
+        else if(i == 1)
         {
-            cl.tprintln("red", "LTC4151", e);
+            sensor.set_frequency(2400);
+            sensor.set_offset(20);
 
-            continue;
+            devices["tx_rf_fwd_power_sensor"] = sensor;
         }
-
-        cl.tprintln("green", "LTC4151", "LTC4151 #%d found!", i);
-
-        await sensor.config();
-
-        sensor.set_current_shunt_value(0.012 / 3);
-        sensor.set_adin_scale_factor((165 + 10) / 10); // Voltage divider factor
-
-        if(false)
+        else if(i == 2)
         {
-            devices["ltc4151_" + i] = sensor;
+            sensor.set_frequency(2400);
+            sensor.set_offset(20);
+
+            devices["tx_rf_ref_power_sensor"] = sensor;
         }
         else
         {
-            devices["ltc4151_" + i] = sensor;
+            devices["ltc5597_" + i] = sensor;
         }
 
-        cl.tprintln(null, "LTC4151", "  VIN Voltage: %d mV", await sensor.get_vin_voltage(10));
-        cl.tprintln(null, "LTC4151", "  Load Voltage: %d mV", await sensor.get_adin_voltage(10));
-        cl.tprintln(null, "LTC4151", "  Load Current: %d mA", await sensor.get_current(10));
+        cl.tprintln(null, "LTC5597", "  Power: %d dBm", await sensor.get_power_level(1, 1));
+    }
+
+    //// LTC4151
+    if(devices["relay_controller"])
+    {
+        await devices["relay_controller"].set_relay_status(0, true); // Boost converter through inrush limit
+        await devices["relay_controller"].set_relay_status(2, true); // TECs
+        await delay(1000);
+
+        const ltc4151_sensors = [];
+        ltc4151_sensors.push(new LTC4151(buses.i2c[0], 8, gpios.ext_i2c_enable[0]));
+        ltc4151_sensors.push(new LTC4151(buses.i2c[0], 0, gpios.ext_i2c_enable[0]));
+
+        for(let i = 0; i < ltc4151_sensors.length; i++)
+        {
+            let sensor = ltc4151_sensors[i];
+
+            try
+            {
+                for(let r = 0; r < 3; r++)
+                {
+                    try
+                    {
+                        await sensor.probe();
+
+                        break;
+                    }
+                    catch (e)
+                    {
+                        if(r == 2)
+                            throw e;
+                        else
+                            await delay(500);
+                    }
+                }
+            }
+            catch (e)
+            {
+                cl.tprintln("red", "LTC4151", e);
+
+                continue;
+            }
+
+            cl.tprintln("green", "LTC4151", "LTC4151 #%d found!", i);
+
+            await sensor.config();
+
+            if(i == 0)
+            {
+                sensor.set_current_shunt_value(0.012 / 3);
+                sensor.set_adin_scale_factor((165 + 10) / 10); // Voltage divider factor
+
+                devices["boost_input_power_sensor"] = sensor;
+            }
+            else if(i == 1)
+            {
+                sensor.set_current_shunt_value(0.012 / 3);
+                sensor.set_adin_scale_factor((165 + 10) / 10); // Voltage divider factor
+
+                devices["tec_controller_power_sensor"] = sensor;
+            }
+            else
+            {
+                devices["ltc4151_" + i] = sensor;
+            }
+
+            cl.tprintln(null, "LTC4151", "  VIN Voltage: %d mV", await sensor.get_vin_voltage(10));
+            cl.tprintln(null, "LTC4151", "  Load Voltage: %d mV", await sensor.get_adin_voltage(10));
+            cl.tprintln(null, "LTC4151", "  Load Current: %d mA", await sensor.get_current(10));
+        }
+
+        if(!devices["boost_input_power_sensor"])
+        {
+            await devices["relay_controller"].set_relay_status(0, false);
+
+            cl.tprintln("yellow", "LTC4151", "Boost Converter input power sensor not found! (Thermal fuse open?)");
+        }
+
+        if(!devices["tec_controller_power_sensor"])
+        {
+            await devices["relay_controller"].set_relay_status(2, false);
+
+            cl.tprintln("yellow", "LTC4151", "TECs power sensor not found! (Thermal fuse open?)");
+        }
+    }
+    else
+    {
+        cl.tprintln("yellow", "LTC4151", "Relay Controller not found, cannot probe LTC4151 sensors");
     }
 
     //// F2915 (RFSwitch with MCP23008 IO Controller)
     const f2915_rf_switches = [];
-    f2915_rf_switches.push(new F2915(buses.i2c[0], 0, gpios.ext_i2c_enable[1]));
-    f2915_rf_switches.push(new F2915(buses.i2c[0], 1, gpios.ext_i2c_enable[1]));
-    f2915_rf_switches.push(new F2915(buses.i2c[0], 2, gpios.ext_i2c_enable[1]));
+    f2915_rf_switches.push(new F2915(buses.i2c[0], 0, gpios.ext_i2c_enable[0]));
 
     for(let i = 0; i < f2915_rf_switches.length; i++)
     {
@@ -2027,7 +3176,22 @@ async function main()
 
         try
         {
-            await rf_switch.probe();
+            for(let r = 0; r < 3; r++)
+            {
+                try
+                {
+                    await rf_switch.probe();
+
+                    break;
+                }
+                catch (e)
+                {
+                    if(r == 2)
+                        throw e;
+                    else
+                        await delay(500);
+                }
+            }
         }
         catch (e)
         {
@@ -2039,11 +3203,14 @@ async function main()
         cl.tprintln("green", "F2915", "RF Switch #%d found!", i);
 
         await rf_switch.config();
-        await rf_switch.set_power_enable(true);
-        await rf_switch.set_rf_path(5);
 
         if(i == 0)
         {
+            await rf_switch.set_power_enable(true);
+          //await rf_switch.set_rf_path(1); // Upconverter
+            await rf_switch.set_rf_path(2); // Termination
+          //await rf_switch.set_rf_path(5); // Power meter
+
             devices["tx_if_switch"] = rf_switch;
         }
         else
@@ -2055,258 +3222,45 @@ async function main()
         cl.tprintln(null, "F2915", "  Selected RF path: %d", await rf_switch.get_rf_path());
     }
 
-    //// Controllers
-    // Relay Controller
-    const relay_controllers = [];
-    relay_controllers.push(new RelayController(buses.i2c[0], gpios.ext_i2c_enable[0]));
-
-    for(let i = 0; i < relay_controllers.length; i++)
-    {
-        let controller = relay_controllers[i];
-
-        try
-        {
-            await controller.probe();
-        }
-        catch (e)
-        {
-            cl.tprintln("red", "Relay Controller", e);
-
-            continue;
-        }
-
-        cl.tprintln("green", "Relay Controller", "Relay Controller #%d found!", i);
-
-        await controller.reset();
-        await delay(5500);
-
-        if(i == 0)
-        {
-            devices["relay_controller"] = controller;
-        }
-        else
-        {
-            devices["relay_controller_" + i] = controller;
-        }
-
-        cl.tprintln(null, "Relay Controller", "  Unique ID: %s", await controller.get_unique_id());
-        cl.tprintln(null, "Relay Controller", "  Software Version: v%d", await controller.get_software_version());
-
-        let chip_voltages = await controller.get_chip_voltages();
-        cl.tprintln(null, "Relay Controller", "  AVDD Voltage: %d mV", chip_voltages.avdd);
-        cl.tprintln(null, "Relay Controller", "  DVDD Voltage: %d mV", chip_voltages.dvdd);
-        cl.tprintln(null, "Relay Controller", "  IOVDD Voltage: %d mV", chip_voltages.iovdd);
-        cl.tprintln(null, "Relay Controller", "  Core Voltage: %d mV", chip_voltages.core);
-
-        let system_voltages = await controller.get_system_voltages();
-        cl.tprintln(null, "Relay Controller", "  VIN Voltage: %d mV", system_voltages.vin);
-
-        let uvth = await controller.set_relay_undervoltage_protection(true, 20000);
-        cl.tprintln(null, "Relay Controller", "  VIN Undervoltage threshold: %d mV", uvth);
-        cl.tprintln(null, "Relay Controller", "  VIN Undervoltage status: %s", (await controller.is_undervoltage()) ? "LOW" : "OK");
-
-        let chip_temperatures = await controller.get_chip_temperatures();
-        cl.tprintln(null, "Relay Controller", "  ADC Temperature: %d C", chip_temperatures.adc);
-        cl.tprintln(null, "Relay Controller", "  EMU Temperature: %d C", chip_temperatures.emu);
-
-        cl.tprintln(null, "Relay Controller", "  Relays:");
-
-        let rstatus = await controller.get_relay_status();
-
-        for(let j = 0; j < 12; j++)
-        {
-            cl.tprintln(null, "Relay Controller", "    Relay #%d status: %s", j, (rstatus & (1 << j)) ? "ON" : "OFF");
-            cl.tprintln(null, "Relay Controller", "    Relay #%d duty cycle: %d %%", j, await controller.get_relay_duty_cycle(j) * 100);
-            cl.tprintln(null, "Relay Controller", "    Relay #%d voltage: %d mV", j, await controller.get_relay_voltage(j));
-        }
-    }
-
-    // PA Bias Controller
-    const pa_bias_controllers = [];
-    pa_bias_controllers.push(new PABiasController(buses.i2c[0], gpios.ext_i2c_enable[0]));
-
-    for(let i = 0; i < pa_bias_controllers.length; i++)
-    {
-        let controller = pa_bias_controllers[i];
-
-        try
-        {
-            await controller.probe();
-        }
-        catch (e)
-        {
-            cl.tprintln("red", "PA Bias Controller", e);
-
-            continue;
-        }
-
-        cl.tprintln("green", "PA Bias Controller", "PA Bias Controller #%d found!", i);
-
-        await controller.reset();
-        await delay(5500);
-
-        if(i == 0)
-        {
-            devices["pa_bias_controller"] = controller;
-        }
-        else
-        {
-            devices["pa_bias_controller_" + i] = controller;
-        }
-
-        cl.tprintln(null, "PA Bias Controller", "  Unique ID: %s", await controller.get_unique_id());
-        cl.tprintln(null, "PA Bias Controller", "  Software Version: v%d", await controller.get_software_version());
-
-        let chip_voltages = await controller.get_chip_voltages();
-        cl.tprintln(null, "PA Bias Controller", "  AVDD Voltage: %d mV", chip_voltages.avdd);
-        cl.tprintln(null, "PA Bias Controller", "  DVDD Voltage: %d mV", chip_voltages.dvdd);
-        cl.tprintln(null, "PA Bias Controller", "  IOVDD Voltage: %d mV", chip_voltages.iovdd);
-        cl.tprintln(null, "PA Bias Controller", "  Core Voltage: %d mV", chip_voltages.core);
-
-        let system_voltages = await controller.get_system_voltages();
-        cl.tprintln(null, "PA Bias Controller", "  VIN Voltage: %d mV", system_voltages.vin);
-        cl.tprintln(null, "PA Bias Controller", "  5V0 Voltage: %d mV", system_voltages.v5v0);
-
-        let chip_temperatures = await controller.get_chip_temperatures();
-        cl.tprintln(null, "PA Bias Controller", "  ADC Temperature: %d C", chip_temperatures.adc);
-        cl.tprintln(null, "PA Bias Controller", "  EMU Temperature: %d C", chip_temperatures.emu);
-
-        let system_temperatures = await controller.get_system_temperatures();
-        cl.tprintln(null, "PA Bias Controller", "  AFE Temperature: %d C", system_temperatures.afe);
-
-        cl.tprintln(null, "PA Bias Controller", "  TECs:");
-
-        for(let j = 0; j < 4; j++)
-        {
-            cl.tprintln(null, "PA Bias Controller", "    TEC #%d status: %s", j, false ? "ON" : "OFF");
-            cl.tprintln(null, "PA Bias Controller", "    TEC #%d voltage: %d mV", j, await controller.get_tec_voltage(j));
-        }
-
-        cl.tprintln(null, "PA Bias Controller", "  PAs:");
-
-        for(let j = 0; j < 2; j++)
-        {
-            let data = await controller.get_pa_telemetry(j);
-
-            cl.tprintln(null, "PA Bias Controller", "    PA #%d VGG Raw Voltage: %d mV", j, data.vgg_raw);
-            cl.tprintln(null, "PA Bias Controller", "    PA #%d VGG Voltage: %d mV", j, data.vgg);
-            cl.tprintln(null, "PA Bias Controller", "    PA #%d VDD Voltage: %d mV", j, data.vdd);
-            cl.tprintln(null, "PA Bias Controller", "    PA #%d VDD Current: %d mA", j, data.idd);
-            cl.tprintln(null, "PA Bias Controller", "    PA #%d Temperature: %d C", j, data.temperature);
-        }
-    }
-
-    // LNB Controller
-    const lnb_controllers = [];
-    lnb_controllers.push(new LNBController(buses.i2c[0], gpios.ext_i2c_enable[0]));
-
-    for(let i = 0; i < lnb_controllers.length; i++)
-    {
-        let controller = lnb_controllers[i];
-
-        try
-        {
-            await controller.probe();
-        }
-        catch (e)
-        {
-            cl.tprintln("red", "LNB Controller", e);
-
-            continue;
-        }
-
-        cl.tprintln("green", "LNB Controller", "LNB Controller #%d found!", i);
-
-        await controller.reset();
-        await delay(5500);
-
-        if(i == 0)
-        {
-            devices["lnb_controller"] = controller;
-        }
-        else
-        {
-            devices["lnb_controller_" + i] = controller;
-        }
-
-        cl.tprintln(null, "LNB Controller", "  Unique ID: %s", await controller.get_unique_id());
-        cl.tprintln(null, "LNB Controller", "  Software Version: v%d", await controller.get_software_version());
-
-        let chip_voltages = await controller.get_chip_voltages();
-        cl.tprintln(null, "LNB Controller", "  AVDD Voltage: %d mV", chip_voltages.avdd);
-        cl.tprintln(null, "LNB Controller", "  DVDD Voltage: %d mV", chip_voltages.dvdd);
-        cl.tprintln(null, "LNB Controller", "  IOVDD Voltage: %d mV", chip_voltages.iovdd);
-        cl.tprintln(null, "LNB Controller", "  Core Voltage: %d mV", chip_voltages.core);
-
-        let system_voltages = await controller.get_system_voltages();
-        cl.tprintln(null, "LNB Controller", "  VIN Voltage: %d mV", system_voltages.vin);
-        cl.tprintln(null, "LNB Controller", "  5V0 Voltage: %d mV", system_voltages.v5v0);
-
-        let chip_temperatures = await controller.get_chip_temperatures();
-        cl.tprintln(null, "LNB Controller", "  ADC Temperature: %d C", chip_temperatures.adc);
-        cl.tprintln(null, "LNB Controller", "  EMU Temperature: %d C", chip_temperatures.emu);
-    }
-
-    // Upconverter
-    const upconverters = [];
-    upconverters.push(new Upconverter(buses.i2c[0], gpios.ext_i2c_enable[0]));
-
-    for(let i = 0; i < upconverters.length; i++)
-    {
-        let controller = upconverters[i];
-
-        try
-        {
-            await controller.probe();
-        }
-        catch (e)
-        {
-            cl.tprintln("red", "Upconverter", e);
-
-            continue;
-        }
-
-        cl.tprintln("green", "Upconverter", "Upconverter #%d found!", i);
-
-        await controller.reset();
-        await delay(5500);
-
-        if(i == 0)
-        {
-            devices["upconverter"] = controller;
-        }
-        else
-        {
-            devices["upconverter_" + i] = controller;
-        }
-
-        cl.tprintln(null, "Upconverter", "  Unique ID: %s", await controller.get_unique_id());
-        cl.tprintln(null, "Upconverter", "  Software Version: v%d", await controller.get_software_version());
-
-        let chip_voltages = await controller.get_chip_voltages();
-        cl.tprintln(null, "Upconverter", "  AVDD Voltage: %d mV", chip_voltages.avdd);
-        cl.tprintln(null, "Upconverter", "  DVDD Voltage: %d mV", chip_voltages.dvdd);
-        cl.tprintln(null, "Upconverter", "  IOVDD Voltage: %d mV", chip_voltages.iovdd);
-        cl.tprintln(null, "Upconverter", "  Core Voltage: %d mV", chip_voltages.core);
-
-        let system_voltages = await controller.get_system_voltages();
-        cl.tprintln(null, "Upconverter", "  VIN Voltage: %d mV", system_voltages.vin);
-        cl.tprintln(null, "Upconverter", "  5V0 Voltage: %d mV", system_voltages.v5v0);
-
-        let system_currents = await controller.get_system_currents();
-        cl.tprintln(null, "Upconverter", "  5V0 Current: %d mA", system_currents.i5v0);
-
-        let chip_temperatures = await controller.get_chip_temperatures();
-        cl.tprintln(null, "Upconverter", "  ADC Temperature: %d C", chip_temperatures.adc);
-        cl.tprintln(null, "Upconverter", "  EMU Temperature: %d C", chip_temperatures.emu);
-    }
-
     // Wideband Spectrum monitor
     await wb_spectrum_monitor_init();
 
     // SSH Server
     await ssh_server_init();
+
+    // Startup self tests
+    await self_test_run();
 }
+
+process.on(
+    "SIGINT",
+    async function ()
+    {
+
+        if(ssh_server && ssh_server.listening)
+        {
+            cl.tprintln("grey", "SSH", "Closing server!");
+
+            ssh_server.close();
+        }
+
+        if(devices["psu1"])
+        {
+            cl.tprintln("yellow", "HPPSU", "PSU #%d shutting down...", 1);
+
+            await devices["psu1"].set_enable(false);
+        }
+
+        if(devices["psu0"])
+        {
+            cl.tprintln("yellow", "HPPSU", "PSU #%d shutting down...", 0);
+
+            await devices["psu0"].set_enable(false);
+        }
+
+        process.exit(0);
+    }
+)
 
 try
 {
@@ -2314,7 +3268,13 @@ try
 }
 catch(e)
 {
-    console.error(e);
+    console.error(e.stack || e);
+
+    if(devices["psu1"])
+        devices["psu1"].set_enable(false);
+
+    if(devices["psu0"])
+        devices["psu0"].set_enable(false);
 
     process.exit(1);
 }
