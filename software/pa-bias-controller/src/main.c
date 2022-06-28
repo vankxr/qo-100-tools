@@ -34,12 +34,20 @@
 #define I2C_SLAVE_REGISTER_PA1_VGG_VOLTAGE      0x14 // 32-bit
 #define I2C_SLAVE_REGISTER_PA1_VDD_VOLTAGE      0x18 // 32-bit
 #define I2C_SLAVE_REGISTER_PA1_IDD_CURRENT      0x1C // 32-bit
-#define I2C_SLAVE_REGISTER_PA1_TEMP             0x20 // 32-bit
+#define I2C_SLAVE_REGISTER_PA1_TEMP_STATUS      0x20 // 8-bit
+#define I2C_SLAVE_REGISTER_PA1_TEMP_CONFIG      0x21 // 8-bit
+#define I2C_SLAVE_REGISTER_PA1_TEMP             0x24 // 32-bit
+#define I2C_SLAVE_REGISTER_PA1_TEMP_HIGH        0x28 // 32-bit
+#define I2C_SLAVE_REGISTER_PA1_TEMP_LOW         0x2C // 32-bit
 #define I2C_SLAVE_REGISTER_PA2_VGG_RAW_VOLTAGE  0x30 // 32-bit
 #define I2C_SLAVE_REGISTER_PA2_VGG_VOLTAGE      0x34 // 32-bit
 #define I2C_SLAVE_REGISTER_PA2_VDD_VOLTAGE      0x38 // 32-bit
 #define I2C_SLAVE_REGISTER_PA2_IDD_CURRENT      0x3C // 32-bit
-#define I2C_SLAVE_REGISTER_PA2_TEMP             0x40 // 32-bit
+#define I2C_SLAVE_REGISTER_PA2_TEMP_STATUS      0x40 // 8-bit
+#define I2C_SLAVE_REGISTER_PA2_TEMP_CONFIG      0x41 // 8-bit
+#define I2C_SLAVE_REGISTER_PA2_TEMP             0x44 // 32-bit
+#define I2C_SLAVE_REGISTER_PA2_TEMP_HIGH        0x48 // 32-bit
+#define I2C_SLAVE_REGISTER_PA2_TEMP_LOW         0x4C // 32-bit
 #define I2C_SLAVE_REGISTER_TEC1_VOLTAGE         0x60 // 32-bit
 #define I2C_SLAVE_REGISTER_TEC2_VOLTAGE         0x64 // 32-bit
 #define I2C_SLAVE_REGISTER_TEC3_VOLTAGE         0x68 // 32-bit
@@ -100,7 +108,9 @@ volatile uint8_t ubI2CRegisterWriteMask[I2C_SLAVE_REGISTER_COUNT];
 volatile uint8_t ubI2CRegisterReadMask[I2C_SLAVE_REGISTER_COUNT];
 volatile uint8_t ubI2CRegisterPointer = 0x00;
 volatile uint8_t ubI2CByteCount = 0;
-volatile float fTECVoltageUpdated[4] = {-1.f, -1.f, -1.f, -1.f};
+volatile uint8_t ubPAGateVoltageChanged = 0;
+volatile uint8_t ubTECVoltageChanged = 0;
+uint8_t ubTECDACInitialized = 0;
 
 // ISRs
 
@@ -299,14 +309,14 @@ void i2c_slave_register_init()
 {
     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
     {
-        I2C_SLAVE_REGISTER              (uint8_t,  I2C_SLAVE_REGISTER_STATUS)               = 0x00;
+        I2C_SLAVE_REGISTER              (uint8_t,  I2C_SLAVE_REGISTER_STATUS)               = 0x00 | (ubTECDACInitialized ? BIT(2) : 0);
         I2C_SLAVE_REGISTER_WRITE_MASK   (uint8_t,  I2C_SLAVE_REGISTER_STATUS)               = 0x00;
         I2C_SLAVE_REGISTER_READ_MASK    (uint8_t,  I2C_SLAVE_REGISTER_STATUS)               = 0xFF;
         I2C_SLAVE_REGISTER              (uint8_t,  I2C_SLAVE_REGISTER_CONFIG)               = 0x00;
         I2C_SLAVE_REGISTER_WRITE_MASK   (uint8_t,  I2C_SLAVE_REGISTER_CONFIG)               = 0xFF;
         I2C_SLAVE_REGISTER_READ_MASK    (uint8_t,  I2C_SLAVE_REGISTER_CONFIG)               = 0xFF;
         I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_PA1_VGG_RAW_VOLTAGE)  = -1.f;
-        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_PA1_VGG_RAW_VOLTAGE)  = 0x00000000;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_PA1_VGG_RAW_VOLTAGE)  = 0xFFFFFFFF;
         I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_PA1_VGG_RAW_VOLTAGE)  = 0xFFFFFFFF;
         I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_PA1_VGG_VOLTAGE)      = -1.f;
         I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_PA1_VGG_VOLTAGE)      = 0x00000000;
@@ -317,11 +327,23 @@ void i2c_slave_register_init()
         I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_PA1_IDD_CURRENT)      = -1.f;
         I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_PA1_IDD_CURRENT)      = 0x00000000;
         I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_PA1_IDD_CURRENT)      = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (uint8_t,  I2C_SLAVE_REGISTER_PA1_TEMP_STATUS)      = 0x00;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint8_t,  I2C_SLAVE_REGISTER_PA1_TEMP_STATUS)      = 0x00;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint8_t,  I2C_SLAVE_REGISTER_PA1_TEMP_STATUS)      = 0xFF;
+        I2C_SLAVE_REGISTER              (uint8_t,  I2C_SLAVE_REGISTER_PA1_TEMP_CONFIG)      = 0x00;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint8_t,  I2C_SLAVE_REGISTER_PA1_TEMP_CONFIG)      = 0xFF;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint8_t,  I2C_SLAVE_REGISTER_PA1_TEMP_CONFIG)      = 0xFF;
         I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_PA1_TEMP)             = -1.f;
         I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_PA1_TEMP)             = 0x00000000;
         I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_PA1_TEMP)             = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_PA1_TEMP_HIGH)        = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_PA1_TEMP_HIGH)        = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_PA1_TEMP_HIGH)        = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_PA1_TEMP_LOW)         = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_PA1_TEMP_LOW)         = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_PA1_TEMP_LOW)         = 0xFFFFFFFF;
         I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_PA2_VGG_RAW_VOLTAGE)  = -1.f;
-        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_PA2_VGG_RAW_VOLTAGE)  = 0x00000000;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_PA2_VGG_RAW_VOLTAGE)  = 0xFFFFFFFF;
         I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_PA2_VGG_RAW_VOLTAGE)  = 0xFFFFFFFF;
         I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_PA2_VGG_VOLTAGE)      = -1.f;
         I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_PA2_VGG_VOLTAGE)      = 0x00000000;
@@ -332,9 +354,21 @@ void i2c_slave_register_init()
         I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_PA2_IDD_CURRENT)      = -1.f;
         I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_PA2_IDD_CURRENT)      = 0x00000000;
         I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_PA2_IDD_CURRENT)      = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (uint8_t,  I2C_SLAVE_REGISTER_PA2_TEMP_STATUS)      = 0x00;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint8_t,  I2C_SLAVE_REGISTER_PA2_TEMP_STATUS)      = 0x00;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint8_t,  I2C_SLAVE_REGISTER_PA2_TEMP_STATUS)      = 0xFF;
+        I2C_SLAVE_REGISTER              (uint8_t,  I2C_SLAVE_REGISTER_PA2_TEMP_CONFIG)      = 0x00;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint8_t,  I2C_SLAVE_REGISTER_PA2_TEMP_CONFIG)      = 0xFF;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint8_t,  I2C_SLAVE_REGISTER_PA2_TEMP_CONFIG)      = 0xFF;
         I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_PA2_TEMP)             = -1.f;
         I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_PA2_TEMP)             = 0x00000000;
         I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_PA2_TEMP)             = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_PA2_TEMP_HIGH)        = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_PA2_TEMP_HIGH)        = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_PA2_TEMP_HIGH)        = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_PA2_TEMP_LOW)         = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_PA2_TEMP_LOW)         = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_PA2_TEMP_LOW)         = 0xFFFFFFFF;
         I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_TEC1_VOLTAGE)         = -1.f;
         I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_TEC1_VOLTAGE)         = 0xFFFFFFFF;
         I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_TEC1_VOLTAGE)         = 0xFFFFFFFF;
@@ -402,6 +436,26 @@ uint8_t i2c_slave_tx_data_isr()
     uint8_t ubData = ubI2CRegister[ubI2CRegisterPointer] & ubI2CRegisterReadMask[ubI2CRegisterPointer];
     ubI2CRegisterPointer++;
 
+    switch(ubI2CRegisterPointer)
+    {
+        case I2C_SLAVE_REGISTER_PA1_TEMP_STATUS + sizeof(uint8_t):
+        {
+            if(ubI2CByteCount < sizeof(uint8_t))
+                break;
+
+            I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_PA1_TEMP_STATUS) &= ~0xF0; // Clear on read
+        }
+        break;
+        case I2C_SLAVE_REGISTER_PA2_TEMP_STATUS + sizeof(uint8_t):
+        {
+            if(ubI2CByteCount < sizeof(uint8_t))
+                break;
+
+            I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_PA2_TEMP_STATUS) &= ~0xF0; // Clear on read
+        }
+        break;
+    }
+
     return ubData;
 }
 uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
@@ -420,12 +474,28 @@ uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
 
     switch(ubI2CRegisterPointer)
     {
+        case I2C_SLAVE_REGISTER_PA1_VGG_RAW_VOLTAGE + sizeof(float):
+        {
+            if((ubI2CByteCount - 1) < sizeof(float))
+                break;
+
+            ubPAGateVoltageChanged |= BIT(0);
+        }
+        break;
+        case I2C_SLAVE_REGISTER_PA2_VGG_RAW_VOLTAGE + sizeof(float):
+        {
+            if((ubI2CByteCount - 1) < sizeof(float))
+                break;
+
+            ubPAGateVoltageChanged |= BIT(1);
+        }
+        break;
         case I2C_SLAVE_REGISTER_TEC1_VOLTAGE + sizeof(float):
         {
             if((ubI2CByteCount - 1) < sizeof(float))
                 break;
 
-            fTECVoltageUpdated[TEC1_INDEX] = I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_TEC1_VOLTAGE);
+            ubTECVoltageChanged |= BIT(0);
         }
         break;
         case I2C_SLAVE_REGISTER_TEC2_VOLTAGE + sizeof(float):
@@ -433,7 +503,7 @@ uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
             if((ubI2CByteCount - 1) < sizeof(float))
                 break;
 
-            fTECVoltageUpdated[TEC2_INDEX] = I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_TEC2_VOLTAGE);
+            ubTECVoltageChanged |= BIT(1);
         }
         break;
         case I2C_SLAVE_REGISTER_TEC3_VOLTAGE + sizeof(float):
@@ -441,7 +511,7 @@ uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
             if((ubI2CByteCount - 1) < sizeof(float))
                 break;
 
-            fTECVoltageUpdated[TEC3_INDEX] = I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_TEC3_VOLTAGE);
+            ubTECVoltageChanged |= BIT(2);
         }
         break;
         case I2C_SLAVE_REGISTER_TEC4_VOLTAGE + sizeof(float):
@@ -449,7 +519,7 @@ uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
             if((ubI2CByteCount - 1) < sizeof(float))
                 break;
 
-            fTECVoltageUpdated[TEC4_INDEX] = I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_TEC4_VOLTAGE);
+            ubTECVoltageChanged |= BIT(3);
         }
         break;
     }
@@ -500,6 +570,8 @@ void afe_init()
 void afe_pa_set_raw_vgg(uint8_t ubPAIndex, float fVoltage)
 {
     if(fVoltage < 0.f)
+        return;
+    if(fVoltage > 2800.f)
         return;
 
     switch(ubPAIndex)
@@ -570,17 +642,60 @@ float afe_pa_get_idd(uint8_t ubPAIndex)
 }
 float afe_pa_get_temperature(uint8_t ubPAIndex)
 {
-    switch(ubPAIndex)
+    // Very dirty workaround for transients in temperature sensor
+    static const uint32_t ulSamples = 20;
+
+    uint32_t ulSkipped = 0;
+    uint32_t ulValid = 0;
+    float fTemp = 0.f;
+
+    for(uint32_t i = 0; i < ulSamples; i++)
     {
-        case PA1_INDEX:
-            return max11300_ext1_temp_read();
-        break;
-        case PA2_INDEX:
-            return max11300_ext2_temp_read();
-        break;
+        float fSample;
+
+        switch(ubPAIndex)
+        {
+            case PA1_INDEX:
+                fSample = max11300_ext1_temp_read(1);
+            break;
+            case PA2_INDEX:
+                fSample = max11300_ext2_temp_read(1);
+            break;
+        }
+
+        if(i == 0)
+        {
+            if(fSample > 0.f && fSample < 120.f)
+            {
+                ulValid++;
+                fTemp = fSample;
+            }
+            else
+            {
+                ulSkipped++;
+                i--;
+            }
+        }
+        else
+        {
+            if(fabsf(fSample - fTemp) <= 2.f)
+            {
+                fTemp += fSample;
+                ulValid++;
+            }
+            else
+            {
+                if(ulSkipped < ulSamples)
+                    i--;
+
+                ulSkipped++;
+            }
+        }
     }
 
-    return 0.f;
+    fTemp /= ulValid; // Average
+
+    return fTemp;
 }
 
 void tec_init()
@@ -757,9 +872,14 @@ int init()
         DBGPRINTLN_CTX("MAX11300 init NOK!");
 
     if(mcp4728_init())
+    {
+        ubTECDACInitialized = 1;
         DBGPRINTLN_CTX("MCP4728 init OK!");
+    }
     else
+    {
         DBGPRINTLN_CTX("MCP4728 init NOK!");
+    }
 
     return 0;
 }
@@ -774,13 +894,19 @@ int main()
     // TEC
     tec_init();
 
-    afe_pa_set_raw_vgg(PA1_INDEX, 2250.f);
+    //afe_pa_set_raw_vgg(PA1_INDEX, 2280.f);
     //PA1_ENABLE();
-    afe_pa_set_raw_vgg(PA2_INDEX, 2250.f);
+    //afe_pa_set_raw_vgg(PA2_INDEX, 2250.f);
     //PA2_ENABLE();
 
-    //afe_pa_set_raw_vgg(PA2_INDEX, 2100.f);
-    //PA2_ENABLE();
+    //tec_set_channel_voltage(TEC1_INDEX, 24000.f);
+    //TEC1_ENABLE();
+    //tec_set_channel_voltage(TEC2_INDEX, 24000.f);
+    //TEC2_ENABLE();
+    //tec_set_channel_voltage(TEC3_INDEX, 24000.f);
+    //TEC3_ENABLE();
+    //tec_set_channel_voltage(TEC4_INDEX, 24000.f);
+    //TEC4_ENABLE();
 
     while(1)
     {
@@ -793,24 +919,107 @@ int main()
             reset();
         }
 
-        for(uint8_t ubTECChannel = 0; ubTECChannel < 4; ubTECChannel++)
+        volatile uint8_t ubStatus = 0x00;
+        volatile uint8_t ubConfig = 0x00;
+
+        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+            ubConfig = I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_CONFIG);
+
+        if(ubConfig & BIT(0))
+            PA1_ENABLE();
+        else
+            PA1_DISABLE();
+        if(ubConfig & BIT(1))
+            PA2_ENABLE();
+        else
+            PA2_DISABLE();
+
+        // Prevent TEC enable signals when voltage config DAC is not initialized
+        if(ubTECDACInitialized)
         {
-            if(fTECVoltageUpdated[ubTECChannel] < 0.f)
-                continue;
+            if(ubConfig & BIT(3))
+                TEC1_ENABLE();
+            else
+                TEC1_DISABLE();
+            if(ubConfig & BIT(4))
+                TEC2_ENABLE();
+            else
+                TEC2_DISABLE();
+            if(ubConfig & BIT(5))
+                TEC3_ENABLE();
+            else
+                TEC3_DISABLE();
+            if(ubConfig & BIT(6))
+                TEC4_ENABLE();
+            else
+                TEC4_DISABLE();
+        }
+        else
+        {
+            TEC1_DISABLE();
+            TEC2_DISABLE();
+            TEC3_DISABLE();
+            TEC4_DISABLE();
+        }
 
-            ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+        if(PA1_STATUS())
+            ubStatus |= BIT(0);
+        if(PA2_STATUS())
+            ubStatus |= BIT(1);
+        if(ubTECDACInitialized)
+            ubStatus |= BIT(2);
+        if(TEC1_STATUS())
+            ubStatus |= BIT(3);
+        if(TEC2_STATUS())
+            ubStatus |= BIT(4);
+        if(TEC3_STATUS())
+            ubStatus |= BIT(5);
+        if(TEC4_STATUS())
+            ubStatus |= BIT(6);
+
+        ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+            I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_STATUS) = ubStatus;
+
+        if(ubPAGateVoltageChanged)
+        {
+            for(uint8_t i = 0; i < 2; i++)
             {
-                tec_set_channel_voltage(ubTECChannel, fTECVoltageUpdated[ubTECChannel]);
-                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_TEC1_VOLTAGE + ubTECChannel * sizeof(float)) = tec_get_channel_voltage(ubTECChannel);
+                ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+                {
+                    if(!(ubPAGateVoltageChanged & BIT(i)))
+                        continue;
 
-                fTECVoltageUpdated[ubTECChannel] = -1.f;
+                    afe_pa_set_raw_vgg(i, I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_PA1_VGG_RAW_VOLTAGE + i * 0x20));
+                    I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_PA1_VGG_RAW_VOLTAGE + i * 0x20) = afe_pa_get_raw_vgg(i);
+                    I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_PA1_VGG_VOLTAGE + i * 0x20) = afe_pa_get_vgg(i);
+
+                    ubPAGateVoltageChanged &= ~BIT(i);
+                }
+            }
+        }
+
+        if(ubTECVoltageChanged)
+        {
+            for(uint8_t i = 0; i < 4; i++)
+            {
+                ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+                {
+                    if(!(ubTECVoltageChanged & BIT(i)))
+                        continue;
+
+                    tec_set_channel_voltage(i, I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_TEC1_VOLTAGE + i * sizeof(float)));
+                    I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_TEC1_VOLTAGE + i * sizeof(float)) = tec_get_channel_voltage(i);
+
+                    ubTECVoltageChanged &= ~BIT(i);
+                }
             }
         }
 
         static uint64_t ullLastHeartBeat = 0;
         static uint64_t ullLastTelemetryUpdate = 0;
+        static uint64_t ullLastTemperatureCheck = 0;
 
-        if(g_ullSystemTick - ullLastHeartBeat > 2000)
+        if((g_ullSystemTick > 0 && ullLastHeartBeat == 0) || g_ullSystemTick - ullLastHeartBeat > 2000)
         {
             ullLastHeartBeat = g_ullSystemTick;
 
@@ -820,14 +1029,14 @@ int main()
                 ullLastHeartBeat -= 1900;
         }
 
-        if(g_ullSystemTick - ullLastTelemetryUpdate > 5000)
+        if((g_ullSystemTick > 0 && ullLastTelemetryUpdate == 0) || g_ullSystemTick - ullLastTelemetryUpdate > 5000)
         {
             ullLastTelemetryUpdate = g_ullSystemTick;
 
             // System Temperatures
             float fADCTemp = adc_get_temperature();
             float fEMUTemp = emu_get_temperature();
-            float fAFETemp = max11300_int_temp_read();
+            float fAFETemp = max11300_int_temp_read(0);
 
             ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
             {
@@ -885,6 +1094,9 @@ int main()
 
             DBGPRINTLN_CTX("----------------------------------");
             DBGPRINTLN_CTX("PA #1 Temperature: %.2f C", fPA1Temp);
+            DBGPRINTLN_CTX("PA #1 High Temperature: %.2f C", I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_PA1_TEMP_HIGH));
+            DBGPRINTLN_CTX("PA #1 Low Temperature: %.2f C", I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_PA1_TEMP_LOW));
+            DBGPRINTLN_CTX("PA #1 Temperature Status: %s", (I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_PA1_TEMP_STATUS) & BIT(0)) ? "LOW" : ((I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_PA1_TEMP_STATUS) & BIT(1)) ? "HIGH" : "OK"));
             DBGPRINTLN_CTX("PA #1 Drain Voltage: %.2f mV", fPA1VDD);
             DBGPRINTLN_CTX("PA #1 Drain Current: %.2f mA", fPA1IDD);
             DBGPRINTLN_CTX("PA #1 Gate Raw Voltage: %.2f mV", fPA1VGGRaw);
@@ -908,6 +1120,9 @@ int main()
 
             DBGPRINTLN_CTX("----------------------------------");
             DBGPRINTLN_CTX("PA #2 Temperature: %.2f C", fPA2Temp);
+            DBGPRINTLN_CTX("PA #2 High Temperature: %.2f C", I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_PA2_TEMP_HIGH));
+            DBGPRINTLN_CTX("PA #2 Low Temperature: %.2f C", I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_PA2_TEMP_LOW));
+            DBGPRINTLN_CTX("PA #2 Temperature Status: %s", (I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_PA2_TEMP_STATUS) & BIT(0)) ? "LOW" : ((I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_PA2_TEMP_STATUS) & BIT(1)) ? "HIGH" : "OK"));
             DBGPRINTLN_CTX("PA #2 Drain Voltage: %.2f mV", fPA2VDD);
             DBGPRINTLN_CTX("PA #2 Drain Current: %.2f mA", fPA2IDD);
             DBGPRINTLN_CTX("PA #2 Gate Raw Voltage: %.2f mV", fPA2VGGRaw);
@@ -932,6 +1147,125 @@ int main()
             DBGPRINTLN_CTX("TEC #2 Voltage: %.2f mV", fTEC2Voltage);
             DBGPRINTLN_CTX("TEC #3 Voltage: %.2f mV", fTEC3Voltage);
             DBGPRINTLN_CTX("TEC #4 Voltage: %.2f mV", fTEC4Voltage);
+        }
+
+        if((g_ullSystemTick > 0 && ullLastTemperatureCheck == 0) || g_ullSystemTick - ullLastTemperatureCheck > 1000)
+        {
+            ullLastTemperatureCheck = g_ullSystemTick;
+
+            ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+            {
+                uint8_t ubTempStatus = I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_PA1_TEMP_STATUS) & 0xF0;
+                uint8_t ubTempConfig = I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_PA1_TEMP_CONFIG);
+
+                float ubTemp = I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_PA1_TEMP);
+                float ubTempHigh = I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_PA1_TEMP_HIGH);
+                float ubTempLow = I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_PA1_TEMP_LOW);
+
+                if((ubTempConfig & BIT(0)) && ubTemp < ubTempLow)
+                {
+                    ubTempStatus |= BIT(0);
+                    ubTempStatus |= BIT(2);
+                }
+
+                if((ubTempConfig & BIT(1)) && ubTemp > ubTempHigh)
+                {
+                    ubTempStatus |= BIT(1);
+                    ubTempStatus |= BIT(3);
+                }
+
+                if(ubTempStatus & (BIT(0) | BIT(1)))
+                {
+                    I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_CONFIG) &= ~BIT(0);
+
+                    PA1_DISABLE();
+
+                    // Disable TECs, if requested
+                    if(ubTempConfig & BIT(4))
+                    {
+                        I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_CONFIG) &= ~BIT(3);
+
+                        TEC1_DISABLE();
+                    }
+                    if(ubTempConfig & BIT(5))
+                    {
+                        I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_CONFIG) &= ~BIT(4);
+
+                        TEC2_DISABLE();
+                    }
+                    if(ubTempConfig & BIT(6))
+                    {
+                        I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_CONFIG) &= ~BIT(5);
+
+                        TEC3_DISABLE();
+                    }
+                    if(ubTempConfig & BIT(7))
+                    {
+                        I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_CONFIG) &= ~BIT(6);
+
+                        TEC4_DISABLE();
+                    }
+                }
+
+                I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_PA1_TEMP_STATUS) = ubTempStatus;
+            }
+
+            ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+            {
+                uint8_t ubTempStatus = I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_PA2_TEMP_STATUS) & 0xF0;
+                uint8_t ubTempConfig = I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_PA2_TEMP_CONFIG);
+
+                float ubTemp = I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_PA2_TEMP);
+                float ubTempHigh = I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_PA2_TEMP_HIGH);
+                float ubTempLow = I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_PA2_TEMP_LOW);
+
+                if((ubTempConfig & BIT(0)) && ubTemp < ubTempLow)
+                {
+                    ubTempStatus |= BIT(0);
+                    ubTempStatus |= BIT(2);
+                }
+
+                if((ubTempConfig & BIT(1)) && ubTemp > ubTempHigh)
+                {
+                    ubTempStatus |= BIT(1);
+                    ubTempStatus |= BIT(3);
+                }
+
+                if(ubTempStatus & (BIT(0) | BIT(1)))
+                {
+                    I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_CONFIG) &= ~BIT(1);
+
+                    PA2_DISABLE();
+
+                    // Disable TECs, if requested
+                    if(ubTempConfig & BIT(4))
+                    {
+                        I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_CONFIG) &= ~BIT(3);
+
+                        TEC1_DISABLE();
+                    }
+                    if(ubTempConfig & BIT(5))
+                    {
+                        I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_CONFIG) &= ~BIT(4);
+
+                        TEC2_DISABLE();
+                    }
+                    if(ubTempConfig & BIT(6))
+                    {
+                        I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_CONFIG) &= ~BIT(5);
+
+                        TEC3_DISABLE();
+                    }
+                    if(ubTempConfig & BIT(7))
+                    {
+                        I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_CONFIG) &= ~BIT(6);
+
+                        TEC4_DISABLE();
+                    }
+                }
+
+                I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_PA2_TEMP_STATUS) = ubTempStatus;
+            }
         }
     }
 

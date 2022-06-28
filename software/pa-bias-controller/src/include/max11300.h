@@ -42,16 +42,22 @@
 #define MAX11300_REG_PORTn_DAC_DATA(n)      (0x60 + (n))
 
 // MAX11300_REG_INTERRUPT
-#define MAX11300_REG_INTERRUPT_ADCFLAG  0x0001
-#define MAX11300_REG_INTERRUPT_ADCDR    0x0002
-#define MAX11300_REG_INTERRUPT_ADCDM    0x0004
-#define MAX11300_REG_INTERRUPT_GPIDR    0x0008
-#define MAX11300_REG_INTERRUPT_GPIDM    0x0010
-#define MAX11300_REG_INTERRUPT_DACOI    0x0020
-#define MAX11300_REG_INTERRUPT_TMPINT   0x01C0
-#define MAX11300_REG_INTERRUPT_TMPEXT1  0x0E00
-#define MAX11300_REG_INTERRUPT_TMPEXT2  0x7000
-#define MAX11300_REG_INTERRUPT_VMON     0x8000
+#define MAX11300_REG_INTERRUPT_ADCFLAG          0x0001
+#define MAX11300_REG_INTERRUPT_ADCDR            0x0002
+#define MAX11300_REG_INTERRUPT_ADCDM            0x0004
+#define MAX11300_REG_INTERRUPT_GPIDR            0x0008
+#define MAX11300_REG_INTERRUPT_GPIDM            0x0010
+#define MAX11300_REG_INTERRUPT_DACOI            0x0020
+#define MAX11300_REG_INTERRUPT_TMPINT_UPDATE    0x0040
+#define MAX11300_REG_INTERRUPT_TMPINT_LOW       0x0080
+#define MAX11300_REG_INTERRUPT_TMPINT_HIGH      0x0100
+#define MAX11300_REG_INTERRUPT_TMPEXT1_UPDATE   0x0200
+#define MAX11300_REG_INTERRUPT_TMPEXT1_LOW      0x0400
+#define MAX11300_REG_INTERRUPT_TMPEXT1_HIGH     0x0800
+#define MAX11300_REG_INTERRUPT_TMPEXT2_UPDATE   0x1000
+#define MAX11300_REG_INTERRUPT_TMPEXT2_LOW      0x2000
+#define MAX11300_REG_INTERRUPT_TMPEXT2_HIGH     0x4000
+#define MAX11300_REG_INTERRUPT_VMON_UV          0x8000
 
 // MAX11300_REG_DEVICE_CTRL
 #define MAX11300_REG_DEVICE_CTRL_ADCCTL_IDLE            0x0000
@@ -72,8 +78,8 @@
 #define MAX11300_REG_DEVICE_CTRL_TMPCTL_INT             0x0100
 #define MAX11300_REG_DEVICE_CTRL_TMPCTL_EXT1            0x0200
 #define MAX11300_REG_DEVICE_CTRL_TMPCTL_EXT2            0x0400
-#define MAX11300_REG_DEVICE_CTRL_TMPPER_DEFAULT         0x0000
-#define MAX11300_REG_DEVICE_CTRL_TMPPER_EXTENDED        0x0800
+#define MAX11300_REG_DEVICE_CTRL_TMPPER_DEFAULT         0x0000 // 7 ms
+#define MAX11300_REG_DEVICE_CTRL_TMPPER_EXTENDED        0x0800 // 14 ms
 #define MAX11300_REG_DEVICE_CTRL_RS_CANCEL              0x1000
 #define MAX11300_REG_DEVICE_CTRL_LPEN                   0x2000
 #define MAX11300_REG_DEVICE_CTRL_BRST_DEFAULT           0x0000
@@ -143,11 +149,11 @@ uint16_t max11300_read_device_id();
 void max11300_config(uint16_t usConfig);
 
 void max11300_int_temp_config(uint8_t ubEnable, uint16_t usSamples, float fLowThresh, float fHighThresh);
-float max11300_int_temp_read();
+float max11300_int_temp_read(uint8_t ubWait);
 void max11300_ext1_temp_config(uint8_t ubEnable, uint16_t usSamples, float fLowThresh, float fHighThresh);
-float max11300_ext1_temp_read();
+float max11300_ext1_temp_read(uint8_t ubWait);
 void max11300_ext2_temp_config(uint8_t ubEnable, uint16_t usSamples, float fLowThresh, float fHighThresh);
-float max11300_ext2_temp_read();
+float max11300_ext2_temp_read(uint8_t ubWait);
 
 void max11300_dac_set_preset(uint8_t ubIndex, uint16_t usData);
 uint16_t max11300_dac_get_preset(uint8_t ubIndex);

@@ -1,5 +1,7 @@
 #include "max11300.h"
 
+static volatile uint8_t ubTempUpdate = 0x00;
+
 static uint16_t max11300_read_register(uint8_t ubRegister)
 {
     uint16_t usValue = 0;
@@ -60,6 +62,9 @@ uint8_t max11300_init()
         return 0;
 
     max11300_reset();
+    delay_ms(10);
+
+    max11300_write_register(MAX11300_REG_INTERRUPT_MASK, ~(MAX11300_REG_INTERRUPT_TMPINT_UPDATE | MAX11300_REG_INTERRUPT_TMPEXT1_UPDATE | MAX11300_REG_INTERRUPT_TMPEXT2_UPDATE));
 
     return 1;
 }
@@ -67,7 +72,14 @@ void max11300_isr()
 {
     uint16_t usFlags = max11300_read_register(MAX11300_REG_INTERRUPT);
 
+    if(usFlags & MAX11300_REG_INTERRUPT_TMPINT_UPDATE)
+        ubTempUpdate |= BIT(0);
 
+    if(usFlags & MAX11300_REG_INTERRUPT_TMPEXT1_UPDATE)
+        ubTempUpdate |= BIT(1);
+
+    if(usFlags & MAX11300_REG_INTERRUPT_TMPEXT2_UPDATE)
+        ubTempUpdate |= BIT(2);
 }
 
 void max11300_reset()
@@ -99,8 +111,11 @@ void max11300_int_temp_config(uint8_t ubEnable, uint16_t usSamples, float fLowTh
     max11300_write_register(MAX11300_REG_INT_TEMP_THRESH_HIGH, (uint16_t)(fHighThresh * 8) & 0x0FFF);
     max11300_rmw_register(MAX11300_REG_DEVICE_CTRL, (uint16_t)~MAX11300_REG_DEVICE_CTRL_TMPCTL_INT, MAX11300_REG_DEVICE_CTRL_TMPCTL_INT);
 }
-float max11300_int_temp_read()
+float max11300_int_temp_read(uint8_t ubWait)
 {
+    if(ubWait)
+        while(!(ubTempUpdate & BIT(0)));
+
     return (float)max11300_read_register(MAX11300_REG_INT_TEMP) / 8;
 }
 void max11300_ext1_temp_config(uint8_t ubEnable, uint16_t usSamples, float fLowThresh, float fHighThresh)
@@ -117,8 +132,11 @@ void max11300_ext1_temp_config(uint8_t ubEnable, uint16_t usSamples, float fLowT
     max11300_write_register(MAX11300_REG_EXT1_TEMP_THRESH_HIGH, (uint16_t)(fHighThresh * 8) & 0x0FFF);
     max11300_rmw_register(MAX11300_REG_DEVICE_CTRL, (uint16_t)~MAX11300_REG_DEVICE_CTRL_TMPCTL_EXT1, MAX11300_REG_DEVICE_CTRL_TMPCTL_EXT1);
 }
-float max11300_ext1_temp_read()
+float max11300_ext1_temp_read(uint8_t ubWait)
 {
+    if(ubWait)
+        while(!(ubTempUpdate & BIT(1)));
+
     return (float)max11300_read_register(MAX11300_REG_EXT1_TEMP) / 8;
 }
 void max11300_ext2_temp_config(uint8_t ubEnable, uint16_t usSamples, float fLowThresh, float fHighThresh)
@@ -135,8 +153,11 @@ void max11300_ext2_temp_config(uint8_t ubEnable, uint16_t usSamples, float fLowT
     max11300_write_register(MAX11300_REG_EXT2_TEMP_THRESH_HIGH, (uint16_t)(fHighThresh * 8) & 0x0FFF);
     max11300_rmw_register(MAX11300_REG_DEVICE_CTRL, (uint16_t)~MAX11300_REG_DEVICE_CTRL_TMPCTL_EXT2, MAX11300_REG_DEVICE_CTRL_TMPCTL_EXT2);
 }
-float max11300_ext2_temp_read()
+float max11300_ext2_temp_read(uint8_t ubWait)
 {
+    if(ubWait)
+        while(!(ubTempUpdate & BIT(2)));
+
     return (float)max11300_read_register(MAX11300_REG_EXT2_TEMP) / 8;
 }
 
