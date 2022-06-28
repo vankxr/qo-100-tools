@@ -124,15 +124,32 @@ class LTC5597
         let v1;
         let p1;
 
-        for(let i = 1; i < this.current_calibration.length; i++)
+        if(voltage < this.current_calibration[0])
         {
-            v0 = this.current_calibration[i - 1];
-            p0 = this.calibration.pdata[i - 1];
-            v1 = this.current_calibration[i];
-            p1 = this.calibration.pdata[i];
+            v0 = this.current_calibration[0];
+            p0 = this.calibration.pdata[0];
+            v1 = this.current_calibration[1];
+            p1 = this.calibration.pdata[1];
+        }
+        else if(voltage > this.current_calibration[this.current_calibration.length - 1])
+        {
+            v0 = this.current_calibration[this.current_calibration.length - 2];
+            p0 = this.calibration.pdata[this.current_calibration.length - 2];
+            v1 = this.current_calibration[this.current_calibration.length - 1];
+            p1 = this.calibration.pdata[this.current_calibration.length - 1];
+        }
+        else
+        {
+            for(let i = 1; i < this.current_calibration.length; i++)
+            {
+                v0 = this.current_calibration[i - 1];
+                p0 = this.calibration.pdata[i - 1];
+                v1 = this.current_calibration[i];
+                p1 = this.calibration.pdata[i];
 
-            if(v0 <= voltage && v1 > voltage)
-                break;
+                if(v0 <= voltage && v1 > voltage)
+                    break;
+            }
         }
 
         let dv = v1 - v0;
