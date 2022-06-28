@@ -499,7 +499,7 @@ int main()
         static uint64_t ullLastHeartBeat = 0;
         static uint64_t ullLastTelemetryUpdate = 0;
 
-        if(g_ullSystemTick - ullLastHeartBeat > 2000)
+        if((g_ullSystemTick > 0 && ullLastHeartBeat == 0) || g_ullSystemTick - ullLastHeartBeat > 2000)
         {
             ullLastHeartBeat = g_ullSystemTick;
 
@@ -509,7 +509,7 @@ int main()
                 ullLastHeartBeat -= 1900;
         }
 
-        if(g_ullSystemTick - ullLastTelemetryUpdate > 5000)
+        if((g_ullSystemTick > 0 && ullLastTelemetryUpdate == 0) || g_ullSystemTick - ullLastTelemetryUpdate > 5000)
         {
             ullLastTelemetryUpdate = g_ullSystemTick;
 
