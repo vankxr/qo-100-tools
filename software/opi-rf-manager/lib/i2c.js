@@ -2,6 +2,7 @@ const Util = require("util");
 const Mutex = require('async-mutex').Mutex;
 const I2C_BUS = require("i2c-bus");
 const GPIO = require.main.require("./lib/gpio");
+const delay = require.main.require("./util/delay");
 
 class I2CDevice
 {
@@ -32,7 +33,11 @@ class I2CDevice
         try
         {
             if(this.bus_enable_gpio)
+            {
                 await this.bus_enable_gpio.set_value(GPIO.HIGH);
+
+                await delay(10);
+            }
 
             if((await this.bus.scan(this.addr)).indexOf(this.addr) === -1)
                 throw new Error("Could not find I2C device at address 0x" + this.addr.toString(16).toUpperCase());
@@ -57,7 +62,11 @@ class I2CDevice
         try
         {
             if(this.bus_enable_gpio)
+            {
                 await this.bus_enable_gpio.set_value(GPIO.HIGH);
+
+                await delay(10);
+            }
 
             await this.bus.write(this.addr, data);
         }
@@ -82,7 +91,11 @@ class I2CDevice
         try
         {
             if(this.bus_enable_gpio)
+            {
                 await this.bus_enable_gpio.set_value(GPIO.HIGH);
+
+                await delay(10);
+            }
 
             result = await this.bus.read(this.addr, count);
         }
