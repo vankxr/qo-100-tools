@@ -322,7 +322,7 @@ class HPPSU
 
     async get_efficiency()
     {
-        return await this.get_input_power() / await this.get_output_power();
+        return await this.get_output_power() / await this.get_input_power();
     }
 
     async get_intake_temperature()
