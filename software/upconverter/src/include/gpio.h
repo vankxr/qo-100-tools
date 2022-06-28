@@ -20,17 +20,21 @@
 #define PLL_UNLATCH()       PERI_REG_BIT_CLEAR(&(GPIO->P[2].DOUT)) = BIT(15)
 #define PLL_UNMUTE()        PERI_REG_BIT_SET(&(GPIO->P[4].DOUT)) = BIT(13)
 #define PLL_MUTE()          PERI_REG_BIT_CLEAR(&(GPIO->P[4].DOUT)) = BIT(13)
+#define PLL_MUTED()         !(GPIO->P[4].DIN & BIT(13))
 #define PLL_LOCKED()        !!(GPIO->P[4].DIN & BIT(11))
 
 // MIXER MACROS
 #define MIXER_ENABLE()      PERI_REG_BIT_SET(&(GPIO->P[3].DOUT)) = BIT(7)
 #define MIXER_DISABLE()     PERI_REG_BIT_CLEAR(&(GPIO->P[3].DOUT)) = BIT(7)
+#define MIXER_STATUS()      !!(GPIO->P[3].DIN & BIT(7))
 
 // PA MACROS
 #define PA_STG1_2_ENABLE()  PERI_REG_BIT_SET(&(GPIO->P[1].DOUT)) = BIT(7)
 #define PA_STG1_2_DISABLE() PERI_REG_BIT_CLEAR(&(GPIO->P[1].DOUT)) = BIT(7)
+#define PA_STG1_2_STATUS()  !!(GPIO->P[1].DIN & BIT(7))
 #define PA_STG3_ENABLE()    PERI_REG_BIT_SET(&(GPIO->P[1].DOUT)) = BIT(8)
 #define PA_STG3_DISABLE()   PERI_REG_BIT_CLEAR(&(GPIO->P[1].DOUT)) = BIT(8)
+#define PA_STG3_STATUS()    !!(GPIO->P[1].DIN & BIT(8))
 
 // ATT MACROS
 #define ATT_IF_UNLATCH()    PERI_REG_BIT_CLEAR(&(GPIO->P[3].DOUT)) = BIT(6)
