@@ -89,39 +89,49 @@ class RelayController extends I2CDevice
         };
     }
 
-    async set_relay_undervoltage_protection(enable, voltage)
+    async set_relay_undervoltage_point(voltage)
     {
         if(isNaN(voltage) || voltage < 500 || voltage > 27000)
             throw new Error("Voltage out of bounds");
-
-        if(!enable)
-            await this.write(0x01, (await this.read(0x01)) & ~0x01);
 
         let buf = Buffer.alloc(4);
 
         buf.writeFloatLE(voltage, 0);
 
         await this.write(0x1C, buf);
-
-        if(enable)
-            await this.write(0x01, (await this.read(0x01)) | 0x01);
-
-        buf = await this.read(0x1C, 4);
+    }
+    async get_relay_undervoltage_point()
+    {
+        let buf = await this.read(0x1C, 4);
 
         return buf.readFloatLE(0);
     }
-    async was_undervoltage_protection_triggered()
+    async set_relay_undervoltage_status(status)
+    {
+        if(typeof(status) != "boolean")
+            throw new Error("Invalid status");
+
+        if(status)
+            await this.write(0x01, (await this.read(0x01)) | 0x01);
+        else
+            await this.write(0x01, (await this.read(0x01)) & ~0x01);
+    }
+    async get_relay_undervoltage_status()
+    {
+        return !!((await this.read(0x01)) & 0x01);
+    }
+    async was_relay_undervoltage_triggered()
     {
         return !!((await this.read(0x00)) & 0x01);
     }
-    async is_undervoltage()
+    async is_relay_undervoltage()
     {
         return !((await this.read(0x00)) & 0x02);
     }
 
     async set_relay_status(index, status)
     {
-        if(isNaN(index) || index < 0 || index > 11)
+        if(isNaN(index) || !Number.isInteger(index) || index < 0 || index > 11)
             throw new Error("Invalid index");
 
         if(typeof(status) != "boolean")
@@ -138,11 +148,11 @@ class RelayController extends I2CDevice
         let buf = await this.read(0x02, 2);
         let rstatus = buf.readUInt16LE(0);
 
-        return (index < 0 || index > 11) ? rstatus : !!(rstatus & (1 << index));
+        return (!Number.isInteger(index) || index < 0 || index > 11) ? rstatus : !!(rstatus & (1 << index));
     }
     async set_relay_duty_cycle(index, dc)
     {
-        if(isNaN(index) || index < 0 || index > 11)
+        if(isNaN(index) || !Number.isInteger(index) || index < 0 || index > 11)
             throw new Error("Invalid index");
 
         if(isNaN(dc) || dc < 0 || dc > 1)
@@ -157,14 +167,14 @@ class RelayController extends I2CDevice
     }
     async get_relay_duty_cycle(index)
     {
-        if(isNaN(index) || index < 0 || index > 11)
+        if(isNaN(index) || !Number.isInteger(index) || index < 0 || index > 11)
             throw new Error("Invalid index");
 
         return (await this.read(0x10 + index)) / 256;
     }
     async set_relay_voltage(index, voltage)
     {
-        if(isNaN(index) || index < 0 || index > 11)
+        if(isNaN(index) || !Number.isInteger(index) || index < 0 || index > 11)
             throw new Error("Invalid index");
 
         if(isNaN(voltage) || voltage < 0)
@@ -180,7 +190,7 @@ class RelayController extends I2CDevice
     }
     async get_relay_voltage(index)
     {
-        if(isNaN(index) || index < 0 || index > 11)
+        if(isNaN(index) || !Number.isInteger(index) || index < 0 || index > 11)
             throw new Error("Invalid index");
 
         let vin = (await this.get_system_voltages()).vin;

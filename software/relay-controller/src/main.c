@@ -75,8 +75,8 @@ static uint8_t i2c_slave_rx_data_isr(uint8_t ubData);
 static void timers_init();
 
 static void acmp_init();
-static void acmp_set_thresh_voltages(float fUTP, float fLTP);
-static void acmp_get_thresh_voltages(float *pfUTP, float *pfLTP);
+static void acmp_set_vin_thresh(float fUTP, float fLTP);
+static void acmp_get_vin_thresh(float *pfUTP, float *pfLTP);
 
 // Variables
 volatile uint8_t ubI2CRegister[I2C_SLAVE_REGISTER_COUNT];
@@ -100,8 +100,8 @@ volatile uint32_t * const pulDutyCycleRegister[12] = {
 };
 volatile uint16_t usRelaySetOnChanged = 0x0000;
 volatile uint16_t usRelaySetOffChanged = 0x0000;
-volatile uint8_t ubRelaySetDCChanged = 0;
-volatile float fRelayUVThreshChanged = -1.f;
+volatile uint16_t usRelaySetDCChanged = 0;
+volatile uint8_t ubRelayUVThreshChanged = 0;
 
 // ISRs
 void _acmp0_1_isr()
@@ -435,7 +435,7 @@ uint8_t i2c_slave_tx_data_isr()
     {
         case I2C_SLAVE_REGISTER_STATUS + sizeof(uint8_t):
         {
-            if((ubI2CByteCount - 1) < sizeof(uint8_t))
+            if(ubI2CByteCount < sizeof(uint8_t))
                 break;
 
             I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_STATUS) &= ~BIT(0); // Clear on read
@@ -466,7 +466,7 @@ uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
             if((ubI2CByteCount - 1) < sizeof(uint16_t))
                 break;
 
-            usRelaySetOnChanged = I2C_SLAVE_REGISTER(uint16_t, I2C_SLAVE_REGISTER_RELAY_SET_ON);
+            usRelaySetOnChanged |= I2C_SLAVE_REGISTER(uint16_t, I2C_SLAVE_REGISTER_RELAY_SET_ON);
         }
         break;
         case I2C_SLAVE_REGISTER_RELAY_SET_OFF + sizeof(uint16_t):
@@ -474,7 +474,7 @@ uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
             if((ubI2CByteCount - 1) < sizeof(uint16_t))
                 break;
 
-            usRelaySetOffChanged = I2C_SLAVE_REGISTER(uint16_t, I2C_SLAVE_REGISTER_RELAY_SET_OFF);
+            usRelaySetOffChanged |= I2C_SLAVE_REGISTER(uint16_t, I2C_SLAVE_REGISTER_RELAY_SET_OFF);
         }
         break;
         case I2C_SLAVE_REGISTER_RELAY_UV_THRESH + sizeof(float):
@@ -482,29 +482,105 @@ uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
             if((ubI2CByteCount - 1) < sizeof(float))
                 break;
 
-            fRelayUVThreshChanged = I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_RELAY_UV_THRESH);
+            ubRelayUVThreshChanged = 1;
         }
         break;
         case I2C_SLAVE_REGISTER_RELAY0_DUTY_CYCLE + sizeof(uint8_t):
+        {
+            if((ubI2CByteCount - 1) < sizeof(uint8_t))
+                break;
+
+            usRelaySetDCChanged |= BIT(0);
+        }
+        break;
         case I2C_SLAVE_REGISTER_RELAY1_DUTY_CYCLE + sizeof(uint8_t):
+        {
+            if((ubI2CByteCount - 1) < sizeof(uint8_t))
+                break;
+
+            usRelaySetDCChanged |= BIT(1);
+        }
+        break;
         case I2C_SLAVE_REGISTER_RELAY2_DUTY_CYCLE + sizeof(uint8_t):
+        {
+            if((ubI2CByteCount - 1) < sizeof(uint8_t))
+                break;
+
+            usRelaySetDCChanged |= BIT(2);
+        }
+        break;
         case I2C_SLAVE_REGISTER_RELAY3_DUTY_CYCLE + sizeof(uint8_t):
+        {
+            if((ubI2CByteCount - 1) < sizeof(uint8_t))
+                break;
+
+            usRelaySetDCChanged |= BIT(3);
+        }
+        break;
         case I2C_SLAVE_REGISTER_RELAY4_DUTY_CYCLE + sizeof(uint8_t):
+        {
+            if((ubI2CByteCount - 1) < sizeof(uint8_t))
+                break;
+
+            usRelaySetDCChanged |= BIT(4);
+        }
+        break;
         case I2C_SLAVE_REGISTER_RELAY5_DUTY_CYCLE + sizeof(uint8_t):
+        {
+            if((ubI2CByteCount - 1) < sizeof(uint8_t))
+                break;
+
+            usRelaySetDCChanged |= BIT(5);
+        }
+        break;
         case I2C_SLAVE_REGISTER_RELAY6_DUTY_CYCLE + sizeof(uint8_t):
+        {
+            if((ubI2CByteCount - 1) < sizeof(uint8_t))
+                break;
+
+            usRelaySetDCChanged |= BIT(6);
+        }
+        break;
         case I2C_SLAVE_REGISTER_RELAY7_DUTY_CYCLE + sizeof(uint8_t):
+        {
+            if((ubI2CByteCount - 1) < sizeof(uint8_t))
+                break;
+
+            usRelaySetDCChanged |= BIT(7);
+        }
+        break;
         case I2C_SLAVE_REGISTER_RELAY8_DUTY_CYCLE + sizeof(uint8_t):
+        {
+            if((ubI2CByteCount - 1) < sizeof(uint8_t))
+                break;
+
+            usRelaySetDCChanged |= BIT(8);
+        }
+        break;
         case I2C_SLAVE_REGISTER_RELAY9_DUTY_CYCLE + sizeof(uint8_t):
+        {
+            if((ubI2CByteCount - 1) < sizeof(uint8_t))
+                break;
+
+            usRelaySetDCChanged |= BIT(9);
+        }
+        break;
         case I2C_SLAVE_REGISTER_RELAY10_DUTY_CYCLE + sizeof(uint8_t):
+        {
+            if((ubI2CByteCount - 1) < sizeof(uint8_t))
+                break;
+
+            usRelaySetDCChanged |= BIT(10);
+        }
+        break;
         case I2C_SLAVE_REGISTER_RELAY11_DUTY_CYCLE + sizeof(uint8_t):
         {
             if((ubI2CByteCount - 1) < sizeof(uint8_t))
                 break;
 
-            ubRelaySetDCChanged = 1;
+            usRelaySetDCChanged |= BIT(11);
         }
         break;
-
     }
 
     return 1; // ACK
@@ -617,8 +693,11 @@ void acmp_init()
     ACMP0->CTRL |= ACMP_CTRL_EN; // Enable ACMP0
     while(!(ACMP0->STATUS & ACMP_STATUS_ACMPACT)); // Wait for it to be enabled
 }
-void acmp_set_thresh_voltages(float fUTP, float fLTP)
+void acmp_set_vin_thresh(float fUTP, float fLTP)
 {
+    fUTP /= ADC_VIN_DIV;
+    fLTP /= ADC_VIN_DIV;
+
     if(fUTP < 2500.f * 1.f / 64.f || fUTP > 2500.f)
         return;
 
@@ -631,20 +710,20 @@ void acmp_set_thresh_voltages(float fUTP, float fLTP)
     ACMP0->HYSTERESIS0 = ((uint8_t)(fUTP * 64.f / 2500.f) - 1) << _ACMP_HYSTERESIS0_DIVVB_SHIFT;
     ACMP0->HYSTERESIS1 = ((uint8_t)(fLTP * 64.f / 2500.f) - 1) << _ACMP_HYSTERESIS1_DIVVB_SHIFT;
 }
-void acmp_get_thresh_voltages(float *pfUTP, float *pfLTP)
+void acmp_get_vin_thresh(float *pfUTP, float *pfLTP)
 {
     if(pfUTP)
     {
         uint8_t ubCode = (ACMP0->HYSTERESIS0 & _ACMP_HYSTERESIS0_DIVVB_MASK) >> _ACMP_HYSTERESIS0_DIVVB_SHIFT;
 
-        *pfUTP = 2500.f * (float)(ubCode + 1) / 64.f;
+        *pfUTP = 2500.f * (float)(ubCode + 1) / 64.f * ADC_VIN_DIV;
     }
 
     if(pfLTP)
     {
         uint8_t ubCode = (ACMP0->HYSTERESIS1 & _ACMP_HYSTERESIS1_DIVVB_MASK) >> _ACMP_HYSTERESIS1_DIVVB_SHIFT;
 
-        *pfLTP = 2500.f * (float)(ubCode + 1) / 64.f;
+        *pfLTP = 2500.f * (float)(ubCode + 1) / 64.f * ADC_VIN_DIV;
     }
 }
 
@@ -781,19 +860,19 @@ int main()
             reset();
         }
 
-        if(fRelayUVThreshChanged >= 0.f)
+        if(ubRelayUVThreshChanged)
         {
             ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
             {
-                acmp_set_thresh_voltages((fRelayUVThreshChanged + 500.f) / ADC_VIN_DIV, fRelayUVThreshChanged / ADC_VIN_DIV);
+                float fLTP = I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_RELAY_UV_THRESH);
 
-                float fLTP;
-                acmp_get_thresh_voltages(NULL, &fLTP);
+                acmp_set_vin_thresh(fLTP + 500.f, fLTP);
+                acmp_get_vin_thresh(NULL, &fLTP);
 
-                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_RELAY_UV_THRESH) = fLTP * ADC_VIN_DIV;
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_RELAY_UV_THRESH) = fLTP;
+
+                ubRelayUVThreshChanged = 0;
             }
-
-            fRelayUVThreshChanged = -1.f;
         }
 
         if(usRelaySetOnChanged)
@@ -802,18 +881,17 @@ int main()
             {
                 for(uint8_t i = 0; i < 12; i++)
                 {
-                    if(!(usRelaySetOnChanged & BIT(i)))
-                        continue;
-
                     ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
                     {
+                        if(!(usRelaySetOnChanged & BIT(i)))
+                            continue;
+
                         *pulDutyCycleRegister[i] = I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_RELAY0_DUTY_CYCLE + i);
                         I2C_SLAVE_REGISTER(uint16_t, I2C_SLAVE_REGISTER_RELAY_STATUS) |= BIT(i);
+                        usRelaySetOnChanged &= ~BIT(i);
                     }
                 }
             }
-
-            usRelaySetOnChanged = 0x0000;
         }
         if(usRelaySetOffChanged)
         {
@@ -826,29 +904,31 @@ int main()
                 {
                     *pulDutyCycleRegister[i] = 0x00;
                     I2C_SLAVE_REGISTER(uint16_t, I2C_SLAVE_REGISTER_RELAY_STATUS) &= ~BIT(i);
+                    usRelaySetOffChanged &= ~BIT(i);
                 }
             }
-
-            usRelaySetOffChanged = 0x0000;
         }
-        if(ubRelaySetDCChanged)
+        if(usRelaySetDCChanged)
         {
             for(uint8_t i = 0; i < 12; i++)
             {
                 ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
                 {
+                    if(!(usRelaySetDCChanged & BIT(i)))
+                        continue;
+
                     if(I2C_SLAVE_REGISTER(uint16_t, I2C_SLAVE_REGISTER_RELAY_STATUS) & BIT(i))
                         *pulDutyCycleRegister[i] = I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_RELAY0_DUTY_CYCLE + i);
+
+                    usRelaySetDCChanged &= ~BIT(i);
                 }
             }
-
-            ubRelaySetDCChanged = 0;
         }
 
         static uint64_t ullLastHeartBeat = 0;
         static uint64_t ullLastTelemetryUpdate = 0;
 
-        if(g_ullSystemTick - ullLastHeartBeat > 2000)
+        if((g_ullSystemTick > 0 && ullLastHeartBeat == 0) || g_ullSystemTick - ullLastHeartBeat > 2000)
         {
             ullLastHeartBeat = g_ullSystemTick;
 
@@ -858,7 +938,7 @@ int main()
                 ullLastHeartBeat -= 1900;
         }
 
-        if(g_ullSystemTick - ullLastTelemetryUpdate > 5000)
+        if((g_ullSystemTick > 0 && ullLastTelemetryUpdate == 0) || g_ullSystemTick - ullLastTelemetryUpdate > 5000)
         {
             ullLastTelemetryUpdate = g_ullSystemTick;
 
@@ -900,10 +980,7 @@ int main()
             DBGPRINTLN_CTX("VIN Voltage: %.2f mV", fVIN);
 
             float fUTP, fLTP;
-            acmp_get_thresh_voltages(&fUTP, &fLTP);
-
-            fUTP *= ADC_VIN_DIV;
-            fLTP *= ADC_VIN_DIV;
+            acmp_get_vin_thresh(&fUTP, &fLTP);
 
             DBGPRINTLN_CTX("VIN Undervoltage threshold: %.2f mV", fLTP);
             DBGPRINTLN_CTX("VIN Undervoltage recovery threshold: %.2f mV", fUTP);
