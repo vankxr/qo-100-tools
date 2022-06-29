@@ -384,7 +384,7 @@ uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
             if((ubI2CByteCount - 1) < sizeof(float))
                 break;
 
-            ubBiasVoltageChanged |= BIT(0);
+            ubBiasVoltageChanged |= BIT(LNB1_INDEX);
         }
         break;
         case I2C_SLAVE_REGISTER_LNB2_BIAS_VOLTAGE_SET + sizeof(float):
@@ -392,7 +392,7 @@ uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
             if((ubI2CByteCount - 1) < sizeof(float))
                 break;
 
-            ubBiasVoltageChanged |= BIT(1);
+            ubBiasVoltageChanged |= BIT(LNB2_INDEX);
         }
         break;
         case I2C_SLAVE_REGISTER_LNB1_REF_FREQ + sizeof(uint32_t):
@@ -400,7 +400,7 @@ uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
             if((ubI2CByteCount - 1) < sizeof(uint32_t))
                 break;
 
-            ubRefFrequencyChanged |= BIT(0);
+            ubRefFrequencyChanged |= BIT(LNB1_INDEX);
         }
         break;
         case I2C_SLAVE_REGISTER_LNB2_REF_FREQ + sizeof(uint32_t):
@@ -408,7 +408,7 @@ uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
             if((ubI2CByteCount - 1) < sizeof(uint32_t))
                 break;
 
-            ubRefFrequencyChanged |= BIT(1);
+            ubRefFrequencyChanged |= BIT(LNB2_INDEX);
         }
         break;
     }
@@ -933,11 +933,23 @@ int main()
             float fVBiasSet2 = lnb_get_bias_voltage(LNB2_INDEX);
             float fVBias2 = adc_get_vbias2();
 
+            // Only update at first to initialize registers, otherwise race conditions can occur
+            static uint8_t ubBiasSetVoltageInitialized = 0;
+
+            if(!ubBiasSetVoltageInitialized)
+            {
+                ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+                {
+                    I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_LNB1_BIAS_VOLTAGE_SET) = fVBiasSet1;
+                    I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_LNB2_BIAS_VOLTAGE_SET) = fVBiasSet2;
+                }
+
+                ubBiasSetVoltageInitialized = 1;
+            }
+
             ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
             {
-                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_LNB1_BIAS_VOLTAGE_SET) = fVBiasSet1;
                 I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_LNB1_BIAS_VOLTAGE) = fVBias1;
-                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_LNB2_BIAS_VOLTAGE_SET) = fVBiasSet2;
                 I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_LNB2_BIAS_VOLTAGE) = fVBias2;
             }
 
