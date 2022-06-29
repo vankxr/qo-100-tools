@@ -90,7 +90,7 @@ class LTC4151 extends I2CDevice
 
         accum /= samples;
 
-        return accum / this.current_shunt_value;
+        return accum / this.current_shunt_value; // mA
     }
     async get_vin_voltage(samples = 1)
     {
@@ -131,6 +131,13 @@ class LTC4151 extends I2CDevice
         accum /= samples;
 
         return accum * this.adin_scale_factor;
+    }
+    async get_power(samples = 1)
+    {
+        let voltage = await this.get_vin_voltage(samples);
+        let current = await this.get_current(samples);
+
+        return voltage * current / 1000; // W
     }
 }
 

@@ -215,7 +215,7 @@ class OneWire
                 let dir = 0;
 
                 if(cur_bit < last_mismatch)
-                    dir = devices.length ? !!(pullDeviceID[devices.length - 1].readUInt8(cur_byte) & cur_mask) : 0;
+                    dir = devices.length ? !!(devices[devices.length - 1].rom.readUInt8(cur_byte) & cur_mask) : 0;
                 else
                     dir = (cur_bit == last_mismatch);
 

@@ -5,6 +5,7 @@ const Crypto = require("crypto");
 const SSH2 = require("ssh2");
 const ShellQuote = require("shell-quote");
 const Geolib = require("geolib");
+const MQTT = require("async-mqtt");
 const GPIO = require("./lib/gpio");
 const { I2C, I2CDevice } = require("./lib/i2c");
 const { OneWire, OneWireDevice } = require("./lib/onewire");
@@ -44,6 +45,9 @@ const devices = {};
 const ssh_allowed_users = [];
 const ssh_commands = {};
 let ssh_server;
+const mqtt_topic_prefix = "devices/opi-rf-manager/";
+const mqtt_data_qos = 1;
+let mqtt_client;
 
 function log_init()
 {
@@ -57,6 +61,327 @@ function log_init()
     console_stdout_printer.chain(console_file_printer);
 
     cl = console_stdout_printer;
+}
+
+async function mqtt_init()
+{
+    mqtt_client = MQTT.connect(
+        {
+            protocol: "mqtts",
+            host: "10.1.0.17",
+            port: 8883,
+            keepalive: 60,
+            reschedulePings: true,
+            clientId: "opi-rf-manager-" + Crypto.randomBytes(8).toString("hex"),
+            protocolId: "MQTT",
+            protocolVersion: 4,
+            clean: true,
+            reconnectPeriod: 1000,
+            connectTimeout: 30 * 1000,
+            username: "opi-rf-manager",
+            password: "opi-rf-mgr",
+            queueQoSZero: true,
+            will: {
+                topic: mqtt_topic_prefix + "status",
+                payload: "offline",
+                qos: 1,
+                retain: true
+            },
+            resubscribe: false,
+            rejectUnauthorized: false
+        }
+    );
+
+    mqtt_client.on("connect", mqtt_connect_handler);
+    mqtt_client.on("reconnect", mqtt_reconnect_handler);
+    mqtt_client.on("message", mqtt_message_handler);
+    mqtt_client.on("error", mqtt_error_handler);
+    mqtt_client.on("close", mqtt_close_handler);
+
+    mqtt_update_telemery(true); // Trigger telemetry loop
+}
+async function mqtt_connect_handler()
+{
+    cl.tprintln("green", "MQTT", "MQTT (re)connected!");
+
+    try
+    {
+        await mqtt_client.publish(mqtt_topic_prefix + "/status", "online", { qos: 1, retain: true });
+
+        await mqtt_client.subscribe(mqtt_topic_prefix + "/config/#");
+    }
+    catch(e)
+    {
+        cl.tprintln("red", "MQTT", "Error: " + e);
+    }
+
+    mqtt_update_telemery(false); // Do not trigger loop, as it can be already running on reconnection
+}
+function mqtt_reconnect_handler()
+{
+    cl.tprintln("yellow", "MQTT", "MQTT reconnecting...");
+}
+async function mqtt_message_handler(topic, payload)
+{
+    let path = topic.split("/");
+
+    if(path[0] !== "devices" || path[1] !== "opi-rf-manager")
+        return;
+
+    console.log("MQTT msg:", topic, payload);
+}
+function mqtt_error_handler(e)
+{
+    cl.tprintln("red", "MQTT", "Error: " + e);
+}
+function mqtt_close_handler()
+{
+    cl.tprintln("yellow", "MQTT", "MQTT connection closed!");
+}
+async function mqtt_update_telemery(loop)
+{
+    if(!mqtt_client || !mqtt_client.connected)
+    {
+        if(loop)
+            setTimeout(mqtt_update_telemery, 60000, true); // Update every minute
+
+        return;
+    }
+
+    for(let device_name in devices)
+    {
+        let device = devices[device_name];
+
+        try
+        {
+            if(device instanceof HPPSU)
+            {
+                await mqtt_client.publish(mqtt_topic_prefix + "data/status/" + device_name + "_input_present", (await device.is_input_present()) ? "1" : "0", { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/status/" + device_name + "_output_enabled", (await device.is_main_output_enabled()) ? "1" : "0", { qos: mqtt_data_qos });
+
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_input", ((await device.get_input_voltage()) * 1000).toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_input_nominal", ((await device.get_nominal_input_voltage()) * 1000).toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_input_uv_thresh", ((await device.get_input_undervoltage_threshold()) * 1000).toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_input_ov_thresh", ((await device.get_input_overvoltage_threshold()) * 1000).toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_output", ((await device.get_output_voltage()) * 1000).toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_output_uv_thresh", ((await device.get_output_undervoltage_threshold()) * 1000).toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_output_ov_thresh", ((await device.get_output_overvoltage_threshold()) * 1000).toFixed(2).toString(), { qos: mqtt_data_qos });
+
+                await mqtt_client.publish(mqtt_topic_prefix + "data/current/" + device_name + "_input", ((await device.get_input_current()) * 1000).toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/current/" + device_name + "_output", ((await device.get_output_current()) * 1000).toFixed(2).toString(), { qos: mqtt_data_qos });
+
+                await mqtt_client.publish(mqtt_topic_prefix + "data/power/" + device_name + "_input", (await device.get_input_power()).toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/power/" + device_name + "_output", (await device.get_output_power()).toFixed(2).toString(), { qos: mqtt_data_qos });
+
+                await mqtt_client.publish(mqtt_topic_prefix + "data/energy/" + device_name + "_input", (await device.get_input_energy()).toFixed(2).toString(), { qos: mqtt_data_qos });
+
+                await mqtt_client.publish(mqtt_topic_prefix + "data/efficiency/" + device_name, (await device.get_efficiency()).toFixed(2).toString(), { qos: mqtt_data_qos });
+
+                await mqtt_client.publish(mqtt_topic_prefix + "data/temperature/" + device_name + "_intake", (await device.get_intake_temperature()).toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/temperature/" + device_name + "_internal", (await device.get_internal_temperature()).toFixed(2).toString(), { qos: mqtt_data_qos });
+
+                await mqtt_client.publish(mqtt_topic_prefix + "data/fan_speed/" + device_name, (await device.get_fan_speed()).toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/fan_speed/" + device_name + "_target", (await device.get_fan_target_speed()).toFixed(2).toString(), { qos: mqtt_data_qos });
+
+                await mqtt_client.publish(mqtt_topic_prefix + "data/on_time/" + device_name, (await device.get_on_time()).toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/on_time/" + device_name + "_total", (await device.get_on_time()).toFixed(2).toString(), { qos: mqtt_data_qos });
+            }
+            else if(device instanceof RelayController)
+            {
+                let chip_voltages = await device.get_chip_voltages();
+                let system_voltages = await device.get_system_voltages();
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_avdd", chip_voltages.avdd.toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_dvdd", chip_voltages.dvdd.toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_iovdd", chip_voltages.iovdd.toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_core", chip_voltages.core.toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_vin", system_voltages.vin.toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_vin_uv_thresh", (await device.get_relay_undervoltage_point()).toFixed(2).toString(), { qos: mqtt_data_qos });
+
+                let chip_temperatures = await device.get_chip_temperatures();
+                await mqtt_client.publish(mqtt_topic_prefix + "data/temperature/" + device_name + "_adc", chip_temperatures.adc.toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/temperature/" + device_name + "_emu", chip_temperatures.emu.toFixed(2).toString(), { qos: mqtt_data_qos });
+
+                let rstatus = await device.get_relay_status();
+
+                for(let i = 0; i < 12; i++)
+                {
+                    await mqtt_client.publish(mqtt_topic_prefix + "data/status/" + device_name + "_relay" + i + "_status", (rstatus & (1 << i)) ? "1" : "0", { qos: mqtt_data_qos });
+                    await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_relay" + i, (await device.get_relay_voltage(i)).toFixed(2).toString(), { qos: mqtt_data_qos });
+                    await mqtt_client.publish(mqtt_topic_prefix + "data/duty_cycle/" + device_name + "_relay" + i, (await device.get_relay_duty_cycle(i)).toFixed(2).toString(), { qos: mqtt_data_qos });
+                }
+            }
+            else if(device instanceof Upconverter)
+            {
+                let chip_voltages = await device.get_chip_voltages();
+                let system_voltages = await device.get_system_voltages();
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_avdd", chip_voltages.avdd.toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_dvdd", chip_voltages.dvdd.toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_iovdd", chip_voltages.iovdd.toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_core", chip_voltages.core.toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_vin", system_voltages.vin.toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_v5v0", system_voltages.v5v0.toFixed(2).toString(), { qos: mqtt_data_qos });
+
+                let system_currents = await device.get_system_currents();
+                await mqtt_client.publish(mqtt_topic_prefix + "data/current/" + device_name + "_i5v0", system_currents.i5v0.toFixed(2).toString(), { qos: mqtt_data_qos });
+
+                let chip_temperatures = await device.get_chip_temperatures();
+                await mqtt_client.publish(mqtt_topic_prefix + "data/temperature/" + device_name + "_adc", chip_temperatures.adc.toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/temperature/" + device_name + "_emu", chip_temperatures.emu.toFixed(2).toString(), { qos: mqtt_data_qos });
+
+                await mqtt_client.publish(mqtt_topic_prefix + "data/rf_power/" + device_name + "_out", (await device.get_rf_power()).toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/rf_power_modulation/" + device_name + "_out", Upconverter.get_modulation_name(await device.get_rf_power_modulation()), { qos: mqtt_data_qos });
+
+                await mqtt_client.publish(mqtt_topic_prefix + "data/rf_power/" + device_name + "_out_low_thresh", (await device.get_low_rf_power_threshold()).toFixed(2).toString(), { qos: mqtt_data_qos });
+
+                await mqtt_client.publish(mqtt_topic_prefix + "data/rf_attenuation/" + device_name + "_if", (await device.get_if_attenuation()).toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/rf_attenuation/" + device_name + "_rf1", (await device.get_rf1_attenuation()).toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/rf_attenuation/" + device_name + "_rf2", (await device.get_rf2_attenuation()).toFixed(2).toString(), { qos: mqtt_data_qos });
+
+                await mqtt_client.publish(mqtt_topic_prefix + "data/frequency/" + device_name + "_lo", (await device.get_lo_frequency()).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/frequency/" + device_name + "_lo_ref", (await device.get_lo_ref_frequency()).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/frequency/" + device_name + "_lo_pfd", (await device.get_lo_pfd_frequency()).toString(), { qos: mqtt_data_qos });
+
+                await mqtt_client.publish(mqtt_topic_prefix + "data/status/" + device_name + "_lo_locked", (await device.is_lo_pll_locked()) ? "1" : "0", { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/status/" + device_name + "_lo_muted", (await device.is_lo_pll_muted()) ? "1" : "0", { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/status/" + device_name + "_mixer_enabled", (await device.get_mixer_status()) ? "1" : "0", { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/status/" + device_name + "_pre_amp_enabled", (await device.get_pa_stg1_2_status()) ? "1" : "0", { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/status/" + device_name + "_final_amp_enabled", (await device.get_pa_stg3_status()) ? "1" : "0", { qos: mqtt_data_qos });
+            }
+            else if(device instanceof PABiasController)
+            {
+                let chip_voltages = await device.get_chip_voltages();
+                let system_voltages = await device.get_system_voltages();
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_avdd", chip_voltages.avdd.toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_dvdd", chip_voltages.dvdd.toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_iovdd", chip_voltages.iovdd.toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_core", chip_voltages.core.toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_vin", system_voltages.vin.toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_v5v0", system_voltages.v5v0.toFixed(2).toString(), { qos: mqtt_data_qos });
+
+                let chip_temperatures = await device.get_chip_temperatures();
+                let system_temperatures = await device.get_system_temperatures();
+                await mqtt_client.publish(mqtt_topic_prefix + "data/temperature/" + device_name + "_adc", chip_temperatures.adc.toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/temperature/" + device_name + "_emu", chip_temperatures.emu.toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/temperature/" + device_name + "_afe", system_temperatures.afe.toFixed(2).toString(), { qos: mqtt_data_qos });
+
+                let tec_dac_init = await device.get_tec_dac_status();
+                await mqtt_client.publish(mqtt_topic_prefix + "data/status/" + device_name + "_tec_dac_init", tec_dac_init ? "1" : "0", { qos: mqtt_data_qos });
+
+                if(tec_dac_init)
+                {
+                    for(let i = 0; i < 4; i++)
+                    {
+                        await mqtt_client.publish(mqtt_topic_prefix + "data/status/" + device_name + "_tec" + i, (await device.get_tec_status(i)) ? "1" : "0", { qos: mqtt_data_qos });
+                        await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_tec" + i, (await device.get_tec_voltage(i)).toFixed(2).toString(), { qos: mqtt_data_qos });
+                    }
+                }
+
+                for(let i = 0; i < 2; i++)
+                {
+                    let data = await device.get_pa_telemetry(i);
+
+                    await mqtt_client.publish(mqtt_topic_prefix + "data/status/" + device_name + "_pa" + i, (await device.get_pa_status(i)) ? "1" : "0", { qos: mqtt_data_qos });
+                    await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_pa" + i + "_vgg_raw", data.vgg_raw.toFixed(2).toString(), { qos: mqtt_data_qos });
+                    await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_pa" + i + "_vgg", data.vgg.toFixed(2).toString(), { qos: mqtt_data_qos });
+                    await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_pa" + i + "_vdd", data.vdd.toFixed(2).toString(), { qos: mqtt_data_qos });
+                    await mqtt_client.publish(mqtt_topic_prefix + "data/current/" + device_name + "_pa" + i + "_idd", data.idd.toFixed(2).toString(), { qos: mqtt_data_qos });
+                    await mqtt_client.publish(mqtt_topic_prefix + "data/temperature/" + device_name + "_pa" + i, data.temperature.toFixed(2).toString(), { qos: mqtt_data_qos });
+                    await mqtt_client.publish(mqtt_topic_prefix + "data/temperature/" + device_name + "_pa" + i + "_high_thresh", data.temperature_high.toFixed(2).toString(), { qos: mqtt_data_qos });
+                    await mqtt_client.publish(mqtt_topic_prefix + "data/temperature/" + device_name + "_pa" + i + "_low_thresh", data.temperature_low.toFixed(2).toString(), { qos: mqtt_data_qos });
+                }
+            }
+            else if(device instanceof LNBController)
+            {
+                let chip_voltages = await device.get_chip_voltages();
+                let system_voltages = await device.get_system_voltages();
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_avdd", chip_voltages.avdd.toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_dvdd", chip_voltages.dvdd.toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_iovdd", chip_voltages.iovdd.toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_core", chip_voltages.core.toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_vin", system_voltages.vin.toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_v5v0", system_voltages.v5v0.toFixed(2).toString(), { qos: mqtt_data_qos });
+
+                let chip_temperatures = await device.get_chip_temperatures();
+                let system_temperatures = await device.get_system_temperatures();
+                await mqtt_client.publish(mqtt_topic_prefix + "data/temperature/" + device_name + "_adc", chip_temperatures.adc.toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/temperature/" + device_name + "_emu", chip_temperatures.emu.toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/temperature/" + device_name + "_bias_reg", system_temperatures.bias_reg.toFixed(2).toString(), { qos: mqtt_data_qos });
+
+                await mqtt_client.publish(mqtt_topic_prefix + "data/status/" + device_name + "_global_ref_enabled", (await device.get_lnb_global_reference_status()) ? "1" : "0", { qos: mqtt_data_qos });
+
+                for(let i = 0; i < 2; i++)
+                {
+                    await mqtt_client.publish(mqtt_topic_prefix + "data/status/" + device_name + "_lnb" + i + "_bias", (await device.get_lnb_bias_status(i)) ? "1" : "0", { qos: mqtt_data_qos });
+                    await mqtt_client.publish(mqtt_topic_prefix + "data/status/" + device_name + "_lnb" + i + "_bias_pgood", (await device.is_lnb_bias_power_good(i)) ? "1" : "0", { qos: mqtt_data_qos });
+                    await mqtt_client.publish(mqtt_topic_prefix + "data/status/" + device_name + "_lnb" + i + "_ref", (await device.get_lnb_reference_status(i)) ? "1" : "0", { qos: mqtt_data_qos });
+                    await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_lnb" + i + "_bias_set", (await device.get_lnb_bias_voltage_set(i)).toFixed(2).toString(), { qos: mqtt_data_qos });
+                    await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_lnb" + i + "_bias", (await device.get_lnb_bias_voltage(i)).toFixed(2).toString(), { qos: mqtt_data_qos });
+                    await mqtt_client.publish(mqtt_topic_prefix + "data/frequency/" + device_name + "_lnb" + i + "_ref", (await device.get_lnb_reference_frequency(i)).toFixed(2).toString(), { qos: mqtt_data_qos });
+                }
+            }
+            else if(device instanceof DS18B20)
+            {
+                await device.measure();
+
+                await mqtt_client.publish(mqtt_topic_prefix + "data/temperature/" + device_name, (await device.get_temperature()).toFixed(2).toString(), { qos: mqtt_data_qos });
+            }
+            else if(device instanceof BME280)
+            {
+                await mqtt_client.publish(mqtt_topic_prefix + "data/temperature/" + device_name, (await device.get_temperature()).toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/temperature/" + device_name + "_dew_point", (await device.get_dew_point()).toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/temperature/" + device_name + "_heat_index", (await device.get_heat_index()).toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/humidity/" + device_name, (await device.get_humidity()).toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/pressure/" + device_name, (await device.get_pressure()).toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/altitude/" + device_name, (await device.get_altitude()).toFixed(2).toString(), { qos: mqtt_data_qos });
+            }
+            else if(device instanceof OAQ)
+            {
+                let stable = await device.is_stable();
+
+                if(!stable)
+                    continue;
+
+                await mqtt_client.publish(mqtt_topic_prefix + "data/air_quality/" + device_name + "_no2_conc", (await device.get_no2_concentration()).toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/air_quality/" + device_name + "_o3_conc", (await device.get_o3_concentration()).toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/air_quality/" + device_name + "_aqi", (await device.get_aqi()).toFixed(2).toString(), { qos: mqtt_data_qos });
+            }
+            else if(device instanceof SI1133)
+            {
+                await device.measure();
+
+                await mqtt_client.publish(mqtt_topic_prefix + "data/light/" + device_name + "_visible", (await device.get_lux()).toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/light/" + device_name + "_uv_index", (await device.get_uv()).toFixed(2).toString(), { qos: mqtt_data_qos });
+            }
+            else if(device instanceof MCP3221)
+            {
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name, (await device.get_voltage(1)).toFixed(2).toString(), { qos: mqtt_data_qos });
+            }
+            else if(device instanceof LTC5597)
+            {
+                await mqtt_client.publish(mqtt_topic_prefix + "data/rf_power/" + device_name, (await device.get_power_level(1, 1)).toFixed(2).toString(), { qos: mqtt_data_qos });
+            }
+            else if(device instanceof LTC4151)
+            {
+                // FIXME: It is possible for these to fail if the power rail is off, and it is not really an error...
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_vin", (await device.get_vin_voltage(1)).toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/voltage/" + device_name + "_load", (await device.get_adin_voltage(1)).toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/current/" + device_name, (await device.get_current(1)).toFixed(2).toString(), { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/power/" + device_name, (await device.get_power(1)).toFixed(2).toString(), { qos: mqtt_data_qos });
+            }
+            else if(device instanceof F2915)
+            {
+                await mqtt_client.publish(mqtt_topic_prefix + "data/status/" + device_name + "_powered", (await device.is_powered()) ? "1" : "0", { qos: mqtt_data_qos });
+                await mqtt_client.publish(mqtt_topic_prefix + "data/status/" + device_name + "_selected_path", (await device.get_rf_path()).toString(), { qos: mqtt_data_qos });
+            }
+        }
+        catch(e)
+        {
+            cl.tprintln("red", "MQTT", "Error publishing telemetry data for device \"" + device_name + "\": " + e);
+        }
+    }
+
+    if(loop)
+        setTimeout(mqtt_update_telemery, 60000, true); // Update every minute
 }
 
 async function ssh_server_init()
@@ -252,6 +577,329 @@ async function ssh_server_init()
                     break;
                 }
             }
+            else if(device instanceof RelayController)
+            {
+                switch(param_name)
+                {
+                    case "":
+                    {
+                        this.tprintln(null, "Relay Controller", "Unique ID: %s", await device.get_unique_id());
+                        this.tprintln(null, "Relay Controller", "Software Version: v%d", await device.get_software_version());
+
+                        let chip_voltages = await device.get_chip_voltages();
+                        this.tprintln(null, "Relay Controller", "AVDD Voltage: %d mV", chip_voltages.avdd);
+                        this.tprintln(null, "Relay Controller", "DVDD Voltage: %d mV", chip_voltages.dvdd);
+                        this.tprintln(null, "Relay Controller", "IOVDD Voltage: %d mV", chip_voltages.iovdd);
+                        this.tprintln(null, "Relay Controller", "Core Voltage: %d mV", chip_voltages.core);
+
+                        let system_voltages = await device.get_system_voltages();
+                        this.tprintln(null, "Relay Controller", "VIN Voltage: %d mV", system_voltages.vin);
+
+                        this.tprintln(null, "Relay Controller", "VIN Undervoltage monitor status: %s", (await device.get_relay_undervoltage_status()) ? "ON" : "OFF");
+                        this.tprintln(null, "Relay Controller", "VIN Undervoltage threshold: %d mV", await device.get_relay_undervoltage_point());
+                        this.tprintln(null, "Relay Controller", "VIN Undervoltage triggered: %s", (await device.was_relay_undervoltage_triggered()) ? "YES" : "NO");
+                        this.tprintln(null, "Relay Controller", "VIN Undervoltage status: %s", (await device.is_relay_undervoltage()) ? "LOW" : "OK");
+
+                        let chip_temperatures = await device.get_chip_temperatures();
+                        this.tprintln(null, "Relay Controller", "ADC Temperature: %d C", chip_temperatures.adc);
+                        this.tprintln(null, "Relay Controller", "EMU Temperature: %d C", chip_temperatures.emu);
+                    }
+                    break;
+                    case "relay_status":
+                    {
+                        let i = parseInt(argv[2]);
+
+                        if(isNaN(i) || i < 0 || i > 11)
+                        {
+                            this.tprintln(null, "Relay Controller", "Relays:");
+
+                            let rstatus = await device.get_relay_status();
+
+                            for(i = 0; i < 12; i++)
+                            {
+                                this.tprintln(null, "Relay Controller", "  Relay #%d status: %s", i, (rstatus & (1 << i)) ? "ON" : "OFF");
+                                this.tprintln(null, "Relay Controller", "  Relay #%d duty cycle: %d %%", i, await device.get_relay_duty_cycle(i) * 100);
+                                this.tprintln(null, "Relay Controller", "  Relay #%d voltage: %d mV", i, await device.get_relay_voltage(i));
+                            }
+                        }
+                        else
+                        {
+                            this.tprintln(null, "Relay Controller", "Relay #%d status: %s", i, (await device.get_relay_status(i)) ? "ON" : "OFF");
+                            this.tprintln(null, "Relay Controller", "Relay #%d duty cycle: %d %%", i, await device.get_relay_duty_cycle(i) * 100);
+                            this.tprintln(null, "Relay Controller", "Relay #%d voltage: %d mV", i, await device.get_relay_voltage(i));
+                        }
+                    }
+                    break;
+                    default:
+                    {
+                        throw new Error("Relay Controller parameter not supported");
+                    }
+                    break;
+                }
+            }
+            else if(device instanceof Upconverter)
+            {
+                switch(param_name)
+                {
+                    case "":
+                    {
+                        this.tprintln(null, "Upconverter", "Unique ID: %s", await device.get_unique_id());
+                        this.tprintln(null, "Upconverter", "Software Version: v%d", await device.get_software_version());
+
+                        let chip_voltages = await device.get_chip_voltages();
+                        this.tprintln(null, "Upconverter", "AVDD Voltage: %d mV", chip_voltages.avdd);
+                        this.tprintln(null, "Upconverter", "DVDD Voltage: %d mV", chip_voltages.dvdd);
+                        this.tprintln(null, "Upconverter", "IOVDD Voltage: %d mV", chip_voltages.iovdd);
+                        this.tprintln(null, "Upconverter", "Core Voltage: %d mV", chip_voltages.core);
+
+                        let system_voltages = await device.get_system_voltages();
+                        this.tprintln(null, "Upconverter", "VIN Voltage: %d mV", system_voltages.vin);
+                        this.tprintln(null, "Upconverter", "5V0 Voltage: %d mV", system_voltages.v5v0);
+
+                        let system_currents = await device.get_system_currents();
+                        this.tprintln(null, "Upconverter", "5V0 Current: %d mA", system_currents.i5v0);
+
+                        let chip_temperatures = await device.get_chip_temperatures();
+                        this.tprintln(null, "Upconverter", "ADC Temperature: %d C", chip_temperatures.adc);
+                        this.tprintln(null, "Upconverter", "EMU Temperature: %d C", chip_temperatures.emu);
+
+                        this.tprintln(null, "Upconverter", "RF power: %d dBm", await device.get_rf_power());
+                        this.tprintln(null, "Upconverter", "RF power modulation: %s", Upconverter.get_modulation_name(await device.get_rf_power_modulation()));
+
+                        this.tprintln(null, "Upconverter", "RF Low power monitor status: %s", (await device.get_low_rf_power_status()) ? "ON" : "OFF");
+                        this.tprintln(null, "Upconverter", "RF Low power threshold: %d dBm", await device.get_low_rf_power_threshold());
+                        this.tprintln(null, "Upconverter", "RF Low power triggered: %s", (await device.was_low_rf_power_triggered()) ? "YES" : "NO");
+                        this.tprintln(null, "Upconverter", "RF Low power status: %s", (await device.is_low_rf_power()) ? "LOW" : "OK");
+
+                        this.tprintln(null, "Upconverter", "IF Attenuation: %d dB", await device.get_if_attenuation());
+                        this.tprintln(null, "Upconverter", "RF1 Attenuation: %d dB", await device.get_rf1_attenuation());
+                        this.tprintln(null, "Upconverter", "RF2 Attenuation: %d dB", await device.get_rf2_attenuation());
+
+                        this.tprintln(null, "Upconverter", "LO Frequency: %d MHz", Number((await device.get_lo_frequency()) / 1000000n));
+                        this.tprintln(null, "Upconverter", "LO Reference Frequency: %d MHz", (await device.get_lo_ref_frequency()) / 1000000);
+                        this.tprintln(null, "Upconverter", "LO PFD Frequency: %d MHz", (await device.get_lo_pfd_frequency()) / 1000000);
+                        this.tprintln(null, "Upconverter", "LO Locked: %s", (await device.is_lo_pll_locked()) ? "YES" : "NO");
+                        this.tprintln(null, "Upconverter", "LO Muted: %s", (await device.is_lo_pll_muted()) ? "YES" : "NO");
+
+                        this.tprintln(null, "Upconverter", "Mixer Enabled: %s", (await device.get_mixer_status()) ? "YES" : "NO");
+                        this.tprintln(null, "Upconverter", "Pre-Amplifiers Enabled: %s", (await device.get_pa_stg1_2_status()) ? "YES" : "NO");
+                        this.tprintln(null, "Upconverter", "Final Amplifier Enabled: %s", (await device.get_pa_stg3_status()) ? "YES" : "NO");
+                    }
+                    break;
+                    case "rf_power":
+                    {
+                        this.tprintln(null, "Upconverter", "RF power: %d dBm", await device.get_rf_power());
+                        this.tprintln(null, "Upconverter", "RF power modulation: %s", Upconverter.get_modulation_name(await device.get_rf_power_modulation()));
+
+                        this.tprintln(null, "Upconverter", "RF Low power monitor status: %s", (await device.get_low_rf_power_status()) ? "ON" : "OFF");
+                        this.tprintln(null, "Upconverter", "RF Low power threshold: %d dBm", await device.get_low_rf_power_threshold());
+                        this.tprintln(null, "Upconverter", "RF Low power triggered: %s", (await device.was_low_rf_power_triggered()) ? "YES" : "NO");
+                        this.tprintln(null, "Upconverter", "RF Low power status: %s", (await device.is_low_rf_power()) ? "LOW" : "OK");
+                    }
+                    break;
+                    case "attenuators":
+                    {
+                        this.tprintln(null, "Upconverter", "IF Attenuation: %d dB", await device.get_if_attenuation());
+                        this.tprintln(null, "Upconverter", "RF1 Attenuation: %d dB", await device.get_rf1_attenuation());
+                        this.tprintln(null, "Upconverter", "RF2 Attenuation: %d dB", await device.get_rf2_attenuation());
+                    }
+                    break;
+                    case "lo":
+                    {
+                        this.tprintln(null, "Upconverter", "LO Frequency: %d MHz", Number((await device.get_lo_frequency()) / 1000000n));
+                        this.tprintln(null, "Upconverter", "LO Reference Frequency: %d MHz", (await device.get_lo_ref_frequency()) / 1000000);
+                        this.tprintln(null, "Upconverter", "LO PFD Frequency: %d MHz", (await device.get_lo_pfd_frequency()) / 1000000);
+                        this.tprintln(null, "Upconverter", "LO Locked: %s", (await device.is_lo_pll_locked()) ? "YES" : "NO");
+                        this.tprintln(null, "Upconverter", "LO Muted: %s", (await device.is_lo_pll_muted()) ? "YES" : "NO");
+                    }
+                    break;
+                    case "mixer":
+                    {
+                        this.tprintln(null, "Upconverter", "Mixer Enabled: %s", (await device.get_mixer_status()) ? "YES" : "NO");
+                    }
+                    break;
+                    case "amplifiers":
+                    {
+                        this.tprintln(null, "Upconverter", "Pre-Amplifiers Enabled: %s", (await device.get_pa_stg1_2_status()) ? "YES" : "NO");
+                        this.tprintln(null, "Upconverter", "Final Amplifier Enabled: %s", (await device.get_pa_stg3_status()) ? "YES" : "NO");
+                    }
+                    break;
+                    default:
+                    {
+                        throw new Error("Upconverter parameter not supported");
+                    }
+                    break;
+                }
+            }
+            else if(device instanceof PABiasController)
+            {
+                switch(param_name)
+                {
+                    case "":
+                    {
+                        this.tprintln(null, "PA Bias Controller", "Unique ID: %s", await device.get_unique_id());
+                        this.tprintln(null, "PA Bias Controller", "Software Version: v%d", await device.get_software_version());
+
+                        let chip_voltages = await device.get_chip_voltages();
+                        this.tprintln(null, "PA Bias Controller", "AVDD Voltage: %d mV", chip_voltages.avdd);
+                        this.tprintln(null, "PA Bias Controller", "DVDD Voltage: %d mV", chip_voltages.dvdd);
+                        this.tprintln(null, "PA Bias Controller", "IOVDD Voltage: %d mV", chip_voltages.iovdd);
+                        this.tprintln(null, "PA Bias Controller", "Core Voltage: %d mV", chip_voltages.core);
+
+                        let system_voltages = await device.get_system_voltages();
+                        this.tprintln(null, "PA Bias Controller", "VIN Voltage: %d mV", system_voltages.vin);
+                        this.tprintln(null, "PA Bias Controller", "5V0 Voltage: %d mV", system_voltages.v5v0);
+
+                        let chip_temperatures = await device.get_chip_temperatures();
+                        this.tprintln(null, "PA Bias Controller", "ADC Temperature: %d C", chip_temperatures.adc);
+                        this.tprintln(null, "PA Bias Controller", "EMU Temperature: %d C", chip_temperatures.emu);
+
+                        let system_temperatures = await device.get_system_temperatures();
+                        this.tprintln(null, "PA Bias Controller", "AFE Temperature: %d C", system_temperatures.afe);
+
+                        let tec_dac_init = await device.get_tec_dac_status();
+
+                        this.tprintln(tec_dac_init ? null : "yellow", "PA Bias Controller", "TEC DAC init status: %s", tec_dac_init ? "OK" : "FAULTY");
+                    }
+                    break;
+                    case "tec_status":
+                    {
+                        let i = parseInt(argv[2]);
+
+                        if(isNaN(i) || i < 0 || i > 3)
+                        {
+                            this.tprintln(null, "PA Bias Controller", "TECs:");
+
+                            for(i = 0; i < 4; i++)
+                            {
+                                this.tprintln(null, "PA Bias Controller", "  TEC #%d status: %s", i, (await device.get_tec_status(i)) ? "ON" : "OFF");
+                                this.tprintln(null, "PA Bias Controller", "  TEC #%d voltage: %d mV", i, await device.get_tec_voltage(i));
+                            }
+                        }
+                        else
+                        {
+                            this.tprintln(null, "PA Bias Controller", "TEC #%d status: %s", i, (await device.get_tec_status(i)) ? "ON" : "OFF");
+                            this.tprintln(null, "PA Bias Controller", "TEC #%d voltage: %d mV", i, await device.get_tec_voltage(i));
+                        }
+                    }
+                    break;
+                    case "pa_status":
+                    {
+                        let i = parseInt(argv[2]);
+
+                        if(isNaN(i) || i < 0 || i > 1)
+                        {
+                            this.tprintln(null, "PA Bias Controller", "PAs:");
+
+                            for(i = 0; i < 2; i++)
+                            {
+                                let data = await device.get_pa_telemetry(i);
+
+                                this.tprintln(null, "PA Bias Controller", "  PA #%d status: %s", i, (await device.get_pa_status(i)) ? "ON" : "OFF");
+                                this.tprintln(null, "PA Bias Controller", "  PA #%d VGG Raw Voltage: %d mV", i, data.vgg_raw);
+                                this.tprintln(null, "PA Bias Controller", "  PA #%d VGG Voltage: %d mV", i, data.vgg);
+                                this.tprintln(null, "PA Bias Controller", "  PA #%d VDD Voltage: %d mV", i, data.vdd);
+                                this.tprintln(null, "PA Bias Controller", "  PA #%d VDD Current: %d mA", i, data.idd);
+                                this.tprintln(null, "PA Bias Controller", "  PA #%d Temperature: %d C", i, data.temperature);
+                                this.tprintln(null, "PA Bias Controller", "  PA #%d High Temperature: %d C", i, data.temperature_high);
+                                this.tprintln(null, "PA Bias Controller", "  PA #%d High Temperature triggered: %s", i, (await device.was_pa_high_temperature_triggered(i)) ? "YES" : "NO");
+                                this.tprintln(null, "PA Bias Controller", "  PA #%d High Temperature status: %s", i, (await device.is_pa_high_temperature(i)) ? "HIGH" : "OK");
+                                this.tprintln(null, "PA Bias Controller", "  PA #%d Low Temperature: %d C", i, data.temperature_low);
+                                this.tprintln(null, "PA Bias Controller", "  PA #%d Low Temperature triggered: %s", i, (await device.was_pa_low_temperature_triggered(i)) ? "YES" : "NO");
+                                this.tprintln(null, "PA Bias Controller", "  PA #%d Low Temperature status: %s", i, (await device.is_pa_low_temperature(i)) ? "LOW" : "OK");
+                            }
+                        }
+                        else
+                        {
+                            let data = await device.get_pa_telemetry(i);
+
+                            this.tprintln(null, "PA Bias Controller", "  PA #%d status: %s", i, (await device.get_pa_status(i)) ? "ON" : "OFF");
+                            this.tprintln(null, "PA Bias Controller", "  PA #%d VGG Raw Voltage: %d mV", i, data.vgg_raw);
+                            this.tprintln(null, "PA Bias Controller", "  PA #%d VGG Voltage: %d mV", i, data.vgg);
+                            this.tprintln(null, "PA Bias Controller", "  PA #%d VDD Voltage: %d mV", i, data.vdd);
+                            this.tprintln(null, "PA Bias Controller", "  PA #%d VDD Current: %d mA", i, data.idd);
+                            this.tprintln(null, "PA Bias Controller", "  PA #%d Temperature: %d C", i, data.temperature);
+                            this.tprintln(null, "PA Bias Controller", "  PA #%d High Temperature: %d C", i, data.temperature_high);
+                            this.tprintln(null, "PA Bias Controller", "  PA #%d High Temperature triggered: %s", i, (await device.was_pa_high_temperature_triggered(i)) ? "YES" : "NO");
+                            this.tprintln(null, "PA Bias Controller", "  PA #%d High Temperature status: %s", i, (await device.is_pa_high_temperature(i)) ? "HIGH" : "OK");
+                            this.tprintln(null, "PA Bias Controller", "  PA #%d Low Temperature: %d C", i, data.temperature_low);
+                            this.tprintln(null, "PA Bias Controller", "  PA #%d Low Temperature triggered: %s", i, (await device.was_pa_low_temperature_triggered(i)) ? "YES" : "NO");
+                            this.tprintln(null, "PA Bias Controller", "  PA #%d Low Temperature status: %s", i, (await device.is_pa_low_temperature(i)) ? "LOW" : "OK");
+                        }
+                    }
+                    break;
+                    default:
+                    {
+                        throw new Error("PA Bias Controller parameter not supported");
+                    }
+                    break;
+                }
+            }
+            else if(device instanceof LNBController)
+            {
+                switch(param_name)
+                {
+                    case "":
+                    {
+                        this.tprintln(null, "LNB Controller", "Unique ID: %s", await device.get_unique_id());
+                        this.tprintln(null, "LNB Controller", "Software Version: v%d", await device.get_software_version());
+
+                        let chip_voltages = await device.get_chip_voltages();
+                        this.tprintln(null, "LNB Controller", "AVDD Voltage: %d mV", chip_voltages.avdd);
+                        this.tprintln(null, "LNB Controller", "DVDD Voltage: %d mV", chip_voltages.dvdd);
+                        this.tprintln(null, "LNB Controller", "IOVDD Voltage: %d mV", chip_voltages.iovdd);
+                        this.tprintln(null, "LNB Controller", "Core Voltage: %d mV", chip_voltages.core);
+
+                        let system_voltages = await device.get_system_voltages();
+                        this.tprintln(null, "LNB Controller", "VIN Voltage: %d mV", system_voltages.vin);
+                        this.tprintln(null, "LNB Controller", "5V0 Voltage: %d mV", system_voltages.v5v0);
+
+                        let chip_temperatures = await device.get_chip_temperatures();
+                        this.tprintln(null, "LNB Controller", "ADC Temperature: %d C", chip_temperatures.adc);
+                        this.tprintln(null, "LNB Controller", "EMU Temperature: %d C", chip_temperatures.emu);
+
+                        let system_temperatures = await device.get_system_temperatures();
+                        this.tprintln(null, "LNB Controller", "Bias Regulator Temperature: %d C", system_temperatures.bias_reg);
+
+                        this.tprintln(null, "LNB Controller", "Global reference enable: %s", (await device.get_lnb_global_reference_status()) ? "ON" : "OFF");
+                    }
+                    break;
+                    case "lnb_status":
+                    {
+                        let i = parseInt(argv[2]);
+
+                        if(isNaN(i) || i < 0 || i > 1)
+                        {
+                            this.tprintln(null, "LNB Controller", "LNBs:");
+
+                            for(i = 0; i < 2; i++)
+                            {
+                                this.tprintln(null, "LNB Controller", "  LNB #%d Bias enable: %s", i, (await device.get_lnb_bias_status(i)) ? "ON" : "OFF");
+                                this.tprintln(null, "LNB Controller", "  LNB #%d Bias status: %s", i, (await device.is_lnb_bias_power_good(i)) ? "POWER GOOD" : "POWER NOT GOOD");
+                                this.tprintln(null, "LNB Controller", "  LNB #%d Set Bias Voltage: %d mV", i, await device.get_lnb_bias_voltage_set(i));
+                                this.tprintln(null, "LNB Controller", "  LNB #%d Bias Voltage: %d mV", i, await device.get_lnb_bias_voltage(i));
+                                this.tprintln(null, "LNB Controller", "  LNB #%d Reference enable: %s", i, (await device.get_lnb_reference_status(i)) ? "ON" : "OFF");
+                                this.tprintln(null, "LNB Controller", "  LNB #%d Reference Frequency: %d Hs", i, await device.get_lnb_reference_frequency(i));
+                            }
+                        }
+                        else
+                        {
+                            this.tprintln(null, "LNB Controller", "LNB #%d Bias enable: %s", i, (await device.get_lnb_bias_status(i)) ? "ON" : "OFF");
+                            this.tprintln(null, "LNB Controller", "LNB #%d Bias status: %s", i, (await device.is_lnb_bias_power_good(i)) ? "POWER GOOD" : "POWER NOT GOOD");
+                            this.tprintln(null, "LNB Controller", "LNB #%d Set Bias Voltage: %d mV", i, await device.get_lnb_bias_voltage_set(i));
+                            this.tprintln(null, "LNB Controller", "LNB #%d Bias Voltage: %d mV", i, await device.get_lnb_bias_voltage(i));
+                            this.tprintln(null, "LNB Controller", "LNB #%d Reference enable: %s", i, (await device.get_lnb_reference_status(i)) ? "ON" : "OFF");
+                            this.tprintln(null, "LNB Controller", "LNB #%d Reference Frequency: %d Hs", i, await device.get_lnb_reference_frequency(i));
+                        }
+                    }
+                    break;
+                    default:
+                    {
+                        throw new Error("LNB Controller parameter not supported");
+                    }
+                    break;
+                }
+            }
             else if(device instanceof DS18B20)
             {
                 await device.measure();
@@ -377,6 +1025,26 @@ async function ssh_server_init()
                     break;
                 }
             }
+            else if(device instanceof LTC4151)
+            {
+                switch(param_name)
+                {
+                    case "":
+                    {
+                        let samples = argv[2] || 1;
+
+                        this.tprintln(null, "LTC4151", "VIN Voltage: %d mV", await device.get_vin_voltage(samples));
+                        this.tprintln(null, "LTC4151", "Load Voltage: %d mV", await device.get_adin_voltage(samples));
+                        this.tprintln(null, "LTC4151", "Load Current: %d mA", await device.get_current(samples));
+                    }
+                    break;
+                    default:
+                    {
+                        throw new Error("LTC4151 parameter not supported");
+                    }
+                    break;
+                }
+            }
             else if(device instanceof F2915)
             {
                 switch(param_name)
@@ -390,66 +1058,6 @@ async function ssh_server_init()
                     default:
                     {
                         throw new Error("F2915 parameter not supported");
-                    }
-                    break;
-                }
-            }
-            else if(device instanceof RelayController)
-            {
-                switch(param_name)
-                {
-                    case "":
-                    {
-                        this.tprintln(null, "Relay Controller", "Unique ID: %s", await device.get_unique_id());
-                        this.tprintln(null, "Relay Controller", "Software Version: v%d", await device.get_software_version());
-
-                        let chip_voltages = await device.get_chip_voltages();
-                        this.tprintln(null, "Relay Controller", "AVDD Voltage: %d mV", chip_voltages.avdd);
-                        this.tprintln(null, "Relay Controller", "DVDD Voltage: %d mV", chip_voltages.dvdd);
-                        this.tprintln(null, "Relay Controller", "IOVDD Voltage: %d mV", chip_voltages.iovdd);
-                        this.tprintln(null, "Relay Controller", "Core Voltage: %d mV", chip_voltages.core);
-
-                        let system_voltages = await device.get_system_voltages();
-                        this.tprintln(null, "Relay Controller", "VIN Voltage: %d mV", system_voltages.vin);
-
-                        this.tprintln(null, "Relay Controller", "VIN Undervoltage monitor status: %s", (await device.get_relay_undervoltage_status()) ? "ON" : "OFF");
-                        this.tprintln(null, "Relay Controller", "VIN Undervoltage threshold: %d mV", await device.get_relay_undervoltage_point());
-                        this.tprintln(null, "Relay Controller", "VIN Undervoltage triggered: %s", (await device.was_relay_undervoltage_triggered()) ? "YES" : "NO");
-                        this.tprintln(null, "Relay Controller", "VIN Undervoltage status: %s", (await device.is_relay_undervoltage()) ? "LOW" : "OK");
-
-                        let chip_temperatures = await device.get_chip_temperatures();
-                        this.tprintln(null, "Relay Controller", "ADC Temperature: %d C", chip_temperatures.adc);
-                        this.tprintln(null, "Relay Controller", "EMU Temperature: %d C", chip_temperatures.emu);
-                    }
-                    break;
-                    case "relay_status":
-                    {
-                        let i = parseInt(argv[2]);
-
-                        if(isNaN(i) || i < 0 || i > 11)
-                        {
-                            this.tprintln(null, "Relay Controller", "Relays:");
-
-                            let rstatus = await device.get_relay_status();
-
-                            for(i = 0; i < 12; i++)
-                            {
-                                this.tprintln(null, "Relay Controller", "  Relay #%d status: %s", i, (rstatus & (1 << i)) ? "ON" : "OFF");
-                                this.tprintln(null, "Relay Controller", "  Relay #%d duty cycle: %d %%", i, await device.get_relay_duty_cycle(i) * 100);
-                                this.tprintln(null, "Relay Controller", "  Relay #%d voltage: %d mV", i, await device.get_relay_voltage(i));
-                            }
-                        }
-                        else
-                        {
-                            this.tprintln(null, "Relay Controller", "Relay #%d status: %s", i, (await device.get_relay_status(i)) ? "ON" : "OFF");
-                            this.tprintln(null, "Relay Controller", "Relay #%d duty cycle: %d %%", i, await device.get_relay_duty_cycle(i) * 100);
-                            this.tprintln(null, "Relay Controller", "Relay #%d voltage: %d mV", i, await device.get_relay_voltage(i));
-                        }
-                    }
-                    break;
-                    default:
-                    {
-                        throw new Error("RelayController parameter not supported");
                     }
                     break;
                 }
@@ -475,6 +1083,14 @@ async function ssh_server_init()
 
                 if(device instanceof HPPSU)
                     device_param_names = ["info", "status", "input", "output", "temperature", "fan_speed", "on_time"];
+                else if(device instanceof RelayController)
+                    device_param_names = ["relay_status"];
+                else if(device instanceof Upconverter)
+                    device_param_names = ["rf_power", "attenuators", "lo", "mixer", "amplifiers"];
+                else if(device instanceof PABiasController)
+                    device_param_names = ["tec_status", "pa_status"];
+                else if(device instanceof LNBController)
+                    device_param_names = ["lnb_status"];
                 else if(device instanceof DS18B20)
                     device_param_names = [];
                 else if(device instanceof BME280)
@@ -487,10 +1103,10 @@ async function ssh_server_init()
                     device_param_names = [];
                 else if(device instanceof LTC5597)
                     device_param_names = [];
+                else if(device instanceof LTC4151)
+                    device_param_names = [];
                 else if(device instanceof F2915)
                     device_param_names = [];
-                else if(device instanceof RelayController)
-                    device_param_names = ["relay_status"];
 
                 for(const param of device_param_names)
                     param_names.push(device_name + "." + param);
@@ -599,10 +1215,99 @@ async function ssh_server_init()
                     break;
                 }
             }
+            else if(device instanceof RelayController)
+            {
+                switch(param_name)
+                {
+                    case "turn_relay_on":
+                    {
+                        let i = parseInt(argv[2]);
+
+                        if(isNaN(i) || i < 0 || i > 11)
+                            throw new Error("Invalid relay index");
+
+                        await device.set_relay_status(i, true);
+
+                        this.tprintln(null, "Relay Controller", "Relay #%d status: %s", i, (await device.get_relay_status(i)) ? "ON" : "OFF");
+                        this.tprintln(null, "Relay Controller", "Relay #%d duty cycle: %d %%", i, await device.get_relay_duty_cycle(i) * 100);
+                        this.tprintln(null, "Relay Controller", "Relay #%d voltage: %d mV", i, await device.get_relay_voltage(i));
+                    }
+                    break;
+                    case "turn_relay_off":
+                    {
+                        let i = parseInt(argv[2]);
+
+                        if(isNaN(i) || i < 0 || i > 11)
+                            throw new Error("Invalid relay index");
+
+                        await device.set_relay_status(i, false);
+
+                        this.tprintln(null, "Relay Controller", "Relay #%d status: %s", i, (await device.get_relay_status(i)) ? "ON" : "OFF");
+                        this.tprintln(null, "Relay Controller", "Relay #%d duty cycle: %d %%", i, await device.get_relay_duty_cycle(i) * 100);
+                        this.tprintln(null, "Relay Controller", "Relay #%d voltage: %d mV", i, await device.get_relay_voltage(i));
+                    }
+                    break;
+                    case "set_relay_voltage":
+                    {
+                        let i = parseInt(argv[2]);
+
+                        if(isNaN(i) || i < 0 || i > 11)
+                            throw new Error("Invalid relay index");
+
+                        let voltage = parseInt(argv[3]);
+
+                        if(isNaN(voltage))
+                            throw new Error("Invalid voltage");
+
+                        await device.set_relay_voltage(i, voltage);
+
+                        this.tprintln(null, "Relay Controller", "Relay #%d status: %s", i, (await device.get_relay_status(i)) ? "ON" : "OFF");
+                        this.tprintln(null, "Relay Controller", "Relay #%d duty cycle: %d %%", i, await device.get_relay_duty_cycle(i) * 100);
+                        this.tprintln(null, "Relay Controller", "Relay #%d voltage: %d mV", i, await device.get_relay_voltage(i));
+                    }
+                    break;
+                    default:
+                    {
+                        throw new Error("Relay Controller parameter not supported");
+                    }
+                    break;
+                }
+            }
+            else if(device instanceof Upconverter)
+            {
+                switch(param_name)
+                {
+                    default:
+                    {
+                        throw new Error("Upconverter parameter not supported");
+                    }
+                    break;
+                }
+            }
+            else if(device instanceof PABiasController)
+            {
+                switch(param_name)
+                {
+                    default:
+                    {
+                        throw new Error("PA Bias Controller parameter not supported");
+                    }
+                    break;
+                }
+            }
+            else if(device instanceof LNBController)
+            {
+                switch(param_name)
+                {
+                    default:
+                    {
+                        throw new Error("LNB Controller parameter not supported");
+                    }
+                    break;
+                }
+            }
             else if(device instanceof DS18B20)
             {
-                await device.measure();
-
                 switch(param_name)
                 {
                     default:
@@ -667,6 +1372,17 @@ async function ssh_server_init()
                     break;
                 }
             }
+            else if(device instanceof LTC4151)
+            {
+                switch(param_name)
+                {
+                    default:
+                    {
+                        throw new Error("LTC4151 parameter not supported");
+                    }
+                    break;
+                }
+            }
             else if(device instanceof F2915)
             {
                 switch(param_name)
@@ -683,64 +1399,6 @@ async function ssh_server_init()
                     default:
                     {
                         throw new Error("F2915 parameter not supported");
-                    }
-                    break;
-                }
-            }
-            else if(device instanceof RelayController)
-            {
-                switch(param_name)
-                {
-                    case "turn_relay_on":
-                    {
-                        let i = parseInt(argv[2]);
-
-                        if(isNaN(i) || i < 0 || i > 11)
-                            throw new Error("Invalid relay index");
-
-                        await device.set_relay_status(i, true);
-
-                        this.tprintln(null, "Relay Controller", "Relay #%d status: %s", i, (await device.get_relay_status(i)) ? "ON" : "OFF");
-                        this.tprintln(null, "Relay Controller", "Relay #%d duty cycle: %d %%", i, await device.get_relay_duty_cycle(i) * 100);
-                        this.tprintln(null, "Relay Controller", "Relay #%d voltage: %d mV", i, await device.get_relay_voltage(i));
-                    }
-                    break;
-                    case "turn_relay_off":
-                    {
-                        let i = parseInt(argv[2]);
-
-                        if(isNaN(i) || i < 0 || i > 11)
-                            throw new Error("Invalid relay index");
-
-                        await device.set_relay_status(i, false);
-
-                        this.tprintln(null, "Relay Controller", "Relay #%d status: %s", i, (await device.get_relay_status(i)) ? "ON" : "OFF");
-                        this.tprintln(null, "Relay Controller", "Relay #%d duty cycle: %d %%", i, await device.get_relay_duty_cycle(i) * 100);
-                        this.tprintln(null, "Relay Controller", "Relay #%d voltage: %d mV", i, await device.get_relay_voltage(i));
-                    }
-                    break;
-                    case "set_relay_voltage":
-                    {
-                        let i = parseInt(argv[2]);
-
-                        if(isNaN(i) || i < 0 || i > 11)
-                            throw new Error("Invalid relay index");
-
-                        let voltage = parseInt(argv[3]);
-
-                        if(isNaN(voltage))
-                            throw new Error("Invalid voltage");
-
-                        await device.set_relay_voltage(i, voltage);
-
-                        this.tprintln(null, "Relay Controller", "Relay #%d status: %s", i, (await device.get_relay_status(i)) ? "ON" : "OFF");
-                        this.tprintln(null, "Relay Controller", "Relay #%d duty cycle: %d %%", i, await device.get_relay_duty_cycle(i) * 100);
-                        this.tprintln(null, "Relay Controller", "Relay #%d voltage: %d mV", i, await device.get_relay_voltage(i));
-                    }
-                    break;
-                    default:
-                    {
-                        throw new Error("RelayController parameter not supported");
                     }
                     break;
                 }
@@ -764,6 +1422,14 @@ async function ssh_server_init()
 
                 if(device instanceof HPPSU)
                     device_param_names = ["clear_peak_input_current", "clear_peak_input_power", "clear_peak_output_current", "fan_speed", "clear_on_time_and_energy", "turn_on", "turn_off"];
+                else if(device instanceof RelayController)
+                    device_param_names = ["turn_relay_on", "turn_relay_off", "set_relay_voltage"];
+                else if(device instanceof Upconverter)
+                    device_param_names = [];
+                else if(device instanceof PABiasController)
+                    device_param_names = [];
+                else if(device instanceof LNBController)
+                    device_param_names = [];
                 else if(device instanceof DS18B20)
                     device_param_names = [];
                 else if(device instanceof BME280)
@@ -776,10 +1442,10 @@ async function ssh_server_init()
                     device_param_names = [];
                 else if(device instanceof LTC5597)
                     device_param_names = [];
+                else if(device instanceof LTC4151)
+                    device_param_names = [];
                 else if(device instanceof F2915)
                     device_param_names = ["rf_path"];
-                else if(device instanceof RelayController)
-                    device_param_names = ["turn_relay_on", "turn_relay_off", "set_relay_voltage"];
 
                 for(const param of device_param_names)
                     param_names.push(device_name + "." + param);
@@ -851,12 +1517,22 @@ async function ssh_server_init()
     );
 
     // Listen
-    ssh_server.listen(
-        2222,
-        "0.0.0.0",
-        function ()
+    return new Promise(
+        function (resolve, reject)
         {
-            cl.tprintln("grey", "SSH", "Listening on port %d!", this.address().port);
+            ssh_server.listen(
+                2222,
+                "0.0.0.0",
+                function (e)
+                {
+                    if(e)
+                        return reject(e);
+
+                    cl.tprintln("grey", "SSH", "Listening on port %d!", this.address().port);
+
+                    return resolve();
+                }
+            );
         }
     );
 }
@@ -1458,7 +2134,7 @@ async function ipma_init()
 async function ipma_fetch_sea_hpa()
 {
     if(!(ipma_station instanceof IPMAStation))
-        cl.tprintln("red", "IPMA", "No valid IPMA station instance defined");
+        cl.tprintln("yellow", "IPMA", "No valid IPMA station instance defined");
 
     try
     {
@@ -1470,6 +2146,16 @@ async function ipma_fetch_sea_hpa()
         cl.tprintln("green", "IPMA", "Got IPMA Sea pressure: %d hPa", sea_hpa);
 
         BME280.set_sea_pressure(sea_hpa);
+
+        try
+        {
+            if(mqtt_client && mqtt_client.connected)
+                await mqtt_client.publish(mqtt_topic_prefix + "/data/pressure/ipma_sea_level", sea_hpa.toString(), { qos: mqtt_data_qos });
+        }
+        catch (e)
+        {
+            cl.tprintln("red", "MQTT", "Error: " + e);
+        }
     }
     catch(e)
     {
@@ -1480,7 +2166,7 @@ async function ipma_fetch_sea_hpa()
 async function self_test_run()
 {
     cl.tprintln("cyan", "SELFTEST", "Running self tests...");
-    if(false) // TODO: Remove
+
     try
     {
         await self_test_psus();
@@ -1997,7 +2683,8 @@ async function main()
     log_init();
 
     // IPMA
-    await ipma_init();
+    ipma_init(); // Do not await, it can run in parallel
+    //await ipma_init();
 
     // GPIOs
     gpios.intrusion = [];
@@ -2076,13 +2763,15 @@ async function main()
 
         cl.tprintln(bus_devices.length > 0 ? null : "yellow", "OneWire", "  Found %d devices on OneWire bus %d:", bus_devices.length, i);
 
-        for(const device of bus_devices)
+        for(let j = 0; j < bus_devices.length; j++)
         {
+            let device = bus_devices[j];
+
             cl.tprintln(null, "OneWire", "    %s", device);
 
             if(device.get_family_name() == "DS18B20")
             {
-                cl.tprintln("green", "OneWire", "      DS18B20 #%d found!", i);
+                cl.tprintln("green", "OneWire", "      DS18B20 #%d found!", j);
 
                 let sensor = new DS18B20(device);
 
@@ -2092,7 +2781,11 @@ async function main()
 
                 if(uid == 0x000000000CCC3BEDn)
                 {
-                    devices["pump_water_tempe_sensor"] = sensor;
+                    devices["pump_water_temperature_sensor"] = sensor;
+                }
+                else if(uid == 0x00003C01D607AC13n)
+                {
+                    devices["boost_converter_temperature_sensor"] = sensor;
                 }
                 else
                 {
@@ -3222,14 +3915,17 @@ async function main()
         cl.tprintln(null, "F2915", "  Selected RF path: %d", await rf_switch.get_rf_path());
     }
 
+    // Startup self tests
+    await self_test_run();
+
     // Wideband Spectrum monitor
     await wb_spectrum_monitor_init();
 
     // SSH Server
     await ssh_server_init();
 
-    // Startup self tests
-    await self_test_run();
+    // MQTT client
+    await mqtt_init();
 }
 
 process.on(

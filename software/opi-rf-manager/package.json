@@ -4,6 +4,7 @@
   "description": "Orange Pi RF manager backend",
   "main": "index.js",
   "dependencies": {
+    "async-mqtt": "^2.6.2",
     "async-mutex": "^0.2.6",
     "colors": "^1.4.0",
     "geolib": "^3.3.1",
