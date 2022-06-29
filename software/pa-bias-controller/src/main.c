@@ -479,7 +479,7 @@ uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
             if((ubI2CByteCount - 1) < sizeof(float))
                 break;
 
-            ubPAGateVoltageChanged |= BIT(0);
+            ubPAGateVoltageChanged |= BIT(PA1_INDEX);
         }
         break;
         case I2C_SLAVE_REGISTER_PA2_VGG_RAW_VOLTAGE + sizeof(float):
@@ -487,7 +487,7 @@ uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
             if((ubI2CByteCount - 1) < sizeof(float))
                 break;
 
-            ubPAGateVoltageChanged |= BIT(1);
+            ubPAGateVoltageChanged |= BIT(PA2_INDEX);
         }
         break;
         case I2C_SLAVE_REGISTER_TEC1_VOLTAGE + sizeof(float):
@@ -495,7 +495,7 @@ uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
             if((ubI2CByteCount - 1) < sizeof(float))
                 break;
 
-            ubTECVoltageChanged |= BIT(0);
+            ubTECVoltageChanged |= BIT(TEC1_INDEX);
         }
         break;
         case I2C_SLAVE_REGISTER_TEC2_VOLTAGE + sizeof(float):
@@ -503,7 +503,7 @@ uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
             if((ubI2CByteCount - 1) < sizeof(float))
                 break;
 
-            ubTECVoltageChanged |= BIT(1);
+            ubTECVoltageChanged |= BIT(TEC2_INDEX);
         }
         break;
         case I2C_SLAVE_REGISTER_TEC3_VOLTAGE + sizeof(float):
@@ -511,7 +511,7 @@ uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
             if((ubI2CByteCount - 1) < sizeof(float))
                 break;
 
-            ubTECVoltageChanged |= BIT(2);
+            ubTECVoltageChanged |= BIT(TEC3_INDEX);
         }
         break;
         case I2C_SLAVE_REGISTER_TEC4_VOLTAGE + sizeof(float):
@@ -519,7 +519,7 @@ uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
             if((ubI2CByteCount - 1) < sizeof(float))
                 break;
 
-            ubTECVoltageChanged |= BIT(3);
+            ubTECVoltageChanged |= BIT(TEC4_INDEX);
         }
         break;
     }
@@ -1134,12 +1134,20 @@ int main()
             float fTEC3Voltage = tec_get_channel_voltage(TEC3_INDEX);
             float fTEC4Voltage = tec_get_channel_voltage(TEC4_INDEX);
 
-            ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+            // Only update at first to initialize registers, otherwise race conditions can occur
+            static uint8_t ubTECVoltageInitialized = 0;
+
+            if(!ubTECVoltageInitialized)
             {
-                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_TEC1_VOLTAGE) = fTEC1Voltage;
-                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_TEC2_VOLTAGE) = fTEC2Voltage;
-                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_TEC3_VOLTAGE) = fTEC3Voltage;
-                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_TEC4_VOLTAGE) = fTEC4Voltage;
+                ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+                {
+                    I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_TEC1_VOLTAGE) = fTEC1Voltage;
+                    I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_TEC2_VOLTAGE) = fTEC2Voltage;
+                    I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_TEC3_VOLTAGE) = fTEC3Voltage;
+                    I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_TEC4_VOLTAGE) = fTEC4Voltage;
+                }
+
+                ubTECVoltageInitialized = 1;
             }
 
             DBGPRINTLN_CTX("----------------------------------");
