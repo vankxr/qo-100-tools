@@ -787,7 +787,7 @@ int init()
     i2c0_set_slave_addr_isr(i2c_slave_addr_isr);
     i2c0_set_slave_tx_data_isr(i2c_slave_tx_data_isr);
     i2c0_set_slave_rx_data_isr(i2c_slave_rx_data_isr);
-    i2c1_init(I2C_FAST, 3, 3);
+    i2c1_init(I2C_NORMAL, 3, 3);
 
     char szDeviceCoreName[32];
     char szDeviceName[32];
