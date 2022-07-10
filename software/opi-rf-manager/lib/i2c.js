@@ -68,7 +68,25 @@ class I2CDevice
                 await delay(10);
             }
 
-            await this.bus.write(this.addr, data);
+            for(let i = 0; i < 5; i++)
+            {
+                try
+                {
+                    await this.bus.write(this.addr, data);
+
+                    break;
+                }
+                catch(e)
+                {
+                    if(i === 4)
+                        throw e;
+
+                    if(e && e.code !== "EAGAIN")
+                        throw e;
+
+                    await delay(100);
+                }
+            }
         }
         finally
         {
@@ -97,7 +115,25 @@ class I2CDevice
                 await delay(10);
             }
 
-            result = await this.bus.read(this.addr, count);
+            for(let i = 0; i < 5; i++)
+            {
+                try
+                {
+                    result = await this.bus.read(this.addr, count);
+
+                    break;
+                }
+                catch(e)
+                {
+                    if(i === 4)
+                        throw e;
+
+                    if(e && e.code !== "EAGAIN")
+                        throw e;
+
+                    await delay(100);
+                }
+            }
         }
         finally
         {
