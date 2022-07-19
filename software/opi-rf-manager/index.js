@@ -68,7 +68,7 @@ async function mqtt_init()
     mqtt_client = MQTT.connect(
         {
             protocol: "mqtts",
-            host: "10.1.0.17",
+            host: "node1.jsilvaiot.com",
             port: 8883,
             keepalive: 60,
             reschedulePings: true,
@@ -813,18 +813,18 @@ async function ssh_server_init()
                         {
                             let data = await device.get_pa_telemetry(i);
 
-                            this.tprintln(null, "PA Bias Controller", "  PA #%d status: %s", i, (await device.get_pa_status(i)) ? "ON" : "OFF");
-                            this.tprintln(null, "PA Bias Controller", "  PA #%d VGG Raw Voltage: %d mV", i, data.vgg_raw);
-                            this.tprintln(null, "PA Bias Controller", "  PA #%d VGG Voltage: %d mV", i, data.vgg);
-                            this.tprintln(null, "PA Bias Controller", "  PA #%d VDD Voltage: %d mV", i, data.vdd);
-                            this.tprintln(null, "PA Bias Controller", "  PA #%d VDD Current: %d mA", i, data.idd);
-                            this.tprintln(null, "PA Bias Controller", "  PA #%d Temperature: %d C", i, data.temperature);
-                            this.tprintln(null, "PA Bias Controller", "  PA #%d High Temperature: %d C", i, data.temperature_high);
-                            this.tprintln(null, "PA Bias Controller", "  PA #%d High Temperature triggered: %s", i, (await device.was_pa_high_temperature_triggered(i)) ? "YES" : "NO");
-                            this.tprintln(null, "PA Bias Controller", "  PA #%d High Temperature status: %s", i, (await device.is_pa_high_temperature(i)) ? "HIGH" : "OK");
-                            this.tprintln(null, "PA Bias Controller", "  PA #%d Low Temperature: %d C", i, data.temperature_low);
-                            this.tprintln(null, "PA Bias Controller", "  PA #%d Low Temperature triggered: %s", i, (await device.was_pa_low_temperature_triggered(i)) ? "YES" : "NO");
-                            this.tprintln(null, "PA Bias Controller", "  PA #%d Low Temperature status: %s", i, (await device.is_pa_low_temperature(i)) ? "LOW" : "OK");
+                            this.tprintln(null, "PA Bias Controller", "PA #%d status: %s", i, (await device.get_pa_status(i)) ? "ON" : "OFF");
+                            this.tprintln(null, "PA Bias Controller", "PA #%d VGG Raw Voltage: %d mV", i, data.vgg_raw);
+                            this.tprintln(null, "PA Bias Controller", "PA #%d VGG Voltage: %d mV", i, data.vgg);
+                            this.tprintln(null, "PA Bias Controller", "PA #%d VDD Voltage: %d mV", i, data.vdd);
+                            this.tprintln(null, "PA Bias Controller", "PA #%d VDD Current: %d mA", i, data.idd);
+                            this.tprintln(null, "PA Bias Controller", "PA #%d Temperature: %d C", i, data.temperature);
+                            this.tprintln(null, "PA Bias Controller", "PA #%d High Temperature: %d C", i, data.temperature_high);
+                            this.tprintln(null, "PA Bias Controller", "PA #%d High Temperature triggered: %s", i, (await device.was_pa_high_temperature_triggered(i)) ? "YES" : "NO");
+                            this.tprintln(null, "PA Bias Controller", "PA #%d High Temperature status: %s", i, (await device.is_pa_high_temperature(i)) ? "HIGH" : "OK");
+                            this.tprintln(null, "PA Bias Controller", "PA #%d Low Temperature: %d C", i, data.temperature_low);
+                            this.tprintln(null, "PA Bias Controller", "PA #%d Low Temperature triggered: %s", i, (await device.was_pa_low_temperature_triggered(i)) ? "YES" : "NO");
+                            this.tprintln(null, "PA Bias Controller", "PA #%d Low Temperature status: %s", i, (await device.is_pa_low_temperature(i)) ? "LOW" : "OK");
                         }
                     }
                     break;
@@ -879,7 +879,7 @@ async function ssh_server_init()
                                 this.tprintln(null, "LNB Controller", "  LNB #%d Set Bias Voltage: %d mV", i, await device.get_lnb_bias_voltage_set(i));
                                 this.tprintln(null, "LNB Controller", "  LNB #%d Bias Voltage: %d mV", i, await device.get_lnb_bias_voltage(i));
                                 this.tprintln(null, "LNB Controller", "  LNB #%d Reference enable: %s", i, (await device.get_lnb_reference_status(i)) ? "ON" : "OFF");
-                                this.tprintln(null, "LNB Controller", "  LNB #%d Reference Frequency: %d Hs", i, await device.get_lnb_reference_frequency(i));
+                                this.tprintln(null, "LNB Controller", "  LNB #%d Reference Frequency: %d Hz", i, await device.get_lnb_reference_frequency(i));
                             }
                         }
                         else
@@ -889,7 +889,7 @@ async function ssh_server_init()
                             this.tprintln(null, "LNB Controller", "LNB #%d Set Bias Voltage: %d mV", i, await device.get_lnb_bias_voltage_set(i));
                             this.tprintln(null, "LNB Controller", "LNB #%d Bias Voltage: %d mV", i, await device.get_lnb_bias_voltage(i));
                             this.tprintln(null, "LNB Controller", "LNB #%d Reference enable: %s", i, (await device.get_lnb_reference_status(i)) ? "ON" : "OFF");
-                            this.tprintln(null, "LNB Controller", "LNB #%d Reference Frequency: %d Hs", i, await device.get_lnb_reference_frequency(i));
+                            this.tprintln(null, "LNB Controller", "LNB #%d Reference Frequency: %d Hz", i, await device.get_lnb_reference_frequency(i));
                         }
                     }
                     break;
@@ -1228,6 +1228,8 @@ async function ssh_server_init()
 
                         await device.set_relay_status(i, true);
 
+                        await delay(50);
+
                         this.tprintln(null, "Relay Controller", "Relay #%d status: %s", i, (await device.get_relay_status(i)) ? "ON" : "OFF");
                         this.tprintln(null, "Relay Controller", "Relay #%d duty cycle: %d %%", i, await device.get_relay_duty_cycle(i) * 100);
                         this.tprintln(null, "Relay Controller", "Relay #%d voltage: %d mV", i, await device.get_relay_voltage(i));
@@ -1241,6 +1243,8 @@ async function ssh_server_init()
                             throw new Error("Invalid relay index");
 
                         await device.set_relay_status(i, false);
+
+                        await delay(50);
 
                         this.tprintln(null, "Relay Controller", "Relay #%d status: %s", i, (await device.get_relay_status(i)) ? "ON" : "OFF");
                         this.tprintln(null, "Relay Controller", "Relay #%d duty cycle: %d %%", i, await device.get_relay_duty_cycle(i) * 100);
@@ -1261,6 +1265,8 @@ async function ssh_server_init()
 
                         await device.set_relay_voltage(i, voltage);
 
+                        await delay(50);
+
                         this.tprintln(null, "Relay Controller", "Relay #%d status: %s", i, (await device.get_relay_status(i)) ? "ON" : "OFF");
                         this.tprintln(null, "Relay Controller", "Relay #%d duty cycle: %d %%", i, await device.get_relay_duty_cycle(i) * 100);
                         this.tprintln(null, "Relay Controller", "Relay #%d voltage: %d mV", i, await device.get_relay_voltage(i));
@@ -1277,6 +1283,134 @@ async function ssh_server_init()
             {
                 switch(param_name)
                 {
+                    case "set_attenuation":
+                    {
+                        let att_name = argv[2];
+
+                        if(typeof(att_name) != "string")
+                            throw new Error("Invalid attenuator");
+
+                        let att = parseInt(argv[3]);
+
+                        if(isNaN(att))
+                            throw new Error("Invalid attenuation");
+
+                        att_name = att_name.toLowerCase();
+
+                        if(att_name == "if")
+                            await device.set_if_attenuation(att);
+                        else if(att_name == "rf1")
+                            await device.set_rf1_attenuation(att);
+                        else if(att_name == "rf2")
+                            await device.set_rf2_attenuation(att);
+                        else
+                            throw new Error("Invalid attenuator");
+
+                        await delay(500);
+
+                        this.tprintln(null, "Upconverter", "IF Attenuation: %d dB", await device.get_if_attenuation());
+                        this.tprintln(null, "Upconverter", "RF1 Attenuation: %d dB", await device.get_rf1_attenuation());
+                        this.tprintln(null, "Upconverter", "RF2 Attenuation: %d dB", await device.get_rf2_attenuation());
+                    }
+                    break;
+                    case "mute_lo":
+                    {
+                        await device.set_lo_pll_muted(true);
+
+                        await delay(50);
+
+                        this.tprintln(null, "Upconverter", "LO Frequency: %d MHz", Number((await device.get_lo_frequency()) / 1000000n));
+                        this.tprintln(null, "Upconverter", "LO Reference Frequency: %d MHz", (await device.get_lo_ref_frequency()) / 1000000);
+                        this.tprintln(null, "Upconverter", "LO PFD Frequency: %d MHz", (await device.get_lo_pfd_frequency()) / 1000000);
+                        this.tprintln(null, "Upconverter", "LO Locked: %s", (await device.is_lo_pll_locked()) ? "YES" : "NO");
+                        this.tprintln(null, "Upconverter", "LO Muted: %s", (await device.is_lo_pll_muted()) ? "YES" : "NO");
+                    }
+                    break;
+                    case "unmute_lo":
+                    {
+                        await device.set_lo_pll_muted(false);
+
+                        await delay(50);
+
+                        this.tprintln(null, "Upconverter", "LO Frequency: %d MHz", Number((await device.get_lo_frequency()) / 1000000n));
+                        this.tprintln(null, "Upconverter", "LO Reference Frequency: %d MHz", (await device.get_lo_ref_frequency()) / 1000000);
+                        this.tprintln(null, "Upconverter", "LO PFD Frequency: %d MHz", (await device.get_lo_pfd_frequency()) / 1000000);
+                        this.tprintln(null, "Upconverter", "LO Locked: %s", (await device.is_lo_pll_locked()) ? "YES" : "NO");
+                        this.tprintln(null, "Upconverter", "LO Muted: %s", (await device.is_lo_pll_muted()) ? "YES" : "NO");
+                    }
+                    break;
+                    case "set_lo_freq":
+                    {
+                        let freq = BigInt(argv[2]);
+
+                        if(isNaN(Number(freq)))
+                            throw new Error("Invalid frequency");
+
+                        await device.set_lo_frequency(freq);
+
+                        await delay(500);
+
+                        this.tprintln(null, "Upconverter", "LO Frequency: %d MHz", Number((await device.get_lo_frequency()) / 1000000n));
+                        this.tprintln(null, "Upconverter", "LO Reference Frequency: %d MHz", (await device.get_lo_ref_frequency()) / 1000000);
+                        this.tprintln(null, "Upconverter", "LO PFD Frequency: %d MHz", (await device.get_lo_pfd_frequency()) / 1000000);
+                        this.tprintln(null, "Upconverter", "LO Locked: %s", (await device.is_lo_pll_locked()) ? "YES" : "NO");
+                        this.tprintln(null, "Upconverter", "LO Muted: %s", (await device.is_lo_pll_muted()) ? "YES" : "NO");
+                    }
+                    break;
+                    case "turn_mixer_on":
+                    {
+                        await device.set_mixer_status(true);
+
+                        await delay(50);
+
+                        this.tprintln(null, "Upconverter", "Mixer Enabled: %s", (await device.get_mixer_status()) ? "YES" : "NO");
+                    }
+                    break;
+                    case "turn_mixer_off":
+                    {
+                        await device.set_mixer_status(false);
+
+                        await delay(50);
+
+                        this.tprintln(null, "Upconverter", "Mixer Enabled: %s", (await device.get_mixer_status()) ? "YES" : "NO");
+                    }
+                    break;
+                    case "turn_preamps_on":
+                    {
+                        await device.set_pa_stg1_2_status(true);
+
+                        await delay(50);
+
+                        this.tprintln(null, "Upconverter", "Pre-Amplifiers Enabled: %s", (await device.get_pa_stg1_2_status()) ? "YES" : "NO");
+                    }
+                    break;
+                    case "turn_preamps_off":
+                    {
+                        await device.set_pa_stg1_2_status(false);
+
+                        await delay(50);
+
+                        this.tprintln(null, "Upconverter", "Pre-Amplifiers Enabled: %s", (await device.get_pa_stg1_2_status()) ? "YES" : "NO");
+                    }
+                    break;
+                    case "turn_pa_on":
+                    {
+                        await device.set_pa_stg3_status(true);
+
+                        await delay(50);
+
+                        this.tprintln(null, "Upconverter", "Final Amplifier Enabled: %s", (await device.get_pa_stg3_status()) ? "YES" : "NO");
+                    }
+                    break;
+                    case "turn_pa_off":
+                    {
+                        await device.set_pa_stg3_status(false);
+
+                        await delay(50);
+
+                        this.tprintln(null, "Upconverter", "Final Amplifier Enabled: %s", (await device.get_pa_stg3_status()) ? "YES" : "NO");
+                    }
+                    break;
                     default:
                     {
                         throw new Error("Upconverter parameter not supported");
@@ -1288,6 +1422,124 @@ async function ssh_server_init()
             {
                 switch(param_name)
                 {
+                    case "turn_tec_on":
+                    {
+                        let i = parseInt(argv[2]);
+
+                        if(isNaN(i) || i < 0 || i > 3)
+                            throw new Error("Invalid TEC index");
+
+                        await device.set_tec_status(i, true);
+
+                        await delay(500);
+
+                        this.tprintln(null, "PA Bias Controller", "TEC #%d status: %s", i, (await device.get_tec_status(i)) ? "ON" : "OFF");
+                        this.tprintln(null, "PA Bias Controller", "TEC #%d voltage: %d mV", i, await device.get_tec_voltage(i));
+                    }
+                    break;
+                    case "turn_tec_off":
+                    {
+                        let i = parseInt(argv[2]);
+
+                        if(isNaN(i) || i < 0 || i > 3)
+                            throw new Error("Invalid TEC index");
+
+                        await device.set_tec_status(i, false);
+
+                        await delay(500);
+
+                        this.tprintln(null, "PA Bias Controller", "TEC #%d status: %s", i, (await device.get_tec_status(i)) ? "ON" : "OFF");
+                        this.tprintln(null, "PA Bias Controller", "TEC #%d voltage: %d mV", i, await device.get_tec_voltage(i));
+                    }
+                    break;
+                    case "set_tec_voltage":
+                    {
+                        let i = parseInt(argv[2]);
+
+                        if(isNaN(i) || i < 0 || i > 3)
+                            throw new Error("Invalid TEC index");
+
+                        let voltage = parseInt(argv[3]);
+
+                        if(isNaN(voltage))
+                            throw new Error("Invalid voltage");
+
+                        await device.set_tec_voltage(i, voltage);
+
+                        await delay(500);
+
+                        this.tprintln(null, "PA Bias Controller", "TEC #%d status: %s", i, (await device.get_tec_status(i)) ? "ON" : "OFF");
+                        this.tprintln(null, "PA Bias Controller", "TEC #%d voltage: %d mV", i, await device.get_tec_voltage(i));
+                    }
+                    break;
+                    case "turn_pa_on":
+                    {
+                        let i = parseInt(argv[2]);
+
+                        if(isNaN(i) || i < 0 || i > 1)
+                            throw new Error("Invalid PA index");
+
+                        await device.set_pa_status(i, true);
+
+                        await delay(50);
+
+                        let data = await device.get_pa_telemetry(i);
+
+                        this.tprintln(null, "PA Bias Controller", "PA #%d status: %s", i, (await device.get_pa_status(i)) ? "ON" : "OFF");
+                        this.tprintln(null, "PA Bias Controller", "PA #%d VGG Raw Voltage: %d mV", i, data.vgg_raw);
+                        this.tprintln(null, "PA Bias Controller", "PA #%d VGG Voltage: %d mV", i, data.vgg);
+                        this.tprintln(null, "PA Bias Controller", "PA #%d VDD Voltage: %d mV", i, data.vdd);
+                        this.tprintln(null, "PA Bias Controller", "PA #%d VDD Current: %d mA", i, data.idd);
+                        this.tprintln(null, "PA Bias Controller", "PA #%d Temperature: %d C", i, data.temperature);
+                    }
+                    break;
+                    case "turn_pa_off":
+                    {
+                        let i = parseInt(argv[2]);
+
+                        if(isNaN(i) || i < 0 || i > 1)
+                            throw new Error("Invalid PA index");
+
+                        await device.set_pa_status(i, false);
+
+                        await delay(50);
+
+                        let data = await device.get_pa_telemetry(i);
+
+                        this.tprintln(null, "PA Bias Controller", "PA #%d status: %s", i, (await device.get_pa_status(i)) ? "ON" : "OFF");
+                        this.tprintln(null, "PA Bias Controller", "PA #%d VGG Raw Voltage: %d mV", i, data.vgg_raw);
+                        this.tprintln(null, "PA Bias Controller", "PA #%d VGG Voltage: %d mV", i, data.vgg);
+                        this.tprintln(null, "PA Bias Controller", "PA #%d VDD Voltage: %d mV", i, data.vdd);
+                        this.tprintln(null, "PA Bias Controller", "PA #%d VDD Current: %d mA", i, data.idd);
+                        this.tprintln(null, "PA Bias Controller", "PA #%d Temperature: %d C", i, data.temperature);
+                    }
+                    break;
+                    case "set_pa_vgg_raw":
+                    {
+                        let i = parseInt(argv[2]);
+
+                        if(isNaN(i) || i < 0 || i > 1)
+                            throw new Error("Invalid PA index");
+
+                        let voltage = parseInt(argv[3]);
+
+                        if(isNaN(voltage))
+                            throw new Error("Invalid voltage");
+
+                        await device.set_pa_vgg_raw(i, voltage);
+
+                        await delay(500);
+
+                        let data = await device.get_pa_telemetry(i);
+
+                        this.tprintln(null, "PA Bias Controller", "PA #%d status: %s", i, (await device.get_pa_status(i)) ? "ON" : "OFF");
+                        this.tprintln(null, "PA Bias Controller", "PA #%d VGG Raw Voltage: %d mV", i, data.vgg_raw);
+                        this.tprintln(null, "PA Bias Controller", "PA #%d VGG Voltage: %d mV", i, data.vgg);
+                        this.tprintln(null, "PA Bias Controller", "PA #%d VDD Voltage: %d mV", i, data.vdd);
+                        this.tprintln(null, "PA Bias Controller", "PA #%d VDD Current: %d mA", i, data.idd);
+                        this.tprintln(null, "PA Bias Controller", "PA #%d Temperature: %d C", i, data.temperature);
+                    }
+                    break;
                     default:
                     {
                         throw new Error("PA Bias Controller parameter not supported");
@@ -1299,6 +1551,108 @@ async function ssh_server_init()
             {
                 switch(param_name)
                 {
+                    case "turn_global_ref_on":
+                    {
+                        await device.set_lnb_global_reference_status(true);
+
+                        await delay(50);
+
+                        this.tprintln(null, "LNB Controller", "Global reference enable: %s", (await device.get_lnb_global_reference_status()) ? "ON" : "OFF");
+                    }
+                    break;
+                    case "turn_global_ref_off":
+                    {
+                        await device.set_lnb_global_reference_status(false);
+
+                        await delay(50);
+
+                        this.tprintln(null, "LNB Controller", "Global reference enable: %s", (await device.get_lnb_global_reference_status()) ? "ON" : "OFF");
+                    }
+                    break;
+                    case "turn_lnb_on":
+                    {
+                        let i = parseInt(argv[2]);
+
+                        if(isNaN(i) || i < 0 || i > 1)
+                            throw new Error("Invalid LNB index");
+
+                        let ref_on = !!parseInt(argv[3]);
+
+                        await device.set_lnb_reference_status(i, ref_on);
+                        await device.set_lnb_bias_status(i, true);
+
+                        await delay(500);
+
+                        this.tprintln(null, "LNB Controller", "LNB #%d Bias enable: %s", i, (await device.get_lnb_bias_status(i)) ? "ON" : "OFF");
+                        this.tprintln(null, "LNB Controller", "LNB #%d Bias status: %s", i, (await device.is_lnb_bias_power_good(i)) ? "POWER GOOD" : "POWER NOT GOOD");
+                        this.tprintln(null, "LNB Controller", "LNB #%d Set Bias Voltage: %d mV", i, await device.get_lnb_bias_voltage_set(i));
+                        this.tprintln(null, "LNB Controller", "LNB #%d Bias Voltage: %d mV", i, await device.get_lnb_bias_voltage(i));
+                        this.tprintln(null, "LNB Controller", "LNB #%d Reference enable: %s", i, (await device.get_lnb_reference_status(i)) ? "ON" : "OFF");
+                        this.tprintln(null, "LNB Controller", "LNB #%d Reference Frequency: %d Hz", i, await device.get_lnb_reference_frequency(i));
+                    }
+                    break;
+                    case "turn_lnb_off":
+                    {
+                        let i = parseInt(argv[2]);
+
+                        if(isNaN(i) || i < 0 || i > 1)
+                            throw new Error("Invalid LNB index");
+
+                        await device.set_lnb_reference_status(i, false);
+                        await device.set_lnb_bias_status(i, false);
+
+                        await delay(500);
+
+                        this.tprintln(null, "LNB Controller", "LNB #%d Bias enable: %s", i, (await device.get_lnb_bias_status(i)) ? "ON" : "OFF");
+                        this.tprintln(null, "LNB Controller", "LNB #%d Bias status: %s", i, (await device.is_lnb_bias_power_good(i)) ? "POWER GOOD" : "POWER NOT GOOD");
+                        this.tprintln(null, "LNB Controller", "LNB #%d Set Bias Voltage: %d mV", i, await device.get_lnb_bias_voltage_set(i));
+                        this.tprintln(null, "LNB Controller", "LNB #%d Bias Voltage: %d mV", i, await device.get_lnb_bias_voltage(i));
+                        this.tprintln(null, "LNB Controller", "LNB #%d Reference enable: %s", i, (await device.get_lnb_reference_status(i)) ? "ON" : "OFF");
+                        this.tprintln(null, "LNB Controller", "LNB #%d Reference Frequency: %d Hz", i, await device.get_lnb_reference_frequency(i));
+                    }
+                    break;
+                    case "set_lnb_voltage":
+                    {
+                        let i = parseInt(argv[2]);
+
+                        if(isNaN(i) || i < 0 || i > 1)
+                            throw new Error("Invalid LNB index");
+
+                        let voltage = parseInt(argv[3]);
+
+                        if(isNaN(voltage))
+                            throw new Error("Invalid voltage");
+
+                        await device.set_lnb_bias_voltage(i, voltage);
+
+                        await delay(500);
+
+                        this.tprintln(null, "LNB Controller", "LNB #%d Bias enable: %s", i, (await device.get_lnb_bias_status(i)) ? "ON" : "OFF");
+                        this.tprintln(null, "LNB Controller", "LNB #%d Bias status: %s", i, (await device.is_lnb_bias_power_good(i)) ? "POWER GOOD" : "POWER NOT GOOD");
+                        this.tprintln(null, "LNB Controller", "LNB #%d Set Bias Voltage: %d mV", i, await device.get_lnb_bias_voltage_set(i));
+                        this.tprintln(null, "LNB Controller", "LNB #%d Bias Voltage: %d mV", i, await device.get_lnb_bias_voltage(i));
+                    }
+                    break;
+                    case "set_lnb_ref_frequency":
+                    {
+                        let i = parseInt(argv[2]);
+
+                        if(isNaN(i) || i < 0 || i > 1)
+                            throw new Error("Invalid LNB index");
+
+                        let freq = parseInt(argv[3]);
+
+                        if(isNaN(freq))
+                            throw new Error("Invalid frequency");
+
+                        await device.set_lnb_reference_frequency(i, freq);
+
+                        await delay(500);
+
+                        this.tprintln(null, "LNB Controller", "LNB #%d Reference enable: %s", i, (await device.get_lnb_reference_status(i)) ? "ON" : "OFF");
+                        this.tprintln(null, "LNB Controller", "LNB #%d Reference Frequency: %d Hz", i, await device.get_lnb_reference_frequency(i));
+                    }
+                    break;
                     default:
                     {
                         throw new Error("LNB Controller parameter not supported");
@@ -1425,11 +1779,11 @@ async function ssh_server_init()
                 else if(device instanceof RelayController)
                     device_param_names = ["turn_relay_on", "turn_relay_off", "set_relay_voltage"];
                 else if(device instanceof Upconverter)
-                    device_param_names = [];
+                    device_param_names = ["set_attenuation", "mute_lo", "unmute_lo", "set_lo_freq", "turn_mixer_on", "turn_mixer_off", "turn_preamps_on", "turn_preamps_off", "turn_pa_on", "turn_pa_off"];
                 else if(device instanceof PABiasController)
-                    device_param_names = [];
+                    device_param_names = ["turn_tec_on", "turn_tec_off", "set_tec_voltage", "turn_pa_on", "turn_pa_off", "set_pa_vgg_raw"];
                 else if(device instanceof LNBController)
-                    device_param_names = [];
+                    device_param_names = ["turn_global_ref_on", "turn_global_ref_off", "turn_lnb_on", "turn_lnb_off", "set_lnb_voltage", "set_lnb_ref_frequency"];
                 else if(device instanceof DS18B20)
                     device_param_names = [];
                 else if(device instanceof BME280)
@@ -3406,7 +3760,7 @@ async function main()
                 cl.tprintln(null, "LNB Controller", "    LNB #%d Set Bias Voltage: %d mV", j, await controller.get_lnb_bias_voltage_set(j));
                 cl.tprintln(null, "LNB Controller", "    LNB #%d Bias Voltage: %d mV", j, await controller.get_lnb_bias_voltage(j));
                 cl.tprintln(null, "LNB Controller", "    LNB #%d Reference enable: %s", j, (await controller.get_lnb_reference_status(j)) ? "ON" : "OFF");
-                cl.tprintln(null, "LNB Controller", "    LNB #%d Reference Frequency: %d Hs", j, await controller.get_lnb_reference_frequency(j));
+                cl.tprintln(null, "LNB Controller", "    LNB #%d Reference Frequency: %d Hz", j, await controller.get_lnb_reference_frequency(j));
             }
         }
 
@@ -3916,7 +4270,36 @@ async function main()
     }
 
     // Startup self tests
-    await self_test_run();
+    //await self_test_run();
+
+    ///////////////////////////////
+    /* let lnb_controller = devices["lnb_controller"];
+
+    if(lnb_controller)
+    {
+        await lnb_controller.set_lnb_global_reference_status(true);
+        await delay(1500);
+        await lnb_controller.set_lnb_bias_voltage(0, 13500);
+        await delay(1500);
+        await lnb_controller.set_lnb_reference_frequency(0, 24400000);
+        await delay(1500);
+
+        await lnb_controller.set_lnb_bias_status(0, true);
+        await lnb_controller.set_lnb_reference_status(0, true);
+
+
+    }
+
+    let pa_bias_controller = devices["pa_bias_controller"];
+
+    if(pa_bias_controller)
+    {
+        await pa_bias_controller.set_tec_voltage(3, 12000);
+        await delay(1500);
+
+        await pa_bias_controller.set_tec_status(3, true);
+    } */
+    ///////////////////////////////
 
     // Wideband Spectrum monitor
     await wb_spectrum_monitor_init();
