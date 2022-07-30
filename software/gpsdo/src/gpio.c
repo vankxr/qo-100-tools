@@ -5,7 +5,7 @@ static void gpio_isr(uint32_t ulFlags)
     extern void ad9544_isr();
     extern void gps_timepulse_isr();
 
-    if(ulFlags & BIT(10))
+    if(ulFlags & BIT(8))
         ad9544_isr();
 
     if(ulFlags & BIT(13))
@@ -40,7 +40,7 @@ void gpio_init()
     GPIO->P[0].CTRL   = GPIO_P_CTRL_DRIVESTRENGTHALT_STRONG | (5 << _GPIO_P_CTRL_SLEWRATEALT_SHIFT)
                       | GPIO_P_CTRL_DRIVESTRENGTH_STRONG | (5 << _GPIO_P_CTRL_SLEWRATE_SHIFT);
     GPIO->P[0].MODEL  = GPIO_P_MODEL_MODE0_PUSHPULL                 // GPS_RXD - USART3 - Location 0
-                      | GPIO_P_MODEL_MODE1_INPUTPULL                // GPS_TXD - USART3 - Location 0
+                      | GPIO_P_MODEL_MODE1_INPUTPULL                // GPS_TXD - USART3 - Location 0 / GPS_TXREADY
                       | GPIO_P_MODEL_MODE2_PUSHPULL                 // nGPS_RESET
                       | GPIO_P_MODEL_MODE3_DISABLED                 // NR
                       | GPIO_P_MODEL_MODE4_DISABLED                 // NR
@@ -209,7 +209,7 @@ void gpio_init()
                       | GPIO_EXTIPINSELH_EXTIPINSEL15_PIN12;    // NU
 
     GPIO->EXTIRISE = BIT(13); // GPS_TIMEPULSE_BUF
-    GPIO->EXTIFALL = BIT(10); // nPLL_IRQ
+    GPIO->EXTIFALL = BIT(8); // nPLL_IRQ
 
     GPIO->IFC = _GPIO_IFC_MASK; // Clear pending IRQs
     IRQ_CLEAR(GPIO_EVEN_IRQn); // Clear pending vector
@@ -218,5 +218,5 @@ void gpio_init()
     IRQ_SET_PRIO(GPIO_ODD_IRQn, 0, 0); // Set priority 0,0 (max)
     IRQ_ENABLE(GPIO_EVEN_IRQn); // Enable vector
     IRQ_ENABLE(GPIO_ODD_IRQn); // Enable vector
-    GPIO->IEN = BIT(10) | BIT(13); // Enable interrupts
+    GPIO->IEN = BIT(8) | BIT(13); // Enable interrupts
 }

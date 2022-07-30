@@ -29,6 +29,11 @@
 #define PLL_RESET()             PERI_REG_BIT_CLEAR(&(GPIO->P[5].DOUT)) = BIT(7)
 #define PLL_UNRESET()           PERI_REG_BIT_SET(&(GPIO->P[5].DOUT)) = BIT(7)
 
+// GPS MACROS
+#define GPS_TX_READY()          PERI_REG_BIT(&(GPIO->P[0].DIN), 1)
+#define GPS_RESET()             PERI_REG_BIT_CLEAR(&(GPIO->P[0].DOUT)) = BIT(2)
+#define GPS_UNRESET()           PERI_REG_BIT_SET(&(GPIO->P[0].DOUT)) = BIT(2)
+
 void gpio_init();
 
 #endif  // __GPIO_H__

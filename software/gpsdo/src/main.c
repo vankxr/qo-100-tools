@@ -25,6 +25,7 @@
 #include "ocxo.h"
 #include "ad9544.h"
 #include "ssd1306.h"
+#include "ublox.h"
 
 // Structs
 
@@ -376,7 +377,7 @@ int init()
     fIOVDDHighThresh = fIOVDDLowThresh + 0.026f; // Hysteresis from datasheet
 
     usart0_init(36000000, 0, USART_SPI_MSB_FIRST, -1, 0, 0); // Init USART0 at 36 MHz (DAC)
-    usart3_init(115200, USART_FRAME_STOPBITS_ONE | USART_FRAME_PARITY_NONE | USART_FRAME_DATABITS_EIGHT, 0, 0, -1, -1); // Init USART3 at 115200 baud (GPS)
+    //usart3_init(115200, USART_FRAME_STOPBITS_ONE | USART_FRAME_PARITY_NONE | USART_FRAME_DATABITS_EIGHT, 0, 0, -1, -1); // Init USART3 at 115200 baud (GPS)
 
     i2c1_init(I2C_SLAVE_ADDRESS, 1, 1); // Init I2C1 slave
     i2c1_set_slave_addr_isr(i2c_slave_addr_isr);
@@ -483,6 +484,11 @@ int init()
     else
         DBGPRINTLN_CTX("AD9544 init NOK!");
 
+    if(ublox_init())
+        DBGPRINTLN_CTX("GPS (UBLOX) init OK!");
+    else
+        DBGPRINTLN_CTX("GPS (UBLOX) init NOK!");
+
     return 0;
 }
 int main()
@@ -501,6 +507,8 @@ int main()
 
         if((g_ullSystemTick > 0 && ullLastHeartBeat == 0) || g_ullSystemTick - ullLastHeartBeat > 2000)
         {
+            ublox_poll(); // TODO: Remove
+
             ullLastHeartBeat = g_ullSystemTick;
 
             LED_TOGGLE();

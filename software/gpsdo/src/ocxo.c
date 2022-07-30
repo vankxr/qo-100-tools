@@ -14,7 +14,8 @@ uint8_t ocxo_init()
 }
 void gps_timepulse_isr()
 {
-    
+    #include "debug_macros.h"
+    DBGPRINTLN_CTX("PPS TICK");
 }
 
 void ocxo_set_vcont(float fVCont)
