@@ -416,6 +416,7 @@ int init()
     DBGPRINTLN_CTX("EMU - IOVDD Status: %s", g_ubIOVDDLow ? "LOW" : "OK");
     DBGPRINTLN_CTX("EMU - Core Voltage: %.2f mV", adc_get_corevdd());
     DBGPRINTLN_CTX("EMU - VIN Voltage: %.2f mV", adc_get_vin());
+    DBGPRINTLN_CTX("EMU - 5V0 Voltage: %.2f mV", adc_get_5v0());
 
     DBGPRINTLN_CTX("CMU - HFXO Oscillator: %.3f MHz", (float)HFXO_OSC_FREQ / 1000000);
     DBGPRINTLN_CTX("CMU - HFRCO Oscillator: %.3f MHz", (float)HFRCO_OSC_FREQ / 1000000);
