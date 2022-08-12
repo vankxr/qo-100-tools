@@ -30,6 +30,18 @@
 // Structs
 
 // Helper macros
+#define OCXO_SKIP_WARMUP            1
+#define OCXO_MIN_FREQ_MEAS_TICKS    100 // 1 tick = 1 second with GPS PPS
+#define OCXO_MAX_FREQ_MEAS_TICKS    100 // 1 tick = 1 second with GPS PPS
+#define OCXO_FAST_FREQ_MEAS_TICKS   10  // 1 tick = 1 second with GPS PPS
+#define OCXO_FAST_FREQ_MEAS_COUNT   50 // Number of fast frequency measurements
+#define OCXO_FAST_FREQ_MEAS_ADJUST  100 // LSBs to adjust DAC word during fast frequency measurements
+#define OCXO_MID_FREQ_MEAS_TICKS    300 // 1 tick = 1 second with GPS PPS
+#define OCXO_MID_FREQ_MEAS_COUNT    100 // Number of mid frequency measurements
+#define OCXO_MID_FREQ_MEAS_ADJUST   10 // LSBs to adjust DAC word during mid frequency measurements
+#define OCXO_SLOW_FREQ_MEAS_TICKS   900 // 1 tick = 1 second with GPS PPS
+#define OCXO_SLOW_FREQ_MEAS_ADJUST  1 // LSBs to adjust DAC word during slow frequency measurements
+
 #define I2C_SLAVE_ADDRESS                       0x3F
 #define I2C_SLAVE_REGISTER_COUNT                256
 #define I2C_SLAVE_REGISTER(t, a)                (*(t *)&ubI2CRegister[(a)])
@@ -64,12 +76,19 @@ static uint8_t i2c_slave_addr_isr(uint8_t ubRnW);
 static uint8_t i2c_slave_tx_data_isr();
 static uint8_t i2c_slave_rx_data_isr(uint8_t ubData);
 
+static void ocxo_count_done_callback(uint16_t usTicks, uint64_t ullCounter);
+
 // Variables
 volatile uint8_t ubI2CRegister[I2C_SLAVE_REGISTER_COUNT];
 volatile uint8_t ubI2CRegisterWriteMask[I2C_SLAVE_REGISTER_COUNT];
 volatile uint8_t ubI2CRegisterReadMask[I2C_SLAVE_REGISTER_COUNT];
 volatile uint8_t ubI2CRegisterPointer = 0x00;
 volatile uint8_t ubI2CByteCount = 0;
+volatile double gOCXOFrequency = -1.f;
+double gOCXOMinFrequency = 9999986.52; // -1.f;
+double gOCXOMaxFrequency = 10000017.68; // -1.f;
+uint16_t usOCXOControlVoltageWord = 0; // 29186;
+uint8_t ubOCXOTuningFSMState = 0;
 
 // ISRs
 
@@ -339,6 +358,13 @@ uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
     return 1; // ACK
 }
 
+void ocxo_count_done_callback(uint16_t usTicks, uint64_t ullCounter)
+{
+    gOCXOFrequency = (double)ullCounter / usTicks;
+
+    //DBGPRINTLN_CTX("OCXO count done [%llu] / [%hu] = [%.6f Hz]", ullCounter, usTicks, gOCXOFrequency);
+}
+
 int init()
 {
     rmu_init(RMU_CTRL_PINRMODE_FULL, RMU_CTRL_SYSRMODE_EXTENDED, RMU_CTRL_LOCKUPRMODE_EXTENDED, RMU_CTRL_WDOGRMODE_EXTENDED); // Init RMU and set reset modes
@@ -376,7 +402,7 @@ int init()
     fDVDDHighThresh = fDVDDLowThresh + 0.026f; // Hysteresis from datasheet
     fIOVDDHighThresh = fIOVDDLowThresh + 0.026f; // Hysteresis from datasheet
 
-    usart0_init(36000000, 0, USART_SPI_MSB_FIRST, -1, 0, 0); // Init USART0 at 36 MHz (DAC)
+    usart0_init(18000000, 0, USART_SPI_MSB_FIRST, -1, 0, 0); // Init USART0 at 36 MHz (DAC)
     //usart3_init(115200, USART_FRAME_STOPBITS_ONE | USART_FRAME_PARITY_NONE | USART_FRAME_DATABITS_EIGHT, 0, 0, -1, -1); // Init USART3 at 115200 baud (GPS)
 
     i2c1_init(I2C_SLAVE_ADDRESS, 1, 1); // Init I2C1 slave
@@ -493,6 +519,10 @@ int init()
 }
 int main()
 {
+    // OCXO
+    ocxo_power_up();
+    ocxo_set_control_voltage(2000.f); // TODO: Load ans Store OCXO calibration data
+
     // I2C Slave Register block
     i2c_slave_register_init();
 
@@ -502,22 +532,316 @@ int main()
     {
         wdog_feed();
 
+        static uint16_t usHeartbeatInterval = 5000;
+
         static uint64_t ullLastHeartBeat = 0;
+        static uint64_t ullLastOCXOTuning = 0;
         static uint64_t ullLastTelemetryUpdate = 0;
 
-        if((g_ullSystemTick > 0 && ullLastHeartBeat == 0) || g_ullSystemTick - ullLastHeartBeat > 2000)
-        {
-            ublox_poll(); // TODO: Remove
+        //ublox_poll();
 
+        if((g_ullSystemTick > 0 && ullLastHeartBeat == 0) || g_ullSystemTick - ullLastHeartBeat > usHeartbeatInterval)
+        {
             ullLastHeartBeat = g_ullSystemTick;
 
             LED_TOGGLE();
 
             if(LED_STATUS())
-                ullLastHeartBeat -= 1900;
+            {
+                ullLastHeartBeat -= usHeartbeatInterval - 100;
+            }
+            else
+            {
+                if(ubOCXOTuningFSMState < 1)
+                    usHeartbeatInterval = 5000;
+                else if(ubOCXOTuningFSMState < 2)
+                    usHeartbeatInterval = 3000;
+                else if(ubOCXOTuningFSMState < 7)
+                    usHeartbeatInterval = 2000;
+                else if(ubOCXOTuningFSMState < 9)
+                    usHeartbeatInterval = 1000;
+                else
+                    usHeartbeatInterval = 500;
+            }
         }
 
-        if((g_ullSystemTick > 0 && ullLastTelemetryUpdate == 0) || g_ullSystemTick - ullLastTelemetryUpdate > 5000)
+        if(g_ullSystemTick - ullLastOCXOTuning > 2000)
+        {
+            ullLastOCXOTuning = g_ullSystemTick;
+
+            // FSM
+            switch(ubOCXOTuningFSMState)
+            {
+                case 0: // State 0 - Wait for tick signal presence
+                {
+                    if(!ocxo_count_is_tick_present())
+                        break;
+
+                    DBGPRINTLN_CTX("OCXO - Tick detected!");
+                    ubOCXOTuningFSMState = 1;
+                }
+                break;
+                case 1: // State 1 - Wait for OCXO to warmup
+                {
+                    if(!OCXO_SKIP_WARMUP && ocxo_get_warmup_time() < OCXO_WARMUP_TIME)
+                        break;
+
+                    DBGPRINTLN_CTX("OCXO - Warmup %s!", OCXO_SKIP_WARMUP ? "skipped" : "complete");
+                    ubOCXOTuningFSMState = 2;
+                }
+                break;
+                case 2: // State 2 - Set control voltage to minimum and measure frequency
+                {
+                    if(gOCXOMinFrequency >= 0)
+                    {
+                        ubOCXOTuningFSMState = 4;
+
+                        DBGPRINTLN_CTX("OCXO - Minimum frequency measurement skipped!");
+                        DBGPRINTLN_CTX("OCXO - Minimum frequency: %.3f Hz", gOCXOMinFrequency);
+
+                        break;
+                    }
+
+                    ocxo_set_control_voltage(OCXO_CONTROL_VOLTAGE_MIN);
+
+                    delay_ms(100);
+
+                    gOCXOFrequency = -1.f;
+                    uint8_t ubReturn = ocxo_count_ticks(OCXO_MIN_FREQ_MEAS_TICKS, ocxo_count_done_callback);
+
+                    if(ubReturn == OCXO_COUNT_OK)
+                    {
+                        DBGPRINTLN_CTX("OCXO - Minimum frequency measurement started!");
+
+                        ubOCXOTuningFSMState = 3;
+                    }
+                    else
+                    {
+                        DBGPRINTLN_CTX("OCXO - Minimum frequency measurement failed [%hhu]!", ubReturn);
+                    }
+                }
+                break;
+                case 3: // State 3 - Wait for minimum frequency measurement to complete
+                {
+                    if(gOCXOFrequency < 0)
+                        break;
+
+                    gOCXOMinFrequency = gOCXOFrequency;
+
+                    DBGPRINTLN_CTX("OCXO - Minimum frequency: %.3f Hz", gOCXOMinFrequency);
+
+                    ubOCXOTuningFSMState = 4;
+                }
+                break;
+                case 4: // State 4 - Set control voltage to maximum and measure frequency
+                {
+                    if(gOCXOMaxFrequency >= 0)
+                    {
+                        ubOCXOTuningFSMState = 6;
+
+                        DBGPRINTLN_CTX("OCXO - Maximum frequency measurement skipped!");
+                        DBGPRINTLN_CTX("OCXO - Maximum frequency: %.3f Hz", gOCXOMaxFrequency);
+
+                        break;
+                    }
+
+                    ocxo_set_control_voltage(OCXO_CONTROL_VOLTAGE_MAX);
+
+                    delay_ms(100);
+
+                    gOCXOFrequency = -1.f;
+                    uint8_t ubReturn = ocxo_count_ticks(OCXO_MAX_FREQ_MEAS_TICKS, ocxo_count_done_callback);
+
+                    if(ubReturn == OCXO_COUNT_OK)
+                    {
+                        DBGPRINTLN_CTX("OCXO - Maximum frequency measurement started!");
+
+                        ubOCXOTuningFSMState = 5;
+                    }
+                    else
+                    {
+                        DBGPRINTLN_CTX("OCXO - Maximum frequency measurement failed [%hhu]!", ubReturn);
+                    }
+                }
+                break;
+                case 5: // State 5 - Wait for maximum frequency measurement to complete
+                {
+                    if(gOCXOFrequency < 0)
+                        break;
+
+                    gOCXOMaxFrequency = gOCXOFrequency;
+
+                    DBGPRINTLN_CTX("OCXO - Maximum frequency: %.3f Hz", gOCXOMaxFrequency);
+
+                    ubOCXOTuningFSMState = 6;
+                }
+                break;
+                case 6: // State 6 - Determine rough 10 MHz point
+                {
+                    double gTuningRange = gOCXOMaxFrequency - gOCXOMinFrequency;
+                    double gTuningStep = gTuningRange / (OCXO_CONTROL_VOLTAGE_MAX - OCXO_CONTROL_VOLTAGE_MIN);
+                    double gFrequencyDelta = OCXO_FREQUENCY - gOCXOMinFrequency;
+
+                    if(gFrequencyDelta < 0)
+                    {
+                        DBGPRINTLN_CTX("OCXO - Frequency out of pulling range [%.3f]!", gFrequencyDelta);
+
+                        gFrequencyDelta = 0;
+                    }
+
+                    float fTuningVoltate = OCXO_CONTROL_VOLTAGE_MIN + gFrequencyDelta / gTuningStep;
+
+                    DBGPRINTLN_CTX("OCXO - Setting tuning voltage to: %.3f mV", fTuningVoltate);
+
+                    ocxo_set_control_voltage(fTuningVoltate);
+                    usOCXOControlVoltageWord = ocxo_get_control_voltage_word();
+
+                    DBGPRINTLN_CTX("OCXO - Actual tuning voltage: %.3f mV [%hu]", ocxo_get_control_voltage(), usOCXOControlVoltageWord);
+
+                    ubOCXOTuningFSMState = 7;
+                }
+                break;
+                case 7: // State 7 - Start fast frequency measurements
+                {
+                    gOCXOFrequency = -1.f;
+                    uint8_t ubReturn = ocxo_count_ticks(OCXO_FAST_FREQ_MEAS_TICKS, ocxo_count_done_callback);
+
+                    if(ubReturn == OCXO_COUNT_OK)
+                    {
+                        DBGPRINTLN_CTX("OCXO - Fast frequency measurement started!");
+
+                        ubOCXOTuningFSMState = 8;
+                    }
+                    else
+                    {
+                        DBGPRINTLN_CTX("OCXO - Fast frequency measurement failed [%hhu]!", ubReturn);
+                    }
+                }
+                break;
+                case 8: // State 8 - Check if all fast measrements are done
+                {
+                    if(gOCXOFrequency < 0)
+                        break;
+
+                    static uint32_t ulMeasCount = 1;
+
+                    double gFrequencyError = OCXO_FREQUENCY - gOCXOFrequency;
+                    DBGPRINTLN_CTX("OCXO - [Fast #%lu] Current frequency: %.3f Hz (Error: %.3f Hz)", ulMeasCount, gOCXOFrequency, gFrequencyError);
+
+                    if(gFrequencyError < 0)
+                        usOCXOControlVoltageWord -= OCXO_FAST_FREQ_MEAS_ADJUST;
+                    else if(gFrequencyError > 0)
+                        usOCXOControlVoltageWord += OCXO_FAST_FREQ_MEAS_ADJUST;
+
+                    ocxo_set_control_voltage_word(usOCXOControlVoltageWord);
+                    DBGPRINTLN_CTX("OCXO - [Fast #%lu] Tuning voltage: %.3f mV [%hu]", ulMeasCount, ocxo_get_control_voltage(), usOCXOControlVoltageWord);
+
+                    if(ulMeasCount++ < OCXO_FAST_FREQ_MEAS_COUNT)
+                        ubOCXOTuningFSMState = 7;
+                    else
+                        ubOCXOTuningFSMState = 9;
+                }
+                break;
+                case 9: // State 9 - Start mid frequency measurements
+                {
+                    gOCXOFrequency = -1.f;
+                    uint8_t ubReturn = ocxo_count_ticks(OCXO_MID_FREQ_MEAS_TICKS, ocxo_count_done_callback);
+
+                    if(ubReturn == OCXO_COUNT_OK)
+                    {
+                        DBGPRINTLN_CTX("OCXO - Mid frequency measurement started!");
+
+                        ubOCXOTuningFSMState = 10;
+                    }
+                    else
+                    {
+                        DBGPRINTLN_CTX("OCXO - Mid frequency measurement failed [%hhu]!", ubReturn);
+                    }
+                }
+                break;
+                case 10: // State 10 - Check if all mid measrements are done
+                {
+                    if(gOCXOFrequency < 0)
+                        break;
+
+                    static uint32_t ulMeasCount = 1;
+
+                    double gFrequencyError = OCXO_FREQUENCY - gOCXOFrequency;
+                    DBGPRINTLN_CTX("OCXO - [Mid #%lu] Current frequency: %.3f Hz (Error: %.3f Hz)", ulMeasCount, gOCXOFrequency, gFrequencyError);
+
+                    if(gFrequencyError < 0)
+                        usOCXOControlVoltageWord -= OCXO_MID_FREQ_MEAS_ADJUST;
+                    else if(gFrequencyError > 0)
+                        usOCXOControlVoltageWord += OCXO_MID_FREQ_MEAS_ADJUST;
+
+                    ocxo_set_control_voltage_word(usOCXOControlVoltageWord);
+                    DBGPRINTLN_CTX("OCXO - [Mid #%lu] Tuning voltage: %.3f mV [%hu]", ulMeasCount, ocxo_get_control_voltage(), usOCXOControlVoltageWord);
+
+                    if(ulMeasCount++ < OCXO_MID_FREQ_MEAS_COUNT)
+                        ubOCXOTuningFSMState = 9;
+                    else
+                        ubOCXOTuningFSMState = 11;
+                }
+                break;
+                case 11: // State 11 - Start slow frequency measurements
+                {
+                    gOCXOFrequency = -1.f;
+                    uint8_t ubReturn = ocxo_count_ticks(OCXO_SLOW_FREQ_MEAS_TICKS, ocxo_count_done_callback);
+
+                    if(ubReturn == OCXO_COUNT_OK)
+                    {
+                        DBGPRINTLN_CTX("OCXO - Mid frequency measurement started!");
+
+                        ubOCXOTuningFSMState = 12;
+                    }
+                    else
+                    {
+                        DBGPRINTLN_CTX("OCXO - Mid frequency measurement failed [%hhu]!", ubReturn);
+                    }
+                }
+                break;
+                case 12: // State 12 - Check if all slow measrements are done (loop forever)
+                {
+                    if(gOCXOFrequency < 0)
+                        break;
+
+                    static uint32_t ulMeasCount = 1;
+
+                    double gFrequencyError = OCXO_FREQUENCY - gOCXOFrequency;
+                    DBGPRINTLN_CTX("OCXO - [Slow #%lu] Current frequency: %.3f Hz (Error: %.3f Hz)", ulMeasCount, gOCXOFrequency, gFrequencyError);
+
+                    if(gFrequencyError < 0)
+                        usOCXOControlVoltageWord -= OCXO_SLOW_FREQ_MEAS_ADJUST;
+                    else if(gFrequencyError > 0)
+                        usOCXOControlVoltageWord += OCXO_SLOW_FREQ_MEAS_ADJUST;
+
+                    ocxo_set_control_voltage_word(usOCXOControlVoltageWord);
+                    DBGPRINTLN_CTX("OCXO - [Slow #%lu] Tuning voltage: %.3f mV [%hu]", ulMeasCount, ocxo_get_control_voltage(), usOCXOControlVoltageWord);
+
+                    ulMeasCount++;
+                    ubOCXOTuningFSMState = 11;
+                }
+                break;
+            }
+
+            // //static uint16_t usCounts[] = {1, 2, 5, 10};
+            // static uint16_t usCounts[] = {600};
+            // static uint8_t ubCountIndex = 0;
+            // uint8_t ubReturn = ocxo_count_ticks(usCounts[ubCountIndex], ocxo_count_done_callback);
+
+            // if(ubReturn == OCXO_COUNT_OK)
+            // {
+            //     DBGPRINTLN_CTX("OCXO count started [%hu]!", usCounts[ubCountIndex]);
+
+            //     ubCountIndex++;
+
+            //     if(ubCountIndex >= sizeof(usCounts) / sizeof(usCounts[0]))
+            //         ubCountIndex = 0;
+            // }
+        }
+
+        if(0)
+        //if((g_ullSystemTick > 0 && ullLastTelemetryUpdate == 0) || g_ullSystemTick - ullLastTelemetryUpdate > 5000)
         {
             ullLastTelemetryUpdate = g_ullSystemTick;
 

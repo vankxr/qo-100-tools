@@ -209,7 +209,7 @@ void gpio_init()
                       | GPIO_EXTIPINSELH_EXTIPINSEL15_PIN12;    // NU
 
     GPIO->EXTIRISE = BIT(13); // GPS_TIMEPULSE_BUF
-    GPIO->EXTIFALL = BIT(8); // nPLL_IRQ
+    GPIO->EXTIFALL = BIT(8) | BIT(13); // nPLL_IRQ, GPS_TIMEPULSE_BUF
 
     GPIO->IFC = _GPIO_IFC_MASK; // Clear pending IRQs
     IRQ_CLEAR(GPIO_EVEN_IRQn); // Clear pending vector
