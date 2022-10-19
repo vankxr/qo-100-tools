@@ -34,6 +34,7 @@ const Printer = require("./util/printer");
 const delay = require("./util/delay");
 
 const gs_location = JSON.parse(FileSystem.readFileSync("/root/gs_location.json")); // TODO: Get real location via GPS
+const mqtt_credentials = JSON.parse(FileSystem.readFileSync("/root/mqtt_credentials.json"));
 let cl;
 let ipma_station;
 let ipma_location;
@@ -67,9 +68,9 @@ async function mqtt_init()
 {
     mqtt_client = MQTT.connect(
         {
-            protocol: "mqtts",
-            host: "node1.jsilvaiot.com",
-            port: 8883,
+            protocol: mqtt_credentials.ssl ? "mqtts" : "mqtt",
+            host: mqtt_credentials.host,
+            port: mqtt_credentials.port,
             keepalive: 60,
             reschedulePings: true,
             clientId: "opi-rf-manager-" + Crypto.randomBytes(8).toString("hex"),
@@ -78,8 +79,8 @@ async function mqtt_init()
             clean: true,
             reconnectPeriod: 1000,
             connectTimeout: 30 * 1000,
-            username: "opi-rf-manager",
-            password: "opi-rf-mgr",
+            username: mqtt_credentials.username,
+            password: mqtt_credentials.password,
             queueQoSZero: true,
             will: {
                 topic: mqtt_topic_prefix + "status",
@@ -88,7 +89,7 @@ async function mqtt_init()
                 retain: true
             },
             resubscribe: false,
-            rejectUnauthorized: false
+            rejectUnauthorized: !mqtt_credentials.ssl_self_signed
         }
     );
 
