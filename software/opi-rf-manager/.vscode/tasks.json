@@ -1,0 +1,34 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Restart remote service",
+			"type": "shell",
+			"command": "ssh root@opi-rf-manager.local service opi-rf-manager restart"
+		},
+		{
+			"label": "Stop remote service",
+			"type": "shell",
+			"command": "ssh root@opi-rf-manager.local service opi-rf-manager stop"
+		},
+		{
+			"label": "Start remote service",
+			"type": "shell",
+			"command": "ssh root@opi-rf-manager.local service opi-rf-manager start"
+		},
+		{
+			"label": "Update remote",
+			"type": "shell",
+			"command": "scp -rp \"${workspaceFolder}\" root@opi-rf-manager.local:/root"
+		},
+		{
+			"label": "Run on remote",
+			"type": "shell",
+			"command": "scp -rp \"${workspaceFolder}\" root@opi-rf-manager.local:/root; ssh root@opi-rf-manager.local \"cd /root/opi-rf-manager; /root/.nvm/versions/node/v15.8.0/bin/node index.js\"",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		}
+	]
+}
