@@ -390,7 +390,9 @@ async function ssh_server_init()
     ssh_server = new SSH2.Server(
         {
             hostKeys: [
-                await FileSystem.promises.readFile(__dirname + "/keys/host")
+                await FileSystem.promises.readFile(__dirname + "/keys/ssh_host_ecdsa_key"),
+                await FileSystem.promises.readFile(__dirname + "/keys/ssh_host_ed25519_key"),
+                await FileSystem.promises.readFile(__dirname + "/keys/ssh_host_rsa_key")
             ]
         },
         ssh_server_connection_handler
@@ -2170,15 +2172,15 @@ function ssh_server_client_auth_handler(ctx)
     {
         case "password":
         {
-            if(!user.password)
+            if(!found_user.password)
                 return ctx.reject();
 
             let password = Buffer.from(ctx.password);
 
-            if(password.length !== user.password.length)
+            if(password.length !== found_user.password.length)
                 return ctx.reject();
 
-            if(!Crypto.timingSafeEqual(password, user.password))
+            if(!Crypto.timingSafeEqual(password, found_user.password))
                 return ctx.reject();
         }
         break;
@@ -2786,8 +2788,8 @@ async function self_test_pa_bias_controller()
         throw new Error("TEC DAC not detected, check connections between boards!");
 
     // Turn on TEC supply
-    //await relay_controller.set_relay_status(2, true);
-    //await delay(1500);
+    await relay_controller.set_relay_status(2, true);
+    await delay(1500);
 
     // Get starting V/I
     let tec_vin = await tec_controller_power_sensor.get_vin_voltage();
@@ -2816,7 +2818,7 @@ async function self_test_pa_bias_controller()
 
         // Ensure TEC is off
         if(tec_status)
-        throw new Error("TEC #" + i + " did not turn off!");
+            throw new Error("TEC #" + i + " did not turn off!");
 
         // Set TEC voltage
         await pa_bias_controller.set_tec_voltage(i, TEC_VOLTAGE);
@@ -2865,8 +2867,8 @@ async function self_test_pa_bias_controller()
     }
 
     // Turn off TEC supply
-    //await relay_controller.set_relay_status(2, false);
-    //await delay(1500);
+    await relay_controller.set_relay_status(2, false);
+    await delay(1500);
 
     // Turn off VDD supply
     await relay_controller.set_relay_status(0, false);
@@ -3039,7 +3041,6 @@ async function main()
 
     // IPMA
     ipma_init(); // Do not await, it can run in parallel
-    //await ipma_init();
 
     // GPIOs
     gpios.intrusion = [];
