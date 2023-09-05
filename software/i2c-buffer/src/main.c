@@ -28,6 +28,13 @@
 #define I2C_SLAVE_REGISTER_READ_MASK(t, a)          (*(t *)&ubI2CRegisterReadMask[(a)])
 #define I2C_SLAVE_REGISTER_STATUS                   0x00 // 8-bit
 #define I2C_SLAVE_REGISTER_CONFIG                   0x01 // 8-bit
+#define I2C_SLAVE_REGISTER_BUF_STATUS               0x02 // 8-bit
+#define I2C_SLAVE_REGISTER_BUF_ENABLE               0x03 // 8-bit
+#define I2C_SLAVE_REGISTER_BUF_DISABLE              0x04 // 8-bit
+#define I2C_SLAVE_REGISTER_BUS1_BIAS_VOLTAGE        0x10 // 32-bit
+#define I2C_SLAVE_REGISTER_BUS2_BIAS_VOLTAGE        0x14 // 32-bit
+#define I2C_SLAVE_REGISTER_BUS3_BIAS_VOLTAGE        0x18 // 32-bit
+#define I2C_SLAVE_REGISTER_BUS4_BIAS_VOLTAGE        0x1C // 32-bit
 #define I2C_SLAVE_REGISTER_AVDD_VOLTAGE             0xC0 // 32-bit
 #define I2C_SLAVE_REGISTER_DVDD_VOLTAGE             0xC4 // 32-bit
 #define I2C_SLAVE_REGISTER_IOVDD_VOLTAGE            0xC8 // 32-bit
@@ -67,6 +74,8 @@ volatile uint8_t ubI2CByteCount = 0;
 volatile uint8_t ubI2CReadSize = 0;
 volatile uint8_t ubI2CChecksum = 0;
 volatile uint8_t ubI2CChecksumOK = 0;
+volatile uint8_t ubBufferEnableChanged = 0x00;
+volatile uint8_t ubBufferDisableChanged = 0x00;
 
 // ISRs
 
@@ -271,6 +280,27 @@ void i2c_slave_register_init()
         I2C_SLAVE_REGISTER              (uint8_t,  I2C_SLAVE_REGISTER_CONFIG)                   = 0x00;
         I2C_SLAVE_REGISTER_WRITE_MASK   (uint8_t,  I2C_SLAVE_REGISTER_CONFIG)                   = 0xFF;
         I2C_SLAVE_REGISTER_READ_MASK    (uint8_t,  I2C_SLAVE_REGISTER_CONFIG)                   = 0xFF;
+        I2C_SLAVE_REGISTER              (uint8_t,  I2C_SLAVE_REGISTER_BUF_STATUS)               = 0x00;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint8_t,  I2C_SLAVE_REGISTER_BUF_STATUS)               = 0x00;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint8_t,  I2C_SLAVE_REGISTER_BUF_STATUS)               = 0xFF;
+        I2C_SLAVE_REGISTER              (uint8_t,  I2C_SLAVE_REGISTER_BUF_ENABLE)               = 0x00;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint8_t,  I2C_SLAVE_REGISTER_BUF_ENABLE)               = 0xFF;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint8_t,  I2C_SLAVE_REGISTER_BUF_ENABLE)               = 0x00;
+        I2C_SLAVE_REGISTER              (uint8_t,  I2C_SLAVE_REGISTER_BUF_DISABLE)              = 0x00;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint8_t,  I2C_SLAVE_REGISTER_BUF_DISABLE)              = 0xFF;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint8_t,  I2C_SLAVE_REGISTER_BUF_DISABLE)              = 0x00;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_BUS1_BIAS_VOLTAGE)        = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_BUS1_BIAS_VOLTAGE)        = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_BUS1_BIAS_VOLTAGE)        = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_BUS2_BIAS_VOLTAGE)        = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_BUS2_BIAS_VOLTAGE)        = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_BUS2_BIAS_VOLTAGE)        = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_BUS3_BIAS_VOLTAGE)        = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_BUS3_BIAS_VOLTAGE)        = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_BUS3_BIAS_VOLTAGE)        = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_BUS4_BIAS_VOLTAGE)        = -1.f;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_BUS4_BIAS_VOLTAGE)        = 0x00000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_BUS4_BIAS_VOLTAGE)        = 0xFFFFFFFF;
         I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_AVDD_VOLTAGE)             = -1.f;
         I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_AVDD_VOLTAGE)             = 0x00000000;
         I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_AVDD_VOLTAGE)             = 0xFFFFFFFF;
@@ -399,19 +429,27 @@ uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
     {
         ubI2CRegister[ubI2CRegisterPointer] = (ubI2CRegister[ubI2CRegisterPointer] & ~ubI2CRegisterWriteMask[ubI2CRegisterPointer]) | (ubI2CBuffer[2 + i] & ubI2CRegisterWriteMask[ubI2CRegisterPointer]);
         ubI2CRegisterPointer++;
+
+        switch(ubI2CRegisterPointer)
+        {
+            case I2C_SLAVE_REGISTER_BUF_ENABLE + sizeof(uint8_t):
+            {
+                if(ubI2CBuffer[1] < sizeof(uint8_t))
+                    break;
+
+                ubBufferEnableChanged |= I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_BUF_ENABLE);
+            }
+            break;
+            case I2C_SLAVE_REGISTER_BUF_DISABLE + sizeof(uint8_t):
+            {
+                if(ubI2CBuffer[1] < sizeof(uint8_t))
+                    break;
+
+                ubBufferDisableChanged |= I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_BUF_DISABLE);
+            }
+            break;
+        }
     }
-
-    // switch(ubI2CRegisterPointer)
-    // {
-    //     case I2C_SLAVE_REGISTER_LO_FREQ + sizeof(uint64_t):
-    //     {
-    //         if((ubI2CByteCount - 1) < sizeof(uint64_t))
-    //             break;
-
-    //         ublLOChanged = 1;
-    //     }
-    //     break;
-    // }
 
     return 1; // ACK
 }
@@ -448,7 +486,7 @@ int init()
     fDVDDHighThresh = fDVDDLowThresh + 0.026f; // Hysteresis from datasheet
     fIOVDDHighThresh = fIOVDDLowThresh + 0.026f; // Hysteresis from datasheet
 
-    usart1_init(1000000, USART_FRAME_STOPBITS_ONE | USART_FRAME_PARITY_NONE | USART_FRAME_DATABITS_EIGHT, -1, 5, -1, -1);
+    usart1_init(115200, USART_FRAME_STOPBITS_ONE | USART_FRAME_PARITY_NONE | USART_FRAME_DATABITS_EIGHT, -1, 5, -1, -1);
 
     i2c0_init(I2C_SLAVE_ADDRESS, 4, 4);
     i2c0_set_slave_addr_isr(i2c_slave_addr_isr);
@@ -544,6 +582,87 @@ int main()
             reset();
         }
 
+        if(I2C_SLAVE_REGISTER(uint64_t, I2C_SLAVE_REGISTER_UPTIME) != g_ullSystemTick / 1000)
+        {
+            ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+            {
+                I2C_SLAVE_REGISTER(uint64_t, I2C_SLAVE_REGISTER_UPTIME) = g_ullSystemTick / 1000;
+            }
+        }
+
+        if(ubBufferEnableChanged)
+        {
+            for(uint8_t i = 0; i < 4; i++)
+            {
+                ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+                {
+                    if(ubBufferEnableChanged & BIT(i))
+                    {
+                        switch(i)
+                        {
+                            case 0: BUF1_ENABLE(); break;
+                            case 1: BUF2_ENABLE(); break;
+                            case 2: BUF3_ENABLE(); break;
+                            case 3: BUF4_ENABLE(); break;
+                        }
+
+                        I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_BUF_STATUS) |= BIT(i);
+                        ubBufferEnableChanged &= ~BIT(i);
+                    }
+
+                    if(ubBufferEnableChanged & BIT(i + 4))
+                    {
+                        switch(i)
+                        {
+                            case 0: BIAS1_ENABLE(); break;
+                            case 1: BIAS2_ENABLE(); break;
+                            case 2: BIAS3_ENABLE(); break;
+                            case 3: BIAS4_ENABLE(); break;
+                        }
+
+                        I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_BUF_STATUS) |= BIT(i + 4);
+                        ubBufferEnableChanged &= ~BIT(i + 4);
+                    }
+                }
+            }
+        }
+        if(ubBufferDisableChanged)
+        {
+            for(uint8_t i = 0; i < 4; i++)
+            {
+                ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+                {
+                    if(ubBufferDisableChanged & BIT(i))
+                    {
+                        switch(i)
+                        {
+                            case 0: BUF1_DISABLE(); break;
+                            case 1: BUF2_DISABLE(); break;
+                            case 2: BUF3_DISABLE(); break;
+                            case 3: BUF4_DISABLE(); break;
+                        }
+
+                        I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_BUF_STATUS) &= ~BIT(i);
+                        ubBufferDisableChanged &= ~BIT(i);
+                    }
+
+                    if(ubBufferDisableChanged & BIT(i + 4))
+                    {
+                        switch(i)
+                        {
+                            case 0: BIAS1_DISABLE(); break;
+                            case 1: BIAS2_DISABLE(); break;
+                            case 2: BIAS3_DISABLE(); break;
+                            case 3: BIAS4_DISABLE(); break;
+                        }
+
+                        I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_BUF_STATUS) &= ~BIT(i + 4);
+                        ubBufferDisableChanged &= ~BIT(i + 4);
+                    }
+                }
+            }
+        }
+
         static uint64_t ullLastHeartBeat = 0;
         static uint64_t ullLastTelemetryUpdate = 0;
 
@@ -594,6 +713,30 @@ int main()
             DBGPRINTLN_CTX("DVDD Voltage: %.2f mV", fDVDD);
             DBGPRINTLN_CTX("IOVDD Voltage: %.2f mV", fIOVDD);
             DBGPRINTLN_CTX("Core Voltage: %.2f mV", fCoreVDD);
+
+            // Bus Bias Voltages and Status
+            float fVBias1 = adc_get_vbias1();
+            float fVBias2 = adc_get_vbias2();
+            float fVBias3 = adc_get_vbias3();
+            float fVBias4 = adc_get_vbias4();
+
+            ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+            {
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_BUS1_BIAS_VOLTAGE) = fVBias1;
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_BUS2_BIAS_VOLTAGE) = fVBias2;
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_BUS3_BIAS_VOLTAGE) = fVBias3;
+                I2C_SLAVE_REGISTER(float, I2C_SLAVE_REGISTER_BUS4_BIAS_VOLTAGE) = fVBias4;
+            }
+
+            DBGPRINTLN_CTX("----------------------------------");
+            DBGPRINTLN_CTX("Bus #1 Voltage: %.2f mV", fVBias1);
+            DBGPRINTLN_CTX("Bus #1 Status: %s", SCL1_SENSE() ? "HIGH" : "LOW");
+            DBGPRINTLN_CTX("Bus #2 Voltage: %.2f mV", fVBias2);
+            DBGPRINTLN_CTX("Bus #2 Status: %s", SCL2_SENSE() ? "HIGH" : "LOW");
+            DBGPRINTLN_CTX("Bus #3 Voltage: %.2f mV", fVBias3);
+            DBGPRINTLN_CTX("Bus #3 Status: %s", SCL3_SENSE() ? "HIGH" : "LOW");
+            DBGPRINTLN_CTX("Bus #4 Voltage: %.2f mV", fVBias4);
+            DBGPRINTLN_CTX("Bus #4 Status: %s", SCL4_SENSE() ? "HIGH" : "LOW");
         }
     }
 

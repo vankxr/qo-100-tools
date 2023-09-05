@@ -44,13 +44,15 @@
 #define I2C_SLAVE_REGISTER_RELAY10_DUTY_CYCLE   0x1A // 8-bit
 #define I2C_SLAVE_REGISTER_RELAY11_DUTY_CYCLE   0x1B // 8-bit
 #define I2C_SLAVE_REGISTER_RELAY_UV_THRESH      0x1C // 32-bit
-#define I2C_SLAVE_REGISTER_VIN_VOLTAGE          0xC0 // 32-bit
-#define I2C_SLAVE_REGISTER_AVDD_VOLTAGE         0xD0 // 32-bit
-#define I2C_SLAVE_REGISTER_DVDD_VOLTAGE         0xD4 // 32-bit
-#define I2C_SLAVE_REGISTER_IOVDD_VOLTAGE        0xD8 // 32-bit
-#define I2C_SLAVE_REGISTER_CORE_VOLTAGE         0xDC // 32-bit
-#define I2C_SLAVE_REGISTER_EMU_TEMP             0xE0 // 32-bit
-#define I2C_SLAVE_REGISTER_ADC_TEMP             0xE4 // 32-bit
+#define I2C_SLAVE_REGISTER_VIN_VOLTAGE          0xB0 // 32-bit
+#define I2C_SLAVE_REGISTER_AVDD_VOLTAGE         0xC0 // 32-bit
+#define I2C_SLAVE_REGISTER_DVDD_VOLTAGE         0xC4 // 32-bit
+#define I2C_SLAVE_REGISTER_IOVDD_VOLTAGE        0xC8 // 32-bit
+#define I2C_SLAVE_REGISTER_CORE_VOLTAGE         0xCC // 32-bit
+#define I2C_SLAVE_REGISTER_EMU_TEMP             0xD0 // 32-bit
+#define I2C_SLAVE_REGISTER_ADC_TEMP             0xD4 // 32-bit
+#define I2C_SLAVE_REGISTER_UPTIME               0xE0 // 64-bit
+#define I2C_SLAVE_REGISTER_RESET_DATA           0xE8 // 8-bit
 #define I2C_SLAVE_REGISTER_SW_VERSION           0xF4 // 16-bit
 #define I2C_SLAVE_REGISTER_DEV_UIDL             0xF8 // 32-bit
 #define I2C_SLAVE_REGISTER_DEV_UIDH             0xFC // 32-bit
@@ -82,8 +84,12 @@ static void acmp_get_vin_thresh(float *pfUTP, float *pfLTP);
 volatile uint8_t ubI2CRegister[I2C_SLAVE_REGISTER_COUNT];
 volatile uint8_t ubI2CRegisterWriteMask[I2C_SLAVE_REGISTER_COUNT];
 volatile uint8_t ubI2CRegisterReadMask[I2C_SLAVE_REGISTER_COUNT];
+volatile uint8_t ubI2CBuffer[I2C_SLAVE_REGISTER_COUNT];
 volatile uint8_t ubI2CRegisterPointer = 0x00;
 volatile uint8_t ubI2CByteCount = 0;
+volatile uint8_t ubI2CReadSize = 0;
+volatile uint8_t ubI2CChecksum = 0;
+volatile uint8_t ubI2CChecksumOK = 0;
 volatile uint32_t * const pulDutyCycleRegister[12] = {
     &(TIMER1->CC[1].CCVB),
     &(TIMER1->CC[0].CCVB),
@@ -335,7 +341,7 @@ void i2c_slave_register_init()
         I2C_SLAVE_REGISTER_WRITE_MASK   (uint8_t,  I2C_SLAVE_REGISTER_CONFIG)               = 0xFF;
         I2C_SLAVE_REGISTER_READ_MASK    (uint8_t,  I2C_SLAVE_REGISTER_CONFIG)               = 0xFF;
         I2C_SLAVE_REGISTER              (uint16_t, I2C_SLAVE_REGISTER_RELAY_STATUS)         = 0x0000;
-        I2C_SLAVE_REGISTER_WRITE_MASK   (uint16_t, I2C_SLAVE_REGISTER_RELAY_STATUS)         = 0x0FFF;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint16_t, I2C_SLAVE_REGISTER_RELAY_STATUS)         = 0x0000;
         I2C_SLAVE_REGISTER_READ_MASK    (uint16_t, I2C_SLAVE_REGISTER_RELAY_STATUS)         = 0x0FFF;
         I2C_SLAVE_REGISTER              (uint16_t, I2C_SLAVE_REGISTER_RELAY_SET_ON)         = 0x0000;
         I2C_SLAVE_REGISTER_WRITE_MASK   (uint16_t, I2C_SLAVE_REGISTER_RELAY_SET_ON)         = 0x0FFF;
@@ -403,6 +409,12 @@ void i2c_slave_register_init()
         I2C_SLAVE_REGISTER              (float,    I2C_SLAVE_REGISTER_ADC_TEMP)             = -1.f;
         I2C_SLAVE_REGISTER_WRITE_MASK   (uint32_t, I2C_SLAVE_REGISTER_ADC_TEMP)             = 0x00000000;
         I2C_SLAVE_REGISTER_READ_MASK    (uint32_t, I2C_SLAVE_REGISTER_ADC_TEMP)             = 0xFFFFFFFF;
+        I2C_SLAVE_REGISTER              (uint64_t, I2C_SLAVE_REGISTER_UPTIME)               = g_ullSystemTick / 1000;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint64_t, I2C_SLAVE_REGISTER_UPTIME)               = 0x0000000000000000;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint64_t, I2C_SLAVE_REGISTER_UPTIME)               = 0xFFFFFFFFFFFFFFFF;
+      //I2C_SLAVE_REGISTER              (uint8_t,  I2C_SLAVE_REGISTER_RESET_DATA)           = 0x00;
+        I2C_SLAVE_REGISTER_WRITE_MASK   (uint8_t,  I2C_SLAVE_REGISTER_RESET_DATA)           = 0x00;
+        I2C_SLAVE_REGISTER_READ_MASK    (uint8_t,  I2C_SLAVE_REGISTER_RESET_DATA)           = 0xFF;
         I2C_SLAVE_REGISTER              (uint16_t, I2C_SLAVE_REGISTER_SW_VERSION)           = BUILD_VERSION;
         I2C_SLAVE_REGISTER_WRITE_MASK   (uint16_t, I2C_SLAVE_REGISTER_SW_VERSION)           = 0x0000;
         I2C_SLAVE_REGISTER_READ_MASK    (uint16_t, I2C_SLAVE_REGISTER_SW_VERSION)           = 0xFFFF;
@@ -417,6 +429,7 @@ void i2c_slave_register_init()
 uint8_t i2c_slave_addr_isr(uint8_t ubAddress)
 {
     ubI2CByteCount = 0;
+    ubI2CChecksum = I2C_SLAVE_ADDRESS;
 
     // Hardware address comparator already verifies if the address matches
     // This is only called if address is valid
@@ -426,10 +439,26 @@ uint8_t i2c_slave_addr_isr(uint8_t ubAddress)
 }
 uint8_t i2c_slave_tx_data_isr()
 {
+    if(!ubI2CChecksumOK)
+        return 0xFF;
+
+    if(ubI2CByteCount > ubI2CReadSize + 1)
+        return 0xFF;
+
     ubI2CByteCount++;
+
+    if(ubI2CByteCount == ubI2CReadSize + 1)
+    {
+        ubI2CChecksumOK = 0;
+        ubI2CReadSize = 0;
+
+        return (0xFF - ubI2CChecksum) + 1;
+    }
 
     uint8_t ubData = ubI2CRegister[ubI2CRegisterPointer] & ubI2CRegisterReadMask[ubI2CRegisterPointer];
     ubI2CRegisterPointer++;
+
+    ubI2CChecksum += ubData;
 
     switch(ubI2CRegisterPointer)
     {
@@ -447,140 +476,173 @@ uint8_t i2c_slave_tx_data_isr()
 }
 uint8_t i2c_slave_rx_data_isr(uint8_t ubData)
 {
-    ubI2CByteCount++;
+    ubI2CBuffer[ubI2CByteCount++] = ubData;
+    ubI2CChecksum += ubData;
 
-    if(ubI2CByteCount == 1)
+    if(ubI2CByteCount < 2)
+        return 1; // ACK
+
+    uint8_t ubExpectedLength = 3;
+
+    if(ubI2CBuffer[1] > I2C_SLAVE_REGISTER_COUNT - 3)
+        ubExpectedLength++;
+    else
+        ubExpectedLength += ubI2CBuffer[1];
+
+    if(ubI2CByteCount < ubExpectedLength)
+        return 1; // ACK
+
+    ubI2CChecksum -= ubData;
+    ubI2CChecksum = (0xFF - ubI2CChecksum) + 1;
+
+    if(ubI2CChecksum != ubI2CBuffer[ubI2CByteCount - 1])
     {
-        ubI2CRegisterPointer = ubData;
+        ubI2CByteCount = 0;
+        ubI2CChecksum = I2C_SLAVE_ADDRESS;
+
+        return 0; // NAK
+    }
+
+    ubI2CByteCount = 0;
+    ubI2CChecksum = I2C_SLAVE_ADDRESS;
+    ubI2CRegisterPointer = ubI2CBuffer[0];
+
+    if(ubI2CBuffer[1] > I2C_SLAVE_REGISTER_COUNT - 3)
+    {
+        ubI2CChecksumOK = 1;
+        ubI2CReadSize = ubI2CBuffer[2];
 
         return 1; // ACK
     }
 
-    ubI2CRegister[ubI2CRegisterPointer] = (ubI2CRegister[ubI2CRegisterPointer] & ~ubI2CRegisterWriteMask[ubI2CRegisterPointer]) | (ubData & ubI2CRegisterWriteMask[ubI2CRegisterPointer]);
-    ubI2CRegisterPointer++;
-
-    switch(ubI2CRegisterPointer)
+    for(uint8_t i = 0; i < ubI2CBuffer[1]; i++)
     {
-        case I2C_SLAVE_REGISTER_RELAY_SET_ON + sizeof(uint16_t):
-        {
-            if((ubI2CByteCount - 1) < sizeof(uint16_t))
-                break;
+        ubI2CRegister[ubI2CRegisterPointer] = (ubI2CRegister[ubI2CRegisterPointer] & ~ubI2CRegisterWriteMask[ubI2CRegisterPointer]) | (ubI2CBuffer[2 + i] & ubI2CRegisterWriteMask[ubI2CRegisterPointer]);
+        ubI2CRegisterPointer++;
 
-            usRelaySetOnChanged |= I2C_SLAVE_REGISTER(uint16_t, I2C_SLAVE_REGISTER_RELAY_SET_ON);
-        }
-        break;
-        case I2C_SLAVE_REGISTER_RELAY_SET_OFF + sizeof(uint16_t):
+        switch(ubI2CRegisterPointer)
         {
-            if((ubI2CByteCount - 1) < sizeof(uint16_t))
-                break;
+            case I2C_SLAVE_REGISTER_RELAY_SET_ON + sizeof(uint16_t):
+            {
+                if(ubI2CBuffer[1] < sizeof(uint16_t))
+                    break;
 
-            usRelaySetOffChanged |= I2C_SLAVE_REGISTER(uint16_t, I2C_SLAVE_REGISTER_RELAY_SET_OFF);
-        }
-        break;
-        case I2C_SLAVE_REGISTER_RELAY_UV_THRESH + sizeof(float):
-        {
-            if((ubI2CByteCount - 1) < sizeof(float))
-                break;
+                usRelaySetOnChanged |= I2C_SLAVE_REGISTER(uint16_t, I2C_SLAVE_REGISTER_RELAY_SET_ON);
+            }
+            break;
+            case I2C_SLAVE_REGISTER_RELAY_SET_OFF + sizeof(uint16_t):
+            {
+                if(ubI2CBuffer[1] < sizeof(uint16_t))
+                    break;
 
-            ubRelayUVThreshChanged = 1;
-        }
-        break;
-        case I2C_SLAVE_REGISTER_RELAY0_DUTY_CYCLE + sizeof(uint8_t):
-        {
-            if((ubI2CByteCount - 1) < sizeof(uint8_t))
-                break;
+                usRelaySetOffChanged |= I2C_SLAVE_REGISTER(uint16_t, I2C_SLAVE_REGISTER_RELAY_SET_OFF);
+            }
+            break;
+            case I2C_SLAVE_REGISTER_RELAY_UV_THRESH + sizeof(float):
+            {
+                if(ubI2CBuffer[1] < sizeof(float))
+                    break;
 
-            usRelaySetDCChanged |= BIT(0);
-        }
-        break;
-        case I2C_SLAVE_REGISTER_RELAY1_DUTY_CYCLE + sizeof(uint8_t):
-        {
-            if((ubI2CByteCount - 1) < sizeof(uint8_t))
-                break;
+                ubRelayUVThreshChanged = 1;
+            }
+            break;
+            case I2C_SLAVE_REGISTER_RELAY0_DUTY_CYCLE + sizeof(uint8_t):
+            {
+                if(ubI2CBuffer[1] < sizeof(uint8_t))
+                    break;
 
-            usRelaySetDCChanged |= BIT(1);
-        }
-        break;
-        case I2C_SLAVE_REGISTER_RELAY2_DUTY_CYCLE + sizeof(uint8_t):
-        {
-            if((ubI2CByteCount - 1) < sizeof(uint8_t))
-                break;
+                usRelaySetDCChanged |= BIT(0);
+            }
+            break;
+            case I2C_SLAVE_REGISTER_RELAY1_DUTY_CYCLE + sizeof(uint8_t):
+            {
+                if(ubI2CBuffer[1] < sizeof(uint8_t))
+                    break;
 
-            usRelaySetDCChanged |= BIT(2);
-        }
-        break;
-        case I2C_SLAVE_REGISTER_RELAY3_DUTY_CYCLE + sizeof(uint8_t):
-        {
-            if((ubI2CByteCount - 1) < sizeof(uint8_t))
-                break;
+                usRelaySetDCChanged |= BIT(1);
+            }
+            break;
+            case I2C_SLAVE_REGISTER_RELAY2_DUTY_CYCLE + sizeof(uint8_t):
+            {
+                if(ubI2CBuffer[1] < sizeof(uint8_t))
+                    break;
 
-            usRelaySetDCChanged |= BIT(3);
-        }
-        break;
-        case I2C_SLAVE_REGISTER_RELAY4_DUTY_CYCLE + sizeof(uint8_t):
-        {
-            if((ubI2CByteCount - 1) < sizeof(uint8_t))
-                break;
+                usRelaySetDCChanged |= BIT(2);
+            }
+            break;
+            case I2C_SLAVE_REGISTER_RELAY3_DUTY_CYCLE + sizeof(uint8_t):
+            {
+                if(ubI2CBuffer[1] < sizeof(uint8_t))
+                    break;
 
-            usRelaySetDCChanged |= BIT(4);
-        }
-        break;
-        case I2C_SLAVE_REGISTER_RELAY5_DUTY_CYCLE + sizeof(uint8_t):
-        {
-            if((ubI2CByteCount - 1) < sizeof(uint8_t))
-                break;
+                usRelaySetDCChanged |= BIT(3);
+            }
+            break;
+            case I2C_SLAVE_REGISTER_RELAY4_DUTY_CYCLE + sizeof(uint8_t):
+            {
+                if(ubI2CBuffer[1] < sizeof(uint8_t))
+                    break;
 
-            usRelaySetDCChanged |= BIT(5);
-        }
-        break;
-        case I2C_SLAVE_REGISTER_RELAY6_DUTY_CYCLE + sizeof(uint8_t):
-        {
-            if((ubI2CByteCount - 1) < sizeof(uint8_t))
-                break;
+                usRelaySetDCChanged |= BIT(4);
+            }
+            break;
+            case I2C_SLAVE_REGISTER_RELAY5_DUTY_CYCLE + sizeof(uint8_t):
+            {
+                if(ubI2CBuffer[1] < sizeof(uint8_t))
+                    break;
 
-            usRelaySetDCChanged |= BIT(6);
-        }
-        break;
-        case I2C_SLAVE_REGISTER_RELAY7_DUTY_CYCLE + sizeof(uint8_t):
-        {
-            if((ubI2CByteCount - 1) < sizeof(uint8_t))
-                break;
+                usRelaySetDCChanged |= BIT(5);
+            }
+            break;
+            case I2C_SLAVE_REGISTER_RELAY6_DUTY_CYCLE + sizeof(uint8_t):
+            {
+                if(ubI2CBuffer[1] < sizeof(uint8_t))
+                    break;
 
-            usRelaySetDCChanged |= BIT(7);
-        }
-        break;
-        case I2C_SLAVE_REGISTER_RELAY8_DUTY_CYCLE + sizeof(uint8_t):
-        {
-            if((ubI2CByteCount - 1) < sizeof(uint8_t))
-                break;
+                usRelaySetDCChanged |= BIT(6);
+            }
+            break;
+            case I2C_SLAVE_REGISTER_RELAY7_DUTY_CYCLE + sizeof(uint8_t):
+            {
+                if(ubI2CBuffer[1] < sizeof(uint8_t))
+                    break;
 
-            usRelaySetDCChanged |= BIT(8);
-        }
-        break;
-        case I2C_SLAVE_REGISTER_RELAY9_DUTY_CYCLE + sizeof(uint8_t):
-        {
-            if((ubI2CByteCount - 1) < sizeof(uint8_t))
-                break;
+                usRelaySetDCChanged |= BIT(7);
+            }
+            break;
+            case I2C_SLAVE_REGISTER_RELAY8_DUTY_CYCLE + sizeof(uint8_t):
+            {
+                if(ubI2CBuffer[1] < sizeof(uint8_t))
+                    break;
 
-            usRelaySetDCChanged |= BIT(9);
-        }
-        break;
-        case I2C_SLAVE_REGISTER_RELAY10_DUTY_CYCLE + sizeof(uint8_t):
-        {
-            if((ubI2CByteCount - 1) < sizeof(uint8_t))
-                break;
+                usRelaySetDCChanged |= BIT(8);
+            }
+            break;
+            case I2C_SLAVE_REGISTER_RELAY9_DUTY_CYCLE + sizeof(uint8_t):
+            {
+                if(ubI2CBuffer[1] < sizeof(uint8_t))
+                    break;
 
-            usRelaySetDCChanged |= BIT(10);
-        }
-        break;
-        case I2C_SLAVE_REGISTER_RELAY11_DUTY_CYCLE + sizeof(uint8_t):
-        {
-            if((ubI2CByteCount - 1) < sizeof(uint8_t))
-                break;
+                usRelaySetDCChanged |= BIT(9);
+            }
+            break;
+            case I2C_SLAVE_REGISTER_RELAY10_DUTY_CYCLE + sizeof(uint8_t):
+            {
+                if(ubI2CBuffer[1] < sizeof(uint8_t))
+                    break;
 
-            usRelaySetDCChanged |= BIT(11);
+                usRelaySetDCChanged |= BIT(10);
+            }
+            break;
+            case I2C_SLAVE_REGISTER_RELAY11_DUTY_CYCLE + sizeof(uint8_t):
+            {
+                if(ubI2CBuffer[1] < sizeof(uint8_t))
+                    break;
+
+                usRelaySetDCChanged |= BIT(11);
+            }
+            break;
         }
-        break;
     }
 
     return 1; // ACK
@@ -788,6 +850,8 @@ int init()
     DBGPRINTLN_CTX("RMU - Reset cause: %hhu", rmu_get_reset_reason());
     DBGPRINTLN_CTX("RMU - Reset state: %hhu", rmu_get_reset_state());
 
+    I2C_SLAVE_REGISTER(uint8_t, I2C_SLAVE_REGISTER_RESET_DATA) = ((rmu_get_reset_state() << 6) & 0xC0) | (rmu_get_reset_reason() & 0x3F);
+
     rmu_clear_reset_reason();
 
     DBGPRINTLN_CTX("EMU - AVDD Fall Threshold: %.2f mV!", fAVDDLowThresh * 1000);
@@ -858,6 +922,14 @@ int main()
             delay_ms(20);
 
             reset();
+        }
+
+        if(I2C_SLAVE_REGISTER(uint64_t, I2C_SLAVE_REGISTER_UPTIME) != g_ullSystemTick / 1000)
+        {
+            ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+            {
+                I2C_SLAVE_REGISTER(uint64_t, I2C_SLAVE_REGISTER_UPTIME) = g_ullSystemTick / 1000;
+            }
         }
 
         if(ubRelayUVThreshChanged)

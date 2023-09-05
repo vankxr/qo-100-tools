@@ -7,7 +7,7 @@
         {
             "name": "Debug",
             "cwd": "${workspaceRoot}",
-            "executable": "./bin/v1.icyradio-pa-bias-controller.elf",
+            "executable": "./bin/v2.icyradio-pa-bias-controller.elf",
             "request": "launch",
             "type": "cortex-debug",
             "preLaunchTask": "Build",
@@ -15,6 +15,7 @@
             "device": "EFM32TG11BXXXF128",
             "svdFile": "${env:ARM_LIBROOT}/SiliconLabs.EFM32TG11B_DFP.5.8.10/SVD/EFM32TG11B/EFM32TG11B120F128GM32.svd",
             "interface": "swd",
+            "breakAfterReset": true,
             "swoConfig": {
                 "enabled": true,
                 "swoFrequency": 2000000,

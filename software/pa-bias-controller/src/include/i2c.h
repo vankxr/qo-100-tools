@@ -2,6 +2,7 @@
 #define __I2C_H__
 
 #include <em_device.h>
+#include <stddef.h>
 #include "cmu.h"
 #include "nvic.h"
 #include "utils.h"

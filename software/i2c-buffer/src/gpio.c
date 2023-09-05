@@ -61,8 +61,8 @@ void gpio_init()
                       | GPIO_P_MODEL_MODE4_DISABLED         // NC
                       | GPIO_P_MODEL_MODE5_DISABLED         // NC
                       | GPIO_P_MODEL_MODE6_DISABLED         // NC
-                      | GPIO_P_MODEL_MODE7_DISABLED;        // I2C_SCL_BUF_SENSE2
-    GPIO->P[1].MODEH  = GPIO_P_MODEH_MODE8_DISABLED         // I2C_SCL_BUF_SENSE1
+                      | GPIO_P_MODEL_MODE7_INPUT;           // I2C_SCL_BUF_SENSE2
+    GPIO->P[1].MODEH  = GPIO_P_MODEH_MODE8_INPUT            // I2C_SCL_BUF_SENSE1
                       | GPIO_P_MODEH_MODE9_DISABLED         // NC
                       | GPIO_P_MODEH_MODE10_DISABLED        // NC
                       | GPIO_P_MODEH_MODE11_PUSHPULL        // I2C_BUF_EN2
@@ -74,24 +74,24 @@ void gpio_init()
     GPIO->P[1].OVTDIS = BIT(7) | BIT(8) | BIT(14);
 
     // Port C
-    GPIO->P[2].CTRL   = GPIO_P_CTRL_DRIVESTRENGTHALT_STRONG | (5 << _GPIO_P_CTRL_SLEWRATEALT_SHIFT)
+    GPIO->P[2].CTRL   = GPIO_P_CTRL_DRIVESTRENGTHALT_STRONG | (7 << _GPIO_P_CTRL_SLEWRATEALT_SHIFT)
                       | GPIO_P_CTRL_DRIVESTRENGTH_STRONG | (5 << _GPIO_P_CTRL_SLEWRATE_SHIFT);
-    GPIO->P[2].MODEL  = GPIO_P_MODEL_MODE0_WIREDANDPULLUPFILTER // I2C0_SDA - Location 4
-                      | GPIO_P_MODEL_MODE1_WIREDANDPULLUPFILTER // I2C0_SCL - Location 4
-                      | GPIO_P_MODEL_MODE2_DISABLED             // NC
-                      | GPIO_P_MODEL_MODE3_DISABLED             // NC
-                      | GPIO_P_MODEL_MODE4_DISABLED             // NC
-                      | GPIO_P_MODEL_MODE5_DISABLED             // NC
-                      | GPIO_P_MODEL_MODE6_DISABLED             // NC
-                      | GPIO_P_MODEL_MODE7_DISABLED;            // NC
-    GPIO->P[2].MODEH  = GPIO_P_MODEH_MODE8_DISABLED             // NC
-                      | GPIO_P_MODEH_MODE9_DISABLED             // NC
-                      | GPIO_P_MODEH_MODE10_DISABLED            // NC
-                      | GPIO_P_MODEH_MODE11_DISABLED            // NC
-                      | GPIO_P_MODEH_MODE12_DISABLED            // NC
-                      | GPIO_P_MODEH_MODE13_PUSHPULL            // I2C_BUF_EN4
-                      | GPIO_P_MODEH_MODE14_DISABLED            // I2C_SCL_BUF_SENSE4
-                      | GPIO_P_MODEH_MODE15_DISABLED;           // I2C_SCL_BUF_SENSE3
+    GPIO->P[2].MODEL  = GPIO_P_MODEL_MODE0_WIREDANDALTPULLUPFILTER // I2C0_SDA - Location 4
+                      | GPIO_P_MODEL_MODE1_WIREDANDALTPULLUPFILTER // I2C0_SCL - Location 4
+                      | GPIO_P_MODEL_MODE2_DISABLED                // NC
+                      | GPIO_P_MODEL_MODE3_DISABLED                // NC
+                      | GPIO_P_MODEL_MODE4_DISABLED                // NC
+                      | GPIO_P_MODEL_MODE5_DISABLED                // NC
+                      | GPIO_P_MODEL_MODE6_DISABLED                // NC
+                      | GPIO_P_MODEL_MODE7_DISABLED;               // NC
+    GPIO->P[2].MODEH  = GPIO_P_MODEH_MODE8_DISABLED                // NC
+                      | GPIO_P_MODEH_MODE9_DISABLED                // NC
+                      | GPIO_P_MODEH_MODE10_DISABLED               // NC
+                      | GPIO_P_MODEH_MODE11_DISABLED               // NC
+                      | GPIO_P_MODEH_MODE12_DISABLED               // NC
+                      | GPIO_P_MODEH_MODE13_PUSHPULL               // I2C_BUF_EN4
+                      | GPIO_P_MODEH_MODE14_INPUT                  // I2C_SCL_BUF_SENSE4
+                      | GPIO_P_MODEH_MODE15_INPUT;                 // I2C_SCL_BUF_SENSE3
     GPIO->P[2].DOUT   = 0;
     GPIO->P[2].OVTDIS = BIT(14) | BIT(15);
 

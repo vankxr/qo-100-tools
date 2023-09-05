@@ -33,24 +33,24 @@ void gpio_init()
     // NU - Not used (not currently in use)
 
     // Port A
-    GPIO->P[0].CTRL   = GPIO_P_CTRL_DRIVESTRENGTHALT_STRONG | (5 << _GPIO_P_CTRL_SLEWRATEALT_SHIFT)
+    GPIO->P[0].CTRL   = GPIO_P_CTRL_DRIVESTRENGTHALT_STRONG | (7 << _GPIO_P_CTRL_SLEWRATEALT_SHIFT)
                       | GPIO_P_CTRL_DRIVESTRENGTH_STRONG | (5 << _GPIO_P_CTRL_SLEWRATE_SHIFT);
-    GPIO->P[0].MODEL  = GPIO_P_MODEL_MODE0_WIREDANDPULLUPFILTER // I2C0_SDA - Location 0
-                      | GPIO_P_MODEL_MODE1_WIREDANDPULLUPFILTER // I2C0_SCL - Location 0
-                      | GPIO_P_MODEL_MODE2_INPUTPULL            // nAFE_IRQ
-                      | GPIO_P_MODEL_MODE3_DISABLED             // NC
-                      | GPIO_P_MODEL_MODE4_DISABLED             // NC
-                      | GPIO_P_MODEL_MODE5_DISABLED             // NC
-                      | GPIO_P_MODEL_MODE6_DISABLED             // NC
-                      | GPIO_P_MODEL_MODE7_DISABLED;            // NC
-    GPIO->P[0].MODEH  = GPIO_P_MODEH_MODE8_DISABLED             // NC
-                      | GPIO_P_MODEH_MODE9_DISABLED             // NC
-                      | GPIO_P_MODEH_MODE10_DISABLED            // NC
-                      | GPIO_P_MODEH_MODE11_DISABLED            // NC
-                      | GPIO_P_MODEH_MODE12_DISABLED            // NC
-                      | GPIO_P_MODEH_MODE13_DISABLED            // NC
-                      | GPIO_P_MODEH_MODE14_DISABLED            // NC
-                      | GPIO_P_MODEH_MODE15_DISABLED;           // NC
+    GPIO->P[0].MODEL  = GPIO_P_MODEL_MODE0_WIREDANDALTPULLUPFILTER // I2C0_SDA - Location 0
+                      | GPIO_P_MODEL_MODE1_WIREDANDALTPULLUPFILTER // I2C0_SCL - Location 0
+                      | GPIO_P_MODEL_MODE2_INPUTPULL               // nAFE_IRQ
+                      | GPIO_P_MODEL_MODE3_DISABLED                // NC
+                      | GPIO_P_MODEL_MODE4_DISABLED                // NC
+                      | GPIO_P_MODEL_MODE5_DISABLED                // NC
+                      | GPIO_P_MODEL_MODE6_DISABLED                // NC
+                      | GPIO_P_MODEL_MODE7_DISABLED;               // NC
+    GPIO->P[0].MODEH  = GPIO_P_MODEH_MODE8_DISABLED                // NC
+                      | GPIO_P_MODEH_MODE9_DISABLED                // NC
+                      | GPIO_P_MODEH_MODE10_DISABLED               // NC
+                      | GPIO_P_MODEH_MODE11_DISABLED               // NC
+                      | GPIO_P_MODEH_MODE12_DISABLED               // NC
+                      | GPIO_P_MODEH_MODE13_DISABLED               // NC
+                      | GPIO_P_MODEH_MODE14_DISABLED               // NC
+                      | GPIO_P_MODEH_MODE15_DISABLED;              // NC
     GPIO->P[0].DOUT   = BIT(2);
     GPIO->P[0].OVTDIS = 0;
 

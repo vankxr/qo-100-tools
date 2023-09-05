@@ -136,6 +136,13 @@ void _i2c0_isr()
 {
     uint32_t ulFlags = I2C0->IFC;
 
+    if(ulFlags & I2C_IFC_CLTO)
+    {
+        I2C0->CMD = I2C_CMD_ABORT;
+
+        return;
+    }
+
     if(ulFlags & I2C_IFC_BUSHOLD)
     {
         switch(I2C0->STATE & _I2C_STATE_STATE_MASK)
@@ -192,7 +199,7 @@ void i2c0_init(uint8_t ubAddress, uint8_t ubSCLLocation, uint8_t ubSDALocation)
 
     cmu_hfper0_clock_gate(CMU_HFPERCLKEN0_I2C0, 1);
 
-    I2C0->CTRL = I2C_CTRL_TXBIL_EMPTY | I2C_CTRL_SLAVE;
+    I2C0->CTRL = I2C_CTRL_CLTO_1024PCC | I2C_CTRL_TXBIL_EMPTY | I2C_CTRL_SLAVE;
     I2C0->CLKDIV = 1;
     I2C0->SADDR = (ubAddress << _I2C_SADDR_ADDR_SHIFT);
     I2C0->SADDRMASK = (0x7F << _I2C_SADDRMASK_MASK_SHIFT);
@@ -203,7 +210,7 @@ void i2c0_init(uint8_t ubAddress, uint8_t ubSCLLocation, uint8_t ubSDALocation)
     IRQ_CLEAR(I2C0_IRQn); // Clear pending vector
     IRQ_SET_PRIO(I2C0_IRQn, 2, 0); // Set priority 2,0
     IRQ_ENABLE(I2C0_IRQn); // Enable vector
-    I2C0->IEN |= I2C_IEN_BUSHOLD; // Enable BUSHOLD flag
+    I2C0->IEN |= I2C_IEN_CLTO | I2C_IEN_BUSHOLD; // Enable CLTO and BUSHOLD flags
 
     I2C0->CTRL |= I2C_CTRL_EN;
     I2C0->CMD = I2C_CMD_ABORT;
@@ -360,6 +367,13 @@ void _i2c1_isr()
 {
     uint32_t ulFlags = I2C1->IFC;
 
+    if(ulFlags & I2C_IFC_CLTO)
+    {
+        I2C1->CMD = I2C_CMD_ABORT;
+
+        return;
+    }
+
     if(ulFlags & I2C_IFC_BUSHOLD)
     {
         switch(I2C1->STATE & _I2C_STATE_STATE_MASK)
@@ -416,7 +430,7 @@ void i2c1_init(uint8_t ubAddress, uint8_t ubSCLLocation, uint8_t ubSDALocation)
 
     cmu_hfper0_clock_gate(CMU_HFPERCLKEN0_I2C1, 1);
 
-    I2C1->CTRL = I2C_CTRL_TXBIL_EMPTY | I2C_CTRL_SLAVE;
+    I2C1->CTRL = I2C_CTRL_CLTO_1024PCC | I2C_CTRL_TXBIL_EMPTY | I2C_CTRL_SLAVE;
     I2C1->CLKDIV = 1;
     I2C1->SADDR = (ubAddress << _I2C_SADDR_ADDR_SHIFT);
     I2C1->SADDRMASK = (0x7F << _I2C_SADDRMASK_MASK_SHIFT);
@@ -427,7 +441,7 @@ void i2c1_init(uint8_t ubAddress, uint8_t ubSCLLocation, uint8_t ubSDALocation)
     IRQ_CLEAR(I2C1_IRQn); // Clear pending vector
     IRQ_SET_PRIO(I2C1_IRQn, 2, 0); // Set priority 2,0
     IRQ_ENABLE(I2C1_IRQn); // Enable vector
-    I2C1->IEN |= I2C_IEN_BUSHOLD; // Enable BUSHOLD flag
+    I2C1->IEN |= I2C_IEN_CLTO | I2C_IEN_BUSHOLD; // Enable CLTO and BUSHOLD flags
 
     I2C1->CTRL |= I2C_CTRL_EN;
     I2C1->CMD = I2C_CMD_ABORT;

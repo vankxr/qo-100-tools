@@ -10,6 +10,34 @@ class PABiasController extends I2CDevice
             super(bus, 0x3B, bus_enable_gpio);
     }
 
+    calc_checksum(buf)
+    {
+        if(!(buf instanceof Buffer))
+            throw new Error("Invalid buffer");
+
+        let cs = this.addr;
+
+        for(let i = 0; i < buf.length - 1; i++)
+            cs += buf.readUInt8(i);
+
+        buf.writeUInt8(((0xFF - cs) + 1) & 0xFF, buf.length - 1);
+    }
+    check_checksum(buf)
+    {
+        if(!(buf instanceof Buffer))
+            throw new Error("Invalid buffer");
+
+        let cs = this.addr;
+
+        for(let i = 0; i < buf.length; i++)
+            cs += buf.readUInt8(i);
+
+        if((((0xFF - cs) + 1) & 0xFF) === 0)
+            return true;
+
+        return false;
+    }
+
     async write(reg, data)
     {
         if(typeof(reg) !== "number" || isNaN(reg) || reg < 0 || reg > 255)
@@ -24,10 +52,16 @@ class PABiasController extends I2CDevice
         if(!(data instanceof Buffer))
             throw new Error("Invalid data");
 
-        let buf = Buffer.alloc(data.length + 1, 0);
+        if(data.length > 256 - 3)
+            throw new Error("Data too long");
+
+        let buf = Buffer.alloc(data.length + 3, 0);
 
         buf.writeUInt8(reg, 0);
-        data.copy(buf, 1, 0);
+        buf.writeUInt8(data.length, 1);
+        data.copy(buf, 2, 0);
+
+        this.calc_checksum(buf);
 
         await super.write(buf);
     }
@@ -36,12 +70,25 @@ class PABiasController extends I2CDevice
         if(typeof(reg) !== "number" || isNaN(reg) || reg < 0 || reg > 255)
             throw new Error("Invalid register");
 
-        if(typeof(count) !== "number" || isNaN(count) || count < 1)
+        if(typeof(count) !== "number" || isNaN(count) || count < 1 || count > 255)
             throw new Error("Invalid count");
 
-        await super.write(reg);
+        let buf = Buffer.alloc(4, 0);
 
-        return super.read(count);
+        buf.writeUInt8(reg, 0);
+        buf.writeUInt8(0xFF, 1);
+        buf.writeUInt8(count, 2);
+
+        this.calc_checksum(buf);
+
+        await super.write(buf);
+
+        let result = await super.read(count + 1);
+
+        if(!this.check_checksum(result))
+            throw new Error("Checksum does not match");
+
+        return count === 1 ? result.readUInt8(0) : result.subarray(0, count);
     }
 
     async reset()
@@ -60,9 +107,43 @@ class PABiasController extends I2CDevice
 
         return buf.readUInt16LE(0);
     }
-    async get_chip_temperatures()
+    async get_reset_state()
+    {
+        let reg = await this.read(0xE8);
+
+        return (reg & 0xC0) >> 6;
+    }
+    async get_reset_reason()
+    {
+        let reg = await this.read(0xE8);
+
+        return reg & 0x3F;
+    }
+    async get_reset_reason_str()
+    {
+        switch(await this.get_reset_reason())
+        {
+            case 0x00: return "None";
+            case 0x01: return "Power-on reset";
+            case 0x02: return "Analog VDD (AVDD) brown-out reset";
+            case 0x03: return "Digital VDD (DVDD) brown-out reset";
+            case 0x04: return "Core VDD (DECOUPLE) brown-out reset";
+            case 0x05: return "External pin reset";
+            case 0x06: return "Core lockup reset";
+            case 0x07: return "Software reset";
+            case 0x08: return "Watchdog timer reset";
+            case 0x09: return "EM4 wakeup reset";
+        }
+    }
+    async get_uptime()
     {
         let buf = await this.read(0xE0, 8);
+
+        return buf.readUInt32LE(0); // TODO: Support 64-bit uptime
+    }
+    async get_chip_temperatures()
+    {
+        let buf = await this.read(0xD0, 8);
 
         return {
             emu: buf.readFloatLE(0),
@@ -71,7 +152,7 @@ class PABiasController extends I2CDevice
     }
     async get_system_temperatures()
     {
-        let buf = await this.read(0xE8, 4);
+        let buf = await this.read(0xD8, 4);
 
         return {
             afe: buf.readFloatLE(0)
@@ -79,7 +160,7 @@ class PABiasController extends I2CDevice
     }
     async get_chip_voltages()
     {
-        let buf = await this.read(0xD0, 16);
+        let buf = await this.read(0xC0, 16);
 
         return {
             avdd: buf.readFloatLE(0),
@@ -90,7 +171,7 @@ class PABiasController extends I2CDevice
     }
     async get_system_voltages()
     {
-        let buf = await this.read(0xC0, 8);
+        let buf = await this.read(0xB0, 8);
 
         return {
             vin: buf.readFloatLE(0),

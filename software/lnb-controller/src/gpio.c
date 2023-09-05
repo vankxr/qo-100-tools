@@ -96,7 +96,7 @@ void gpio_init()
     GPIO->P[2].OVTDIS = 0;
 
     // Port D
-    GPIO->P[3].CTRL   = GPIO_P_CTRL_DRIVESTRENGTHALT_STRONG | (5 << _GPIO_P_CTRL_SLEWRATEALT_SHIFT)
+    GPIO->P[3].CTRL   = GPIO_P_CTRL_DRIVESTRENGTHALT_STRONG | (7 << _GPIO_P_CTRL_SLEWRATEALT_SHIFT)
                       | GPIO_P_CTRL_DRIVESTRENGTH_STRONG | (5 << _GPIO_P_CTRL_SLEWRATE_SHIFT);
     GPIO->P[3].MODEL  = GPIO_P_MODEL_MODE0_DISABLED                 // NC
                       | GPIO_P_MODEL_MODE1_DISABLED                 // NC
@@ -104,8 +104,8 @@ void gpio_init()
                       | GPIO_P_MODEL_MODE3_DISABLED                 // NC
                       | GPIO_P_MODEL_MODE4_WIREDANDPULLUPFILTER     // I2C1_SDA - Location 3
                       | GPIO_P_MODEL_MODE5_WIREDANDPULLUPFILTER     // I2C1_SCL - Location 3
-                      | GPIO_P_MODEL_MODE6_WIREDANDPULLUPFILTER     // I2C0_SDA - Location 1
-                      | GPIO_P_MODEL_MODE7_WIREDANDPULLUPFILTER;    // I2C0_SCL - Location 1
+                      | GPIO_P_MODEL_MODE6_WIREDANDALTPULLUPFILTER  // I2C0_SDA - Location 1
+                      | GPIO_P_MODEL_MODE7_WIREDANDALTPULLUPFILTER; // I2C0_SCL - Location 1
     GPIO->P[3].MODEH  = GPIO_P_MODEH_MODE8_DISABLED                 // NC
                       | GPIO_P_MODEH_MODE9_DISABLED                 // NC
                       | GPIO_P_MODEH_MODE10_DISABLED                // NC

@@ -1,13 +1,13 @@
 const { I2C, I2CDevice } = require.main.require("./lib/i2c");
 
-class RelayController extends I2CDevice
+class I2CBuffer extends I2CDevice
 {
-    constructor(bus, bus_enable_gpio)
+    constructor(bus, addr, bus_enable_gpio)
     {
         if(bus instanceof I2CDevice)
             super(bus.bus, bus.addr, bus.bus_enable_gpio);
         else
-            super(bus, 0x3A, bus_enable_gpio);
+            super(bus, 0x38 | (addr & 0x01), bus_enable_gpio);
     }
 
     calc_checksum(buf)
@@ -161,124 +161,39 @@ class RelayController extends I2CDevice
             core: buf.readFloatLE(12)
         };
     }
-    async get_system_voltages()
+
+    async get_bus_bias_voltage(index)
     {
-        let buf = await this.read(0xB0, 4);
+        if(isNaN(index) || !Number.isInteger(index) || index < 0 || index > 3)
+            throw new Error("Invalid bus index");
 
-        return {
-            vin: buf.readFloatLE(0)
-        };
-    }
-
-    async set_relay_undervoltage_point(voltage)
-    {
-        if(isNaN(voltage) || voltage < 500 || voltage > 27000)
-            throw new Error("Voltage out of bounds");
-
-        let buf = Buffer.alloc(4);
-
-        buf.writeFloatLE(voltage, 0);
-
-        await this.write(0x1C, buf);
-    }
-    async get_relay_undervoltage_point()
-    {
-        let buf = await this.read(0x1C, 4);
+        let buf = await this.read(0x10 + index * 4, 4);
 
         return buf.readFloatLE(0);
     }
-    async set_relay_undervoltage_status(status)
-    {
-        if(typeof(status) != "boolean")
-            throw new Error("Invalid status");
 
-        if(status)
-            await this.write(0x01, (await this.read(0x01)) | 0x01);
-        else
-            await this.write(0x01, (await this.read(0x01)) & ~0x01);
-    }
-    async get_relay_undervoltage_status()
+    async set_bus_status(index, status, bias_status = true)
     {
-        return !!((await this.read(0x01)) & 0x01);
-    }
-    async was_relay_undervoltage_triggered()
-    {
-        return !!((await this.read(0x00)) & 0x01);
-    }
-    async is_relay_undervoltage()
-    {
-        return !((await this.read(0x00)) & 0x02);
-    }
-
-    async set_relay_status(index, status)
-    {
-        if(isNaN(index) || !Number.isInteger(index) || index < 0 || index > 11)
-            throw new Error("Invalid index");
+        if(isNaN(index) || !Number.isInteger(index) || index < 0 || index > 3)
+            throw new Error("Invalid bus index");
 
         if(typeof(status) != "boolean")
             throw new Error("Invalid status");
 
-        let buf = Buffer.alloc(2);
-
-        buf.writeUInt16LE(1 << index, 0);
-
-        await this.write(status ? 0x04 : 0x06, buf);
+        await this.write(status ? 0x03 : 0x04, (1 << index) | (bias_status ? (1 << (index + 4)) : 0));
     }
-    async get_relay_status(index = -1)
+    async get_bus_status(index = -1)
     {
-        let buf = await this.read(0x02, 2);
-        let rstatus = buf.readUInt16LE(0);
+        let status = await this.read(0x02);
 
-        return (!Number.isInteger(index) || index < 0 || index > 11) ? rstatus : !!(rstatus & (1 << index));
+        return (!Number.isInteger(index) || index < 0 || index > 3) ? status : !!(status & (1 << index));
     }
-    async set_relay_duty_cycle(index, dc)
+    async get_bus_bias_status(index = -1)
     {
-        if(isNaN(index) || !Number.isInteger(index) || index < 0 || index > 11)
-            throw new Error("Invalid index");
+        let status = await this.read(0x02);
 
-        if(isNaN(dc) || dc < 0 || dc > 1)
-            throw new Error("Invalid duty cycle");
-
-        dc *= 256;
-
-        if(dc > 255)
-            dc = 255;
-
-        await this.write(0x10 + index, dc);
-    }
-    async get_relay_duty_cycle(index)
-    {
-        if(isNaN(index) || !Number.isInteger(index) || index < 0 || index > 11)
-            throw new Error("Invalid index");
-
-        return (await this.read(0x10 + index)) / 256;
-    }
-    async set_relay_voltage(index, voltage)
-    {
-        if(isNaN(index) || !Number.isInteger(index) || index < 0 || index > 11)
-            throw new Error("Invalid index");
-
-        if(isNaN(voltage) || voltage < 0)
-            throw new Error("Invalid voltage");
-
-        let vin = (await this.get_system_voltages()).vin;
-        let dc = voltage / vin;
-
-        if(dc > 1)
-            dc = 1;
-
-        await this.set_relay_duty_cycle(index, dc);
-    }
-    async get_relay_voltage(index)
-    {
-        if(isNaN(index) || !Number.isInteger(index) || index < 0 || index > 11)
-            throw new Error("Invalid index");
-
-        let vin = (await this.get_system_voltages()).vin;
-        let dc = await this.get_relay_duty_cycle(index);
-
-        return vin * dc;
+        return (!Number.isInteger(index) || index < 0 || index > 3) ? ((status & 0xF0) >> 4) : !!(status & (1 << (index + 4)));
     }
 }
 
-module.exports = RelayController;
+module.exports = I2CBuffer;
