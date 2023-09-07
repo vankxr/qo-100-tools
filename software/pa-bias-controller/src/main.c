@@ -704,14 +704,19 @@ float afe_pa_get_idd(uint8_t ubPAIndex)
 }
 float afe_pa_get_temperature(uint8_t ubPAIndex)
 {
-    // Very dirty workaround for transients in temperature sensor
-    static const uint32_t ulSamples = 20;
+    // Very dirty workaround for transients in temperature sensor readings
+    // Computes the average discarding obvious outliers and applies a moving median filter
+    enum
+    {
+        AVG_SAMPLES = 20,
+        MOV_MED_SAMPLES = 21, // Should be odd to facilitate median calculation
+    };
 
     uint32_t ulSkipped = 0;
     uint32_t ulValid = 0;
-    float fTemp = 0.f;
+    float fSum = 0.f;
 
-    for(uint32_t i = 0; i < ulSamples; i++)
+    for(uint32_t i = 0; i < AVG_SAMPLES; i++)
     {
         float fSample;
 
@@ -730,7 +735,7 @@ float afe_pa_get_temperature(uint8_t ubPAIndex)
             if(fSample > 0.f && fSample < 120.f)
             {
                 ulValid++;
-                fTemp = fSample;
+                fSum = fSample;
             }
             else
             {
@@ -740,14 +745,14 @@ float afe_pa_get_temperature(uint8_t ubPAIndex)
         }
         else
         {
-            if(fabsf(fSample - fTemp) <= 2.f)
+            if(fabsf(fSample - fSum) <= 2.f)
             {
-                fTemp += fSample;
+                fSum += fSample;
                 ulValid++;
             }
             else
             {
-                if(ulSkipped < ulSamples)
+                if(ulSkipped < AVG_SAMPLES)
                     i--;
 
                 ulSkipped++;
@@ -755,9 +760,33 @@ float afe_pa_get_temperature(uint8_t ubPAIndex)
         }
     }
 
-    fTemp /= ulValid; // Average
+    fSum /= ulValid; // Average
 
-    return fTemp;
+    static float fMovMedian[MOV_MED_SAMPLES];
+    static uint8_t ubMovMedianInit = 0;
+
+    if(!ubMovMedianInit)
+    {
+        // Init the moving median filter
+        ubMovMedianInit = 1;
+
+        for(uint32_t i = 0; i < MOV_MED_SAMPLES; i++)
+            fMovMedian[i] = fSum;
+    }
+    else
+    {
+        uint32_t ulInsertIndex = 0;
+
+        // Get the index where to insert the new sample so the list remains sorted
+        for(uint32_t i = 0; i < MOV_MED_SAMPLES; i++)
+            if(fSum > fMovMedian[i])
+                ulInsertIndex = i;
+
+        fMovMedian[ulInsertIndex] = fSum;
+    }
+
+    // Median is the center element
+    return fMovMedian[MOV_MED_SAMPLES / 2];
 }
 
 void tec_init()
