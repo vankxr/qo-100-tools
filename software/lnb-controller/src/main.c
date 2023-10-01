@@ -495,9 +495,9 @@ void lnb_ref_clk_synth_init()
     si5351_xtal_config(26000000, 10); // fPFD = XTAL, CLoad = 10 pF
     //si5351_clkin_config(50000000, 2); // fPFD = CLKIN / 2
 
-    DBGPRINTLN_CTX("XTAL Clock: %.3f MHz", (float)SI5351_CLKIN_FREQ / 1000000);
+    DBGPRINTLN_CTX("XTAL Clock: %.3f MHz", (float)SI5351_XTAL_FREQ / 1000000);
     DBGPRINTLN_CTX("CLKIN Clock: %.3f MHz", (float)SI5351_CLKIN_FREQ / 1000000);
-    DBGPRINTLN_CTX("CLKIN Divider Clock: %.3f MHz", (float)SI5351_CLKIN_DIV_FREQ / 1000000);
+    DBGPRINTLN_CTX("CLKIN Divided Clock: %.3f MHz", (float)SI5351_CLKIN_DIV_FREQ / 1000000);
 
     //// PLLA
     si5351_pll_set_source(SI5351_PLLA, SI5351_PLL_SRC_XTAL);
